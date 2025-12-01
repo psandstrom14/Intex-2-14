@@ -105,27 +105,6 @@ nav {
     color: #d4a5a5;
 }
 
-.nav-links a.selected-nav {
-    color: #976a6a;
-    font-weight: 600;
-    }
-
-.nav-links a.selected-nav:hover {
-color: #976a6a;
-}
-
-.login-btn {
-    background-color: #d4a5a5;
-    color: white !important;
-    padding: 0.6rem 1.5rem;
-    border-radius: 25px;
-    transition: background-color 0.3s;
-}
-
-.login-btn:hover {
-    background-color: #c19090;
-}
-
 /* Buttons */
 .btn {
     padding: 0.6rem 1.5rem;
@@ -297,6 +276,52 @@ textarea.form-control {
 .filter-item {
     flex: 1;
     min-width: 200px;
+}
+
+/* Search Input/Button Height Consistency */
+.search-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+    width: 100%;
+}
+
+.search-input-group .form-control {
+    flex: 1;
+    height: 48px;
+}
+
+.search-input-group .btn {
+    height: 48px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.filter-toggle-btn {
+    height: 48px;
+    flex-shrink: 0;
+    width: auto;
+    margin-left: auto;
+}
+
+/* Filter Cards Grid */
+.filter-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .filter-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Tables */
