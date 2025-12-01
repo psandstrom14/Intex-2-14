@@ -1,0 +1,28 @@
+{
+  "name": "intex",
+  "version": "1.0.0",
+  "description": "This website will help managers and users of Ella Rise mamanage user information.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Paris-Jane/Intex.git"
+  },
+  "author": "Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Paris-Jane/Intex/issues"
+  },
+  "homepage": "https://github.com/Paris-Jane/Intex#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^5.2.0",
+    "express-session": "^1.18.2",
+    "knex": "^3.1.0",
+    "pg": "^8.16.3",
+    "save": "^2.9.0"
+  }
+}
