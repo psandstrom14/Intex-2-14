@@ -90,6 +90,10 @@ app.get('/donations',(req,res) => {
     res.render("donations"); 
 });
 
+app.get("/teapot",(req,res) => {
+    res.status(418).send("I'm a teapot");
+});
+
 // START TO LISTEN (& tell command line)
 app.listen(port,() => console.log("the server has started to listen")); 
 
