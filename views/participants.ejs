@@ -3,6 +3,7 @@
 <!--This page will only be visible to users who are logged in.-->
 <!--Ability to maintain milestones for participants-->
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,15 +78,15 @@
                         <!-- Search Dropdown (allow user to select column)-->
                         <div class="filter-item filter-column">
                             <select name="searchColumn" id="searchColumn" class="form-control">
-                                <!--Paris Update: section 4-->
-                                <option value="participant_first_name">First Name</option>
-                                <option value="participant_last_name">Last Name</option>
-                                <option value="participant_email">Email</option>
-                                <option value="participant_phone">Phone</option>
-                                <option value="participant_city">City</option>
-                                <option value="participant_state">State</option>
-                                <option value="participant_school_or_employer">School/Employer</option>
-                                <option value="participant_field_of_interest">Field of Interest</option>
+                                <option value="participant_first_name" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_first_name') ? 'selected' : (!filters || !filters.searchColumn) ? 'selected' : '' %>>First Name</option>
+                                <option value="participant_last_name" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_last_name') ? 'selected' : '' %>>Last Name</option>
+                                <option value="participant_email" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_email') ? 'selected' : '' %>>Email</option>
+                                <option value="participant_phone" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_phone') ? 'selected' : '' %>>Phone</option>
+                                <option value="participant_city" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_city') ? 'selected' : '' %>>City</option>
+                                <option value="participant_state" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_state') ? 'selected' : '' %>>State</option>
+                                <option value="participant_school_or_employer" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_school_or_employer') ? 'selected' : '' %>>School/Employer</option>
+                                <option value="participant_field_of_interest" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_field_of_interest') ? 'selected' : '' %>>Field of Interest</option>
+                                <option value="total_donations" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'total_donations') ? 'selected' : '' %>>Total Donations</option>
                             </select>
                         </div>
 
@@ -104,10 +105,185 @@
                             </div>
                         </div>
                     </div>
-                <!--PARIS ADD: section 1-->
+                    <!-- Hidden inputs to preserve sorting -->
+                    <input type="hidden" name="sortColumn" id="hiddenSortColumn" value="<%= (typeof filters !== 'undefined' && filters.sortColumn) ? filters.sortColumn : '' %>">
+                    <input type="hidden" name="sortOrder" id="hiddenSortOrder" value="<%= (typeof filters !== 'undefined' && filters.sortOrder) ? filters.sortOrder : '' %>">
+                    
+                    <!-- Hidden inputs to preserve filter states when searching -->
+                    <input type="hidden" name="cityFilters" id="hiddenCityFilters" value="">
+                    <input type="hidden" name="schoolFilters" id="hiddenSchoolFilters" value="">
+                    <input type="hidden" name="interestFilters" id="hiddenInterestFilters" value="">
+                    <input type="hidden" name="donationsFilters" id="hiddenDonationsFilters" value="">
                 </form>
 
-                <!--PARIS ADD: section 2-->
+                <!-- Filter Options (Hidden by default) -->
+                <form id="filterForm" method="POST" action="/filter-participants">
+                <div id="filterSection" class="advanced-filter-section is-hidden">
+                
+                    <h3 class="filter-options-title">Filter Options</h3>
+                    <div class="filter-cards-grid">
+                        <!-- City Filter -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="filter-card-title">City</h4>
+                            </div>
+                            <div class="card-body filter-card-scroll">
+                                <% const cityFilters = (typeof filters !== 'undefined' && filters.city) ? filters.city : ['all'];
+                                const isCityAll = cityFilters.includes('all');%>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="all" class="city-checkbox" <%= isCityAll ? 'checked' : '' %>> All
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Bountiful" class="city-checkbox" <%= cityFilters.includes('Bountiful') ? 'checked' : '' %>> Bountiful
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Draper" class="city-checkbox" <%= cityFilters.includes('Draper') ? 'checked' : '' %>> Draper
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Layton" class="city-checkbox" <%= cityFilters.includes('Layton') ? 'checked' : '' %>> Layton
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Lehi" class="city-checkbox" <%= cityFilters.includes('Lehi') ? 'checked' : '' %>> Lehi
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Logan" class="city-checkbox" <%= cityFilters.includes('Logan') ? 'checked' : '' %>> Logan
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Murray" class="city-checkbox" <%= cityFilters.includes('Murray') ? 'checked' : '' %>> Murray
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Ogden" class="city-checkbox" <%= cityFilters.includes('Ogden') ? 'checked' : '' %>> Ogden
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Orem" class="city-checkbox" <%= cityFilters.includes('Orem') ? 'checked' : '' %>> Orem
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Pleasant Grove" class="city-checkbox" <%= cityFilters.includes('Pleasant Grove') ? 'checked' : '' %>> Pleasant Grove
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Provo" class="city-checkbox" <%= cityFilters.includes('Provo') ? 'checked' : '' %>> Provo
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Riverton" class="city-checkbox" <%= cityFilters.includes('Riverton') ? 'checked' : '' %>> Riverton
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Salt Lake City" class="city-checkbox" <%= cityFilters.includes('Salt Lake City') ? 'checked' : '' %>> Salt Lake City
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Sandy" class="city-checkbox" <%= cityFilters.includes('Sandy') ? 'checked' : '' %>> Sandy
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Spanish Fork" class="city-checkbox" <%= cityFilters.includes('Spanish Fork') ? 'checked' : '' %>> Spanish Fork
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="St. George" class="city-checkbox" <%= cityFilters.includes('St. George') ? 'checked' : '' %>> St. George
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="Taylorsville" class="city-checkbox" <%= cityFilters.includes('Taylorsville') ? 'checked' : '' %>> Taylorsville
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="West Jordan" class="city-checkbox" <%= cityFilters.includes('West Jordan') ? 'checked' : '' %>> West Jordan
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="city" value="West Valley City" class="city-checkbox" <%= cityFilters.includes('West Valley City') ? 'checked' : '' %>> West Valley City
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- School/Employer Filter -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="filter-card-title">School/Employer</h4>
+                            </div>
+                            <div class="card-body filter-card-scroll">
+                                <%
+                                const schoolFilters = (typeof filters !== 'undefined' && filters.school) ? filters.school : ['all'];
+                                const isSchoolAll = schoolFilters.includes('all');
+                                %>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="school" value="all" class="school-checkbox" <%= isSchoolAll ? 'checked' : '' %>> All
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="school" value="Art Studio" class="school-checkbox" <%= schoolFilters.includes('Art Studio') ? 'checked' : '' %>> Art Studio
+                                </label>
+                                <!-- ...repeat labels same pattern, just change text/value... -->
+                            </div>
+                        </div>
+
+
+                        <!-- Field of Interest Filter -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="filter-card-title">Field of Interest</h4>
+                            </div>
+                            <div class="card-body">
+                                <%
+                                const interestFilters = (typeof filters !== 'undefined' && filters.interest) ? filters.interest : ['all'];
+                                const isInterestAll = interestFilters.includes('all');
+                                %>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="interest" value="all" class="interest-checkbox" <%= isInterestAll ? 'checked' : '' %>> All
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="interest" value="Arts" class="interest-checkbox" <%= interestFilters.includes('Arts') ? 'checked' : '' %>> Arts
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="interest" value="Both" class="interest-checkbox" <%= interestFilters.includes('Both') ? 'checked' : '' %>> Both
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="interest" value="STEM" class="interest-checkbox" <%= interestFilters.includes('STEM') ? 'checked' : '' %>> STEM
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- Donations Filter -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="filter-card-title">Has Donations</h4>
+                            </div>
+                            <div class="card-body">
+                                <%
+                                const donationFilters = (typeof filters !== 'undefined' && filters.donations) ? filters.donations : ['all'];
+                                const isDonationsAll = donationFilters.includes('all');
+                                %>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="donations" value="all" class="donations-checkbox" <%= isDonationsAll ? 'checked' : '' %>> All
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="donations" value="Yes" class="donations-checkbox" <%= donationFilters.includes('Yes') ? 'checked' : '' %>> Yes
+                                </label>
+                                <label class="filter-checkbox-label">
+                                    <input type="checkbox" name="donations" value="No" class="donations-checkbox" <%= donationFilters.includes('No') ? 'checked' : '' %>> No
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Action Buttons -->
+                    <div class="filter-row filter-actions">
+                        <div class="filter-item filter-actions-item">
+                            <button type="submit" class="btn btn-primary btn-small btn-block">
+                                Apply Filters
+                            </button>
+                        </div>
+                        <div class="filter-item filter-actions-item">
+                            <button type="button" class="btn btn-outline btn-small btn-block" id="clearFilters">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- Hidden inputs to preserve search and sorting when filtering -->
+                    <input type="hidden" name="searchColumn" id="filterSearchColumn" value="<%= (typeof filters !== 'undefined' && filters.searchColumn) ? filters.searchColumn : 'participant_first_name' %>">
+                    <input type="hidden" name="searchValue" id="filterSearchValue" value="<%= (typeof filters !== 'undefined' && filters.searchValue) ? filters.searchValue : '' %>">
+                    <input type="hidden" name="sortColumn" id="filterSortColumn" value="<%= (typeof filters !== 'undefined' && filters.sortColumn) ? filters.sortColumn : '' %>">
+                    <input type="hidden" name="sortOrder" id="filterSortOrder" value="<%= (typeof filters !== 'undefined' && filters.sortOrder) ? filters.sortOrder : '' %>">
+                </div>
+            </form>
 
             </div>
             <!-- Bulk Actions Bar: Edit/Delete (Hidden by default) -->
@@ -133,7 +309,7 @@
                         <tr>
                             <!--UPDATE LATER: only display checkbox (only next row) if Manager-->
                             <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
-                            <th class="sortable" data-column="participant_first_name"></th>First Name <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_email">Email <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_phone">Phone <span class="sort-icon">⇅</span></th>
@@ -229,7 +405,46 @@
                 });
             }
 
-        // PARIS ADD: section 3
+        // Filter Toggle
+        document.getElementById('toggleFilters').addEventListener('click', function() {
+            const filterSection = document.getElementById('filterSection');
+            const buttonText = document.getElementById('filterButtonText');
+            
+            if (filterSection.style.display === 'none' || filterSection.style.display === '') {
+                filterSection.style.display = 'block';
+                buttonText.textContent = 'Hide Filters';
+                // Store that user opened filters
+                sessionStorage.setItem('filtersVisible', 'true');
+            } else {
+                filterSection.style.display = 'none';
+                buttonText.textContent = 'Filters';
+                // Store that user closed filters
+                sessionStorage.setItem('filtersVisible', 'false');
+            }
+        });
+
+
+        // On page load, check if filters should be visible
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSection = document.getElementById('filterSection');
+            const buttonText = document.getElementById('filterButtonText');
+            const filtersVisible = sessionStorage.getItem('filtersVisible');
+            
+            // Show filters if user previously opened them OR if filters are active
+            const hasActiveFilters = <%=
+                (typeof filters !== 'undefined' && filters &&
+                ((filters.city && !filters.city.includes('all')) ||
+                (filters.school && !filters.school.includes('all')) ||
+                (filters.interest && !filters.interest.includes('all')) ||
+                (filters.donations && !filters.donations.includes('all')))) ? 'true' : 'false'
+            %>;
+            
+            if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters)) {
+                filterSection.style.display = 'block';
+                buttonText.textContent = 'Hide Filters';
+            }
+        });
+
 
         // Search Form Submission - Preserve filter checkboxes
         document.getElementById('searchForm').addEventListener('submit', function(e) {
@@ -619,3 +834,4 @@
     </script>
 </body>
 </html>
+
