@@ -294,9 +294,31 @@ app.post('/sort-participants', (req, res) => {
 });
 
 // ADD PAGE: 
-app.get('/add/:table',(req,res) => {
+app.get('/add/:table', async (req, res) => {
     const table_name = req.params.table;
-    res.render("add",{table_name: table_name}); 
+    let events = [];
+    if (table_name === "surveys") {
+        events = await knex("events")
+            .select("event_id","event_name","event_date","event_start_time","event_end_time")
+            .orderBy(["event_name","event_date","event_start_time"]);
+    }
+    res.render("add", { table_name, events });
+});  
+app.post("/add/survey", async (req, res) => {
+    const { event_name, event_id /* UPDATE LATER plus any other survey fields */ } = req.body;
+
+    try {
+        await knex("survey").insert({
+            event_name: event_name,
+            event_id: event_id
+            // UPDATE LATER: other columns...
+        });
+
+        res.redirect("/survey");
+    } catch (err) {
+        console.error("Error inserting survey:", err);
+        res.status(500).send("Error saving survey");
+    }
 });
 
 // EVENT MAINTENANCE PAGE: 
@@ -311,12 +333,16 @@ app.get('/surveys',(req,res) => {
 
 // MILESTONES MAINTENANCE PAGE: 
 app.get('/milestones',(req,res) => {
-    res.status(418).render("milestones"); 
+    res.render("milestones"); 
 });
 
 // DONATINOS MAINTENANCE PAGE: 
 app.get('/donations',(req,res) => {
     res.render("donations"); 
+});
+
+app.get("/teapot",(req,res) => {
+    res.status(418).send("I'm a teapot");
 });
 
 // START TO LISTEN (& tell command line)
