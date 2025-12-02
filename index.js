@@ -20,6 +20,18 @@ const knex = require("knex")({
   },
 });
 
+// Add this debugging code to test database connection:
+knex
+  .raw("SELECT current_database()")
+  .then((result) => {
+    console.log("Database connection successful!");
+    console.log("Connected to database:", result.rows[0].current_database);
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err.message);
+    console.error("Full error:", err);
+  });
+
 function paramToArray(val, defaultVal = ["all"]) {
   if (!val) return defaultVal;
   return Array.isArray(val) ? val : [val];
@@ -105,11 +117,13 @@ app.post("/login", (req, res) => {
         };
         res.redirect("/user_profile");
       } else {
+        console.log("Invalid credentials for:", username); // Add this
         res.render("login", { error_message: "Invalid credentials" });
       }
     })
     .catch((err) => {
-      console.error(err);
+      console.error("❌ Database error during login:", err.message); // Improve this
+      console.error("Full error:", err); // Add this
       res.render("login", { error_message: "Database error" });
     });
 });
@@ -301,7 +315,12 @@ app.get("/participants", async (req, res) => {
       filters,
     });
   } catch (err) {
-    console.error("Error loading participants:", err);
+    console.error("❌ Error loading participants:", err);
+    console.error("Error details:", {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+    });
     res.render("participants", {
       participant: [],
       message: "Error loading participants",
