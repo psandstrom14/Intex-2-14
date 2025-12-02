@@ -207,6 +207,10 @@ nav {
   text-decoration: none;
   display: inline-block;
   font-family: var(--font-body);
+  text-align: center;
+  min-height: 44px;
+  line-height: 1.5;
+  box-sizing: border-box;
 }
 
 .btn-primary {
@@ -335,6 +339,11 @@ nav {
   overflow: hidden;
 }
 
+/* Compact card variant for login/smaller forms */
+.add-card.compact {
+  max-width: 500px;
+}
+
 .modern-form {
   padding: 3rem;
 }
@@ -345,9 +354,11 @@ nav {
   border-bottom: 2px solid var(--border-color);
 }
 
-.form-section:last-of-type {
+.form-section:last-of-type,
+.form-section.no-border {
   border-bottom: none;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .section-title {
@@ -579,6 +590,19 @@ nav {
   padding-top: 2rem;
   border-top: 2px solid var(--border-color);
   margin-top: 2rem;
+}
+
+/* Compact form actions (for login, single-button forms) */
+.form-actions.compact {
+  flex-direction: column;
+  border-top: none;
+  margin-top: 0.5rem;
+  padding-top: 0;
+  gap: 0.75rem;
+}
+
+.form-actions.compact .btn {
+  width: 100%;
 }
 
 /* Empty State */
@@ -1615,4 +1639,20 @@ footer p {
 footer .footer-subtext {
   margin-top: 1rem;
   font-size: 0.9rem;
+}
+
+/* Login page specific styles */
+.login-card {
+  max-width: 500px;
+}
+
+.login-form-section {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.login-form-actions {
+  border-top: none;
+  margin-top: 1rem;
+  padding-top: 0;
 }

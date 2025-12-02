@@ -50,12 +50,9 @@
 
     <!-- Login Form -->
     <div class="container">
-      <div class="add-card" style="max-width: 500px">
+      <div class="add-card compact">
         <form class="modern-form" method="POST" action="/login">
-          <div
-            class="form-section"
-            style="border-bottom: none; margin-bottom: 0"
-          >
+          <div class="form-section no-border">
             <div class="form-group">
               <label class="form-label" for="username"
                 >Username or Email <span class="required">*</span></label
@@ -86,13 +83,13 @@
             </div>
           </div>
 
-          <div
-            class="form-actions"
-            style="border-top: none; margin-top: 1rem; padding-top: 0"
-          >
+          <div class="form-actions compact">
             <button type="submit" class="btn btn-primary btn-block">
               Sign In
             </button>
+            <a href="/add/users" class="btn btn-secondary btn-block">
+              Create New Account
+            </a>
           </div>
         </form>
       </div>
