@@ -311,16 +311,12 @@ app.get('/surveys',(req,res) => {
 
 // MILESTONES MAINTENANCE PAGE: 
 app.get('/milestones',(req,res) => {
-    res.render("milestones"); 
+    res.status(418).render("milestones"); 
 });
 
 // DONATINOS MAINTENANCE PAGE: 
 app.get('/donations',(req,res) => {
     res.render("donations"); 
-});
-
-app.get("/teapot",(req,res) => {
-    res.status(418).send("I'm a teapot");
 });
 
 // START TO LISTEN (& tell command line)
