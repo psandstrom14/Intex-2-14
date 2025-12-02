@@ -129,7 +129,7 @@
     
                         <div class="form-group">
                             <label class="form-label">Zip Code <span class="required">*</span></label>
-                            <input type="number" class="form-input" name="participant_zip" placeholder="12345" maxlength="5" required>
+                            <input type="number" class="form-input" name="participant_zip" placeholder="12345" minlength="5" maxlength="5" required>
                         </div>
     
                         <div class="form-group">
@@ -139,7 +139,7 @@
     
                         <div class="form-group">
                             <label class="form-label">Field of Interest</label><!--UPDATE LATER: Require for user registration-->
-                            <select class="form-select" name="level">
+                            <select class="form-select" name="participant_field_of_interest">
                                 <option value="">Select an Interest</option>
                                 <option value="STEM">STEM</option>
                                 <option value="Arts">Arts</option>
@@ -152,29 +152,141 @@
                     <a href="/participants" class="back-btn">Back to Participant List</a>
                 </form>
             <!-- Add-Events Form -->
-            <%} else if (table === "events"){%>
+            <%} else if (table_name === "events"){%>
                 <form id="signupForm" class="signup-form" action="/add/events" method="POST">
                     <br><br>
                     <p class="text" style="text-align: center;">Please add any neccesary information for the event.</p>
 
+                    <div class="form-group">
+                        <label class="form-label">Event Name<span class="required">*</span></label>
+                        
+                        <select class="form-select" name="event_id" id="eventSelect" required>
+                            <option value="">Select an Event</option>
+                            <option value="1">Mentor Office Hours</option>
+                            <option value="2">Robotics Lab Saturday</option>
+                            <option value="3">Girls in STEAM Mentoring</option>
+                            <option value="4">Monthly Coding Club</option>
+                            <option value="5">Intro to Painting Class</option>
+                            <option value="6">Data Science Study Group</option>
+                            <option value="7">Leadership Circle Meetup</option>
+                            <option value="8">Web Dev Bootcamp Night</option>
+                            <option value="9">Ella Rises Annual Leadership Conference</option>
+                            <option value="10">Monthly Art Studio Workshop</option>
+                            <option value="11">STEAM Summit & Expo</option>
+                            <option value="12">AI for Beginners Bootcamp</option>
+                            <option value="13">Digital Design Workshop</option>
+                            <option value="14">Community STEM Hackathon</option>
+                            <option value="15">Women in Tech & Art Showcase</option>
+                        </select>
+    
+                        <!-- Hidden field to carry the event name -->
+                        <input type="hidden" name="event_name" id="eventNameInput">    
+                    </div>
                     
+                    <div class="form-group">
+                        <label class="form-label">Event Date <span class="required">*</span></label>
+                        <input type="date" class="form-input" name="date">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Start Time <span class="required">*</span></label>
+                        <input type="time" class="form-input" name="event_start_time" id="startTime" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">End Time <span class="required">*</span></label>
+                        <input type="time" class="form-input" name="event_end_time" id="endTime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location <span class="required">*</span></label>
+                        <input list="locations" name="event_location">
+                        <datalist name="event_location" id="locations">
+                            <option value="Ella Rises HQ">Ella Rises HQ</option>
+                            <option value="Virtual Zoom">Virtual Zoom</option>
+                            <option value="Art Studio 2">Art Studio 2</option>
+                            <option value="Community Center Room A">Community Center Room A</option>
+                            <option value="Local Library">Local Library</option>
+                        </datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Event Capacity <span class="required">*</span></label>
+                        <input type="number" class="form-input" name="participant_zip" placeholder="10" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Event Registration Deadline <span class="required">*</span></label>
+                        <input type="date" class="form-input" name="event_registration_deadline_date">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Event Registration Deadline Time<span class="required">*</span></label>
+                        <input type="time" class="form-input" name="event_registration_deadline_time"required>
+                    </div>
 
                     <button type="submit" class="submit-btn">Add Events</button>
                     <a href="/events" class="back-btn">Back to Events List</a>
                 </form>
             <!-- Add-survey Form -->
-            <%} else if (table === "surveys"){%>
+            <%} else if (table_name === "surveys"){%>
                 <form id="signupForm" class="signup-form" action="/add/surveys" method="POST">
                     <br><br>
                     <p class="text" style="text-align: center;">Please add any neccesary information for the survey.</p>
 
-                    <!--Input forms-->
+                    <div class="form-group"> <!--UPDATE LATER: make it so that it will only allow them to input an id that exists, or a name?-->
+                        <label class="form-label">Participant ID<span class="required">*</span></label>
+                        <input type="number" class="form-input" name="participant_id" placeholder="12345" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Event Name<span class="required">*</span></label>
+                        <select class="form-select" name="event_name" id="eventSelect" required>
+                            <option value="">Select an Event</option>
+                            <option value="Mentor Office Hours">Mentor Office Hours</option>
+                            <option value="Robotics Lab Saturday">Robotics Lab Saturday</option>
+                            <option value="Girls in STEAM Mentoring">Girls in STEAM Mentoring</option>
+                            <option value="Monthly Coding Club">Monthly Coding Club</option>
+                            <option value="Intro to Painting Class">Intro to Painting Class</option>
+                            <option value="Data Science Study Group">Data Science Study Group</option>
+                            <option value="Leadership Circle Meetup">Leadership Circle Meetup</option>
+                            <option value="Web Dev Bootcamp Night">Web Dev Bootcamp Night</option>
+                            <option value="Ella Rises Annual Leadership Conference">Ella Rises Annual Leadership Conference</option>
+                            <option value="Monthly Art Studio Workshop">Monthly Art Studio Workshop</option>
+                            <option value="STEAM Summit & Expo">STEAM Summit & Expo</option>
+                            <option value="AI for Beginners Bootcamp">AI for Beginners Bootcamp</option>
+                            <option value="Digital Design Workshop">Digital Design Workshop</option>
+                            <option value="Community STEM Hackathon">Community STEM Hackathon</option>
+                            <option value="Women in Tech & Art Showcase">Women in Tech & Art Showcase</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Event Date & Time<span class="required">*</span></label>
+                        <select class="form-select" name="event_id" id="eventInstanceSelect" required disabled>
+                            <option value="">Select an event above first</option>
+                        </select>
+                    </div>                    
+
+                    <div class="form-group">
+                        <label class="form-label">Registration Status<span class="required">*</span></label>
+                        <select class="form-select" name="registration_status" required>
+                            <option value="">Select a Registration Status</option>
+                            <option value="attended">Attended</option>
+                            <option value="no-show">No-Show</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <!-- HIDDEN input for the numeric status -->
+                        <input type="hidden" name="registration_attend_status" id="attendStatusHidden" value="">
+                    </div>
+
+
 
                     <button type="submit" class="submit-btn">Add Survey</button>
                     <a href="/surveys" class="back-btn">Back to Survey Results</a>
                 </form>
             <!-- Add-milestones Form -->
-            <%} else if (table === "milestones"){%>
+            <%} else if (table_name === "milestones"){%>
                 <form id="signupForm" class="signup-form" action="/add/milestones" method="POST">
                     <br><br>
                     <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
@@ -185,7 +297,7 @@
                     <a href="/milestones" class="back-btn">Back to Milestones</a>
                 </form>
             <!--Add Donations Form-->
-            <%} else if (table === "donations"){%>
+            <%} else if (table_name === "donations"){%>
                     <form id="signupForm" class="signup-form" action="/add/donations" method="POST">
                         <br><br>
                         <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
@@ -197,34 +309,7 @@
                     </form>
             <!-- Add-Order Form -->
             <%} else { %>
-                <form id="signupForm" class="signup-form" action="/add/orders" method="POST">
-                    <br><br>
-                    <h1 class="title">Add Order</h1>
-                    <p class="text" style="text-align: center;">Please add any neccesary information for this order.</p>
-
-                    <div class="form-group">
-                        <label class="form-label">Customer ID<span class="required">*</span></label>
-                        <input type="number" class="form-input" name="customer_id" placeholder="10" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Employee ID<span class="required">*</span></label>
-                        <input type="number" class="form-input" name="employee_id" placeholder="1233" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Quantity <span class="required">*</span></label>
-                        <input type="number" class="form-input" name="quantity" placeholder="3" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Date <span class="required">*</span></label>
-                        <input type="datetime-local" class="form-input" name="date" required>
-                    </div>
-
-                    <button type="submit" class="submit-btn">Add Order</button>
-                    <a href="/database" class="back-btn">Back to Database</a>
-                </form>
+                <!--UPDATE LATER: Put something here idk-->
             <%}%>
         </div>
     </div>
@@ -236,33 +321,142 @@
 
     <script>
         // Allow Dropdown to handle delay to increase usability
-        let dropdownTimeout;
-        const dropdown = document.querySelector('.dropdown');
-        const dropdownMenu = document.querySelector('.dropdown-menu');
+            let dropdownTimeout;
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownMenu = document.querySelector('.dropdown-menu');
 
-        if (dropdown && dropdownMenu) {
-            dropdown.addEventListener('mouseenter', function() {
-                clearTimeout(dropdownTimeout);
-                dropdownMenu.style.display = 'block';
+            if (dropdown && dropdownMenu) {
+                dropdown.addEventListener('mouseenter', function() {
+                    clearTimeout(dropdownTimeout);
+                    dropdownMenu.style.display = 'block';
+                });
+
+                dropdown.addEventListener('mouseleave', function() {
+                    dropdownTimeout = setTimeout(function() {
+                        dropdownMenu.style.display = 'none';
+                    }, 200); // 200ms delay before closing
+                });
+
+                dropdownMenu.addEventListener('mouseenter', function() {
+                    clearTimeout(dropdownTimeout);
+                    dropdownMenu.style.display = 'block';
+                });
+
+                dropdownMenu.addEventListener('mouseleave', function() {
+                    dropdownTimeout = setTimeout(function() {
+                        dropdownMenu.style.display = 'none';
+                    }, 200);
+                });
+            }
+
+        // Make it so that it will pass along the event name to the hidden field
+            const select = document.getElementById('eventSelect');
+            const eventNameInput = document.getElementById('eventNameInput');
+
+            select.addEventListener('change', () => {
+                // Use the visible text of the selected option as the event name
+                const selectedOption = select.options[select.selectedIndex];
+                eventNameInput.value = selectedOption.text;
             });
 
-            dropdown.addEventListener('mouseleave', function() {
-                dropdownTimeout = setTimeout(function() {
-                    dropdownMenu.style.display = 'none';
-                }, 200); // 200ms delay before closing
+            // Make sure event end time is not before event start time 
+            const startTimeInput = document.getElementById("startTime");
+            const endTimeInput = document.getElementById("endTime");
+
+        // When the user chooses a start time, update the minimum allowed end time
+            startTimeInput.addEventListener("change", () => {
+                const startValue = startTimeInput.value;
+
+                // Set minimum allowed end time
+                endTimeInput.min = startValue;
+
+                // If the current end time is earlier than start time, reset it
+                if (endTimeInput.value < startValue) {
+                    endTimeInput.value = "";
+                }
             });
 
-            dropdownMenu.addEventListener('mouseenter', function() {
-                clearTimeout(dropdownTimeout);
-                dropdownMenu.style.display = 'block';
+            // Extra safeguard: prevent form submission if invalid
+            endTimeInput.addEventListener("change", () => {
+                if (endTimeInput.value < startTimeInput.value) {
+                    alert("End time cannot be earlier than start time.");
+                    endTimeInput.value = "";
+                }
             });
+        
+        // Make it so that it will pass along the attended flag to the hidden field
+            const regSelect = document.getElementById("regStatusSelect");
+            const hiddenAttend = document.getElementById("attendStatusHidden");
 
-            dropdownMenu.addEventListener('mouseleave', function() {
-                dropdownTimeout = setTimeout(function() {
-                    dropdownMenu.style.display = 'none';
-                }, 200);
+            regSelect.addEventListener("change", () => {
+                if (regSelect.value === "attended") {
+                    hiddenAttend.value = 1;
+                } else {
+                    hiddenAttend.value = 0;
+                }
             });
-        }
+        
+        // Make it display the times avaliable for the selected event
+            // All events from the DB (array of objects)
+            const allEvents = <%- JSON.stringify(events) %>;
+
+            const eventSelect = document.getElementById("eventSelect");
+            const eventInstanceSelect = document.getElementById("eventInstanceSelect");
+
+            function formatEventOption(ev) {
+                // Adjust formatting as needed – assumes date and times are strings
+                let label = ev.event_date;
+                if (ev.event_start_time && ev.event_end_time) {
+                    label += ` (${ev.event_start_time}–${ev.event_end_time})`;
+                } else if (ev.event_start_time) {
+                    label += ` (${ev.event_start_time})`;
+                }
+                return label;
+            }
+
+            eventSelect.addEventListener("change", () => {
+                const selectedName = eventSelect.value;
+
+                // Reset dropdown
+                eventInstanceSelect.innerHTML = "";
+                eventInstanceSelect.disabled = true;
+
+                if (!selectedName) {
+                    const opt = document.createElement("option");
+                    opt.value = "";
+                    opt.textContent = "Select an event above first";
+                    eventInstanceSelect.appendChild(opt);
+                    return;
+                }
+
+                // Filter events with that name
+                const matchingEvents = allEvents.filter(ev => ev.event_name === selectedName);
+
+                // If no matches, show message
+                if (matchingEvents.length === 0) {
+                    const opt = document.createElement("option");
+                    opt.value = "";
+                    opt.textContent = "No dates found for this event";
+                    eventInstanceSelect.appendChild(opt);
+                    return;
+                }
+
+                // Add default option
+                const defaultOpt = document.createElement("option");
+                defaultOpt.value = "";
+                defaultOpt.textContent = "Select a Date/Time";
+                eventInstanceSelect.appendChild(defaultOpt);
+
+                // Create one option per event instance
+                matchingEvents.forEach(ev => {
+                    const opt = document.createElement("option");
+                    opt.value = ev.event_id;                    // what gets submitted
+                    opt.textContent = formatEventOption(ev);    // what user sees
+                    eventInstanceSelect.appendChild(opt);
+                });
+
+                eventInstanceSelect.disabled = false;
+            });
     </script>
 </body>
 </html>
