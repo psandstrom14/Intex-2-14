@@ -295,7 +295,8 @@ app.post('/sort-participants', (req, res) => {
 
 // ADD PAGE: 
 app.get('/add/:table',(req,res) => {
-    res.render("add"); 
+    const table_name = req.params.table;
+    res.render("add",{table_name: table_name}); 
 });
 
 // EVENT MAINTENANCE PAGE: 
