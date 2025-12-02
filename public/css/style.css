@@ -250,7 +250,7 @@ nav {
 }
 
 .btn-add:hover {
-    background-color: var(--powder-blue);
+    background-color: var(--charcoal);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(153, 183, 198, 0.4);

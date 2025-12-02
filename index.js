@@ -18,6 +18,11 @@ const knex = require("knex")({ // KNEX: allows you to work with SQL databases
         port: process.env.RDS_PORT || 5432,
     }
 });
+function paramToArray(val, defaultVal = ['all']) {
+    if (!val) return defaultVal;
+    return Array.isArray(val) ? val : [val];
+}
+
 
 // CREATE VARIABLES: 
 let app = express(); // creates an express object called app
@@ -51,277 +56,173 @@ app.get('/login',(req,res) => {
     res.render("login"); 
 });
 
+// ADD ENTRY PAGE: 
+    app.get('/add/:table', async (req, res) => {
+        const table_name = req.params.table;
+        let events = [];
+        if (table_name === "surveys") {
+            events = await knex("events")
+                .select("event_id","event_name","event_date","event_start_time","event_end_time")
+                .orderBy(["event_name","event_date","event_start_time"]);
+        }
+        res.render("add", { table_name, events });
+    });  
+    app.post("/add/survey", async (req, res) => {
+        const { event_name, event_id /* UPDATE LATER plus any other survey fields */ } = req.body;
+
+        try {
+            await knex("survey").insert({
+                event_name: event_name,
+                event_id: event_id
+                // UPDATE LATER: other columns...
+            });
+
+            res.redirect("/survey");
+        } catch (err) {
+            console.error("Error inserting survey:", err);
+            res.status(500).send("Error saving survey");
+        }
+    });
+
+// DELETE FUNCTIONALITY: 
+    // Map tables to their primary key column
+    const deleteConfig = {
+        participants: 'participant_id',
+        events: 'event_id',
+        surveys: 'survey_id',
+        milestones: 'milestone_id',
+        donations: 'donation_id',
+        users: 'user_id'
+    };
+
+    app.post('/delete-multiple', async (req, res) => {
+        try {
+            const { table, ids } = req.body;
+
+            // Validate table
+            const idColumn = deleteConfig[table];
+            if (!idColumn) {
+                console.error('Delete attempted on invalid table:', table);
+                return res.status(400).send('Invalid table');
+            }
+
+            let idArray = [];
+            if (typeof ids === 'string') {
+                idArray = JSON.parse(ids);
+            } else if (Array.isArray(ids)) {
+                idArray = ids;
+            }
+
+            if (!Array.isArray(idArray) || idArray.length === 0) {
+                return res.redirect('/' + table);
+            }
+
+            await knex(table).whereIn(idColumn, idArray).del();
+
+            res.redirect('/' + table);
+
+        } catch (err) {
+            console.error('Error deleting records:', err);
+            res.status(500).send('Error deleting records');
+        }
+    });
+
+
 // USER MAINTENANCE PAGE: 
 app.get('/users',(req,res) => {
     res.render("users"); 
 });
 
-// ADD PAGE: 
-app.get('/add/:table', async (req, res) => {
-    const table_name = req.params.table;
-    let events = [];
-    if (table_name === "surveys") {
-        events = await knex("events")
-            .select("event_id","event_name","event_date","event_start_time","event_end_time")
-            .orderBy(["event_name","event_date","event_start_time"]);
-    }
-    res.render("add", { table_name, events });
-});  
-app.post("/add/survey", async (req, res) => {
-    const { event_name, event_id /* UPDATE LATER plus any other survey fields */ } = req.body;
-
-    try {
-        await knex("survey").insert({
-            event_name: event_name,
-            event_id: event_id
-            // UPDATE LATER: other columns...
-        });
-
-        res.redirect("/survey");
-    } catch (err) {
-        console.error("Error inserting survey:", err);
-        res.status(500).send("Error saving survey");
-    }
-});
-
 // PARTICIPANT MAINTENANCE PAGE: 
-    // Display page
-        app.get('/participants',(req,res) => {
-            knex.select().from('participants').then(table => { 
-                res.render("participants", {
-                    participant: table,
-                    message: '',
-                    messageType: 'success',
-                    // Initialize empty filters for first page load
-                    filters: {searchColumn: 'participant_first_name',searchValue: '',city: ['all'],school: ['all'],interest: ['all'],donations: ['all'],sortColumn: '',sortOrder: 'asc'}
-                }); 
-            }).catch(err => { 
-                console.log(err); 
-                res.status(500).json({err});
-            });
-        });
+    app.get('/participants', async (req, res) => {
+        try {
+            let {searchColumn, searchValue, city, school, interest,donations,sortColumn,sortOrder} = req.query;
 
-    // filter page
-        app.post('/filter-participants', (req, res) => {
-            let { searchColumn, searchValue, city, school, interest, donations, sortColumn, sortOrder, cityFilters, schoolFilters, interestFilters, donationsFilters } = req.body;
+            // defaults
+            searchColumn = searchColumn || 'participant_first_name';
+            sortOrder = sortOrder === 'desc' ? 'desc' : 'asc';
 
-            // Handle filter arrays passed as JSON strings from search form
-            if (cityFilters && typeof cityFilters === 'string') {
-                try {
-                    city = JSON.parse(cityFilters);
-                } catch (e) {
-                    city = ['all'];
-                }
-            }
-            if (schoolFilters && typeof schoolFilters === 'string') {
-                try {
-                    school = JSON.parse(schoolFilters);
-                } catch (e) {
-                    school = ['all'];
-                }
-            }
-            if (interestFilters && typeof interestFilters === 'string') {
-                try {
-                    interest = JSON.parse(interestFilters);
-                } catch (e) {
-                    interest = ['all'];
-                }
-            }
-            if (donationsFilters && typeof donationsFilters === 'string') {
-                try {
-                    donations = JSON.parse(donationsFilters);
-                } catch (e) {
-                    donations = ['all'];
-                }
-            }
-
-            // Default searchColumn to participant_first_name if not provided
-            if (!searchColumn) {
-                searchColumn = 'participant_first_name';
-            }
-
-            // Start with knex query builder
             let query = knex('participants');
 
             // Search
-            if (searchColumn && searchValue) {
-                query = query.where(searchColumn, 'like', `%${searchValue}%`);
+            if (searchValue && searchColumn) {
+                query.where(searchColumn, 'like', `%${searchValue}%`);
             }
 
-            // City Filter
-            if (city && !city.includes('all')) {
-                const cityArray = Array.isArray(city) ? city : [city];
-                query = query.whereIn('participant_city', cityArray);
+            // City filter
+            const cityArr = paramToArray(city);
+            if (!cityArr.includes('all')) {
+                query.whereIn('participant_city', cityArr);
             }
 
-            // School Filter
-            if (school && !school.includes('all')) {
-                const schoolArray = Array.isArray(school) ? school : [school];
-                query = query.whereIn('participant_school_or_employer', schoolArray);
+            // School filter
+            const schoolArr = paramToArray(school);
+            if (!schoolArr.includes('all')) {
+                query.whereIn('participant_school_or_employer', schoolArr);
             }
 
-            // Interest Filter
-            if (interest && !interest.includes('all')) {
-                const interestArray = Array.isArray(interest) ? interest : [interest];
-                query = query.whereIn('participant_field_of_interest', interestArray);
+            // Interest filter
+            const interestArr = paramToArray(interest);
+            if (!interestArr.includes('all')) {
+                query.whereIn('participant_field_of_interest', interestArr);
             }
 
-            // Donations Filter
-            if (donations && !donations.includes('all')) {
-                const donationsArray = Array.isArray(donations) ? donations : [donations];
-                if (donationsArray.includes('Yes') && !donationsArray.includes('No')) {
-                    query = query.where('total_donations', '>', 0);
-                } else if (donationsArray.includes('No') && !donationsArray.includes('Yes')) {
-                    query = query.where(function() {
-                        this.where('total_donations', 0).orWhereNull('total_donations');
+            // Donations filter
+            const donationsArr = paramToArray(donations);
+            if (!donationsArr.includes('all')) {
+                if (donationsArr.includes('Yes') && !donationsArr.includes('No')) {
+                    query.where('total_donations', '>', 0);
+                } else if (donationsArr.includes('No') && !donationsArr.includes('Yes')) {
+                    query.where(qb => {
+                        qb.where('total_donations', 0).orWhereNull('total_donations');
                     });
                 }
             }
 
             // Sorting
             if (sortColumn) {
-                query = query.orderBy(sortColumn, sortOrder === 'desc' ? 'desc' : 'asc');
+                query.orderBy(sortColumn, sortOrder);
             }
 
-            // Execute query and render results
-            query.then(results => {
-                // Prepare filter arrays - ensure they're always arrays
-                const cityArray = city ? (Array.isArray(city) ? city : [city]) : ['all'];
-                const schoolArray = school ? (Array.isArray(school) ? school : [school]) : ['all'];
-                const interestArray = interest ? (Array.isArray(interest) ? interest : [interest]) : ['all'];
-                const donationsArray = donations ? (Array.isArray(donations) ? donations : [donations]) : ['all'];
+            const results = await query;
 
-                res.render('participants', { 
-                    participant: results,
-                    message: 'Database filtered successfully',
-                    messageType: 'success',
-                    // Pass filter values back to maintain state
-                    filters: {
-                        searchColumn: searchColumn || 'participant_first_name',
-                        searchValue: searchValue || '',
-                        city: cityArray,
-                        school: schoolArray,
-                        interest: interestArray,
-                        donations: donationsArray,
-                        sortColumn: sortColumn || '',
-                        sortOrder: sortOrder || 'asc'
-                    }
-                });
-            }).catch(err => {
-                console.error(err);
-                res.render('participants', { 
-                    participant: [], 
-                    message: 'Error filtering participants', 
-                    messageType: 'danger',
-                    filters: {
-                        searchColumn: 'participant_first_name',
-                        searchValue: '',
-                        city: ['all'],
-                        school: ['all'],
-                        interest: ['all'],
-                        donations: ['all'],
-                        sortColumn: '',
-                        sortOrder: 'asc'
-                    }
-                });
+            const filters = {
+                searchColumn,
+                searchValue: searchValue || '',
+                city: cityArr,
+                school: schoolArr,
+                interest: interestArr,
+                donations: donationsArr,
+                sortColumn: sortColumn || '',
+                sortOrder
+            };
+
+            res.render('participants', {
+                participant: results,
+                message: '',
+                messageType: 'success',
+                filters
             });
-        });
-    
-    // sort page
-        app.post('/sort-participants', (req, res) => {
-            let { searchColumn, searchValue, city, school, interest, donations, sortColumn, sortOrder } = req.body;
 
-            // Default searchColumn to participant_first_name if not provided
-            if (!searchColumn) {
-                searchColumn = 'participant_first_name';
-            }
-
-            // Start with knex query builder
-            let query = knex('participants');
-
-            // Search
-            if (searchColumn && searchValue) {
-                query = query.where(searchColumn, 'like', `%${searchValue}%`);
-            }
-
-            // City Filter
-            if (city && !city.includes('all')) {
-                const cityArray = Array.isArray(city) ? city : [city];
-                query = query.whereIn('participant_city', cityArray);
-            }
-
-            // School Filter
-            if (school && !school.includes('all')) {
-                const schoolArray = Array.isArray(school) ? school : [school];
-                query = query.whereIn('participant_school_or_employer', schoolArray);
-            }
-
-            // Interest Filter
-            if (interest && !interest.includes('all')) {
-                const interestArray = Array.isArray(interest) ? interest : [interest];
-                query = query.whereIn('participant_field_of_interest', interestArray);
-            }
-
-            // Donations Filter
-            if (donations && !donations.includes('all')) {
-                const donationsArray = Array.isArray(donations) ? donations : [donations];
-                if (donationsArray.includes('Yes') && !donationsArray.includes('No')) {
-                    query = query.where('total_donations', '>', 0);
-                } else if (donationsArray.includes('No') && !donationsArray.includes('Yes')) {
-                    query = query.where(function() {
-                        this.where('total_donations', 0).orWhereNull('total_donations');
-                    });
+        } catch (err) {
+            console.error('Error loading participants:', err);
+            res.render('participants', {
+                participant: [],
+                message: 'Error loading participants',
+                messageType: 'danger',
+                filters: {
+                    searchColumn: 'participant_first_name',
+                    searchValue: '',
+                    city: ['all'],
+                    school: ['all'],
+                    interest: ['all'],
+                    donations: ['all'],
+                    sortColumn: '',
+                    sortOrder: 'asc'
                 }
-            }
-
-            // Sorting
-            if (sortColumn) {
-                query = query.orderBy(sortColumn, sortOrder === 'desc' ? 'desc' : 'asc');
-            }
-
-            // Execute query and render results
-            query.then(results => {
-                // Prepare filter arrays - ensure they're always arrays
-                const cityArray = city ? (Array.isArray(city) ? city : [city]) : ['all'];
-                const schoolArray = school ? (Array.isArray(school) ? school : [school]) : ['all'];
-                const interestArray = interest ? (Array.isArray(interest) ? interest : [interest]) : ['all'];
-                const donationsArray = donations ? (Array.isArray(donations) ? donations : [donations]) : ['all'];
-
-                res.render('participants', { 
-                    participant: results,
-                    message: '',
-                    messageType: 'success',
-                    // Pass filter values back to maintain state
-                    filters: {
-                        searchColumn: searchColumn || 'participant_first_name',
-                        searchValue: searchValue || '',
-                        city: cityArray,
-                        school: schoolArray,
-                        interest: interestArray,
-                        donations: donationsArray,
-                        sortColumn: sortColumn || '',
-                        sortOrder: sortOrder || 'asc'
-                    }
-                });
-            }).catch(err => {
-                console.error(err);
-                res.render('participants', { 
-                    participant: [], 
-                    message: 'Error sorting participants', 
-                    messageType: 'danger',
-                    filters: {
-                        searchColumn: 'participant_first_name',
-                        searchValue: '',
-                        city: ['all'],
-                        school: ['all'],
-                        interest: ['all'],
-                        donations: ['all'],
-                        sortColumn: '',
-                        sortOrder: 'asc'
-                    }
-                });
             });
-        });
+        }
+    });
 
 // EVENT MAINTENANCE PAGE: 
 app.get('/events',(req,res) => {
@@ -547,13 +448,9 @@ app.get('/milestones',(req,res) => {
     res.status(418).render("milestones"); 
 });
 
-// DONATINOS MAINTENANCE PAGE: 
+// DONATIONS MAINTENANCE PAGE: 
 app.get('/donations',(req,res) => {
     res.render("donations"); 
-});
-
-app.get(donate_now, (req,res) => {
-    res.render("donate_now"); 
 });
 
 // START TO LISTEN (& tell command line)
