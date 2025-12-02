@@ -15,8 +15,8 @@
     --raspberry: #CE325B;
     
     /* Functional Colors - Updated to use softer primary */
-    --primary: var(--sage);
-    --primary-hover: #88A48B;
+    --primary: #CE325B;
+    --primary-hover: #3A3F3B;
     --secondary: var(--lavender);
     --secondary-hover: #8680B0;
     --accent: var(--peach);
@@ -63,7 +63,6 @@ h1, h2, h3, h4, h5, h6 {
 /* Navigation Styles */
 nav {
     background-color: var(--header-bg);
-    box-shadow: 0 2px 12px rgba(249, 175, 177, 0.15);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -86,23 +85,23 @@ nav {
 }
 
 .logo img {
-    height: 55px;
+    height: 28px;
     width: auto;
     object-fit: contain;
 }
 
 .logo a {
-    font-family: var(--font-script);
+    font-family: var(--font-display);
     font-size: 2rem;
     font-weight: normal;
-    color: var(--accent-dark);
+    color: var(--raspberry);
     text-decoration: none;
     transition: all 0.3s ease;
     letter-spacing: 0.5px;
 }
 
 .logo a:hover {
-    color: var(--secondary);
+    color: white;
     transform: translateY(-1px);
 }
 
@@ -118,25 +117,9 @@ nav {
     text-decoration: none;
     color: var(--text-dark);
     transition: all 0.3s ease;
-    font-weight: 500;
+    font-weight: 800;
     font-size: 0.95rem;
     position: relative;
-}
-
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: var(--primary);
-    transition: width 0.3s ease;
-}
-
-.nav-links a:hover::after,
-.nav-links a.selected-nav::after {
-    width: 100%;
 }
 
 .nav-links a:hover,
@@ -203,8 +186,7 @@ nav {
 }
 
 .dropdown-menu a:hover {
-    background-color: var(--blush-light);
-    color: var(--primary);
+    background-color: var(--cream);
     padding-left: 2rem;
 }
 
@@ -230,7 +212,7 @@ nav {
 .btn-primary:hover {
     background-color: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(154, 181, 157, 0.3);
+    box-shadow: 0 6px 16px rgba(206, 50, 91, 0.3);
 }
 
 .btn-secondary {
@@ -262,6 +244,16 @@ nav {
     background-color: #B52A4E;
 }
 
+.btn-add {
+    background-color: var(--cream);
+    color: var(--charcoal);
+}
+
+.btn-add:hover {
+    background-color: var(--charcoal);
+    color: var(--cream);
+}
+
 .btn-outline {
     background-color: transparent;
     border: 2px solid var(--primary);
@@ -283,8 +275,14 @@ nav {
     font-size: 1.1rem;
 }
 
+/* Full-width button utility */
+.btn-block {
+    width: 100%;
+}
+
+/* Donate buttons */
 .donate-btn {
-    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--blush) 100%);
+    background: var(--blush);
     color: white !important;
     padding: 0.7rem 1.8rem;
     border-radius: 30px;
@@ -297,9 +295,10 @@ nav {
     box-shadow: 0 6px 20px rgba(206, 50, 91, 0.3);
 }
 
+/* Login Buttons */
 .login-btn {
     padding: 0.6rem 1.5rem;
-    background-color: var(--secondary);
+    background-color: var(--powder-blue);
     color: white !important;
     border-radius: 25px;
     transition: all 0.3s ease;
@@ -337,11 +336,26 @@ nav {
 .form-control:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(154, 181, 157, 0.15);
+    box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.15);
 }
 
 select.form-control {
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233A3F3B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+}
+
+select.form-control:hover {
+    border-color: var(--secondary);
+}
+
+select.form-control:focus {
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23CE325B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 
 textarea.form-control {
@@ -349,56 +363,33 @@ textarea.form-control {
     min-height: 100px;
 }
 
-/* Search Bar */
-.search-container {
-    position: relative;
-    margin-bottom: 2rem;
-}
-
-.search-bar {
-    width: 100%;
-    padding: 0.8rem 2.5rem 0.8rem 1.2rem;
-    border: 2px solid var(--border-color);
-    border-radius: 30px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background-color: var(--background-light);
-}
-
-.search-bar:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 4px 16px rgba(154, 181, 157, 0.15);
-}
-
-.search-icon {
-    position: absolute;
-    right: 1.2rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-light);
-}
-
-/* Filter Section */
+/* Filter Section (top search row) */
 .filter-section {
-    background-color: var(--background-light);
+    background-color: var(--powder-blue);
     padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
     box-shadow: 0 2px 12px rgba(58, 63, 59, 0.06);
-    border: 1px solid var(--border-color);
 }
 
 .filter-row {
     display: flex;
     gap: 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: flex-end;
 }
 
 .filter-item {
-    flex: 1;
-    min-width: 200px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Dropdown column (searchColumn) */
+.filter-item.filter-column {
+    flex: 0 0 220px;
+}
+
+/* Search + buttons area */
+.filter-item.filter-search {
+    flex: 1 1 auto;
 }
 
 /* Search Input/Button Height Consistency */
@@ -410,21 +401,73 @@ textarea.form-control {
 }
 
 .search-input-group .form-control {
-    flex: 1;
+    flex: 1 1 auto;
     height: 48px;
 }
 
 .search-input-group .btn {
     height: 48px;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     white-space: nowrap;
 }
 
 .filter-toggle-btn {
     height: 48px;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     width: auto;
-    margin-left: auto;
+    padding: 0.7rem 1.8rem;
+}
+
+/* Advanced filter section (the part you toggle open) */
+.advanced-filter-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Hidden utility class for JS toggling */
+.is-hidden {
+    display: none;
+}
+
+/* "Filter Options" heading */
+.filter-options-title {
+    color: #7eb8b8;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Card titles inside filters */
+.filter-card-title {
+    color: #666;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Scrollable card body used for long lists (city/school) */
+.filter-card-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Checkbox labels inside filter panels */
+.filter-checkbox-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-medium);
+}
+
+/* Bottom action bar (Apply / Clear) */
+.filter-actions {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+.filter-actions-item {
+    flex: 0.8;
 }
 
 /* Filter Cards Grid */
@@ -454,6 +497,7 @@ textarea.form-control {
     box-shadow: 0 2px 12px rgba(58, 63, 59, 0.06);
     overflow: hidden;
     margin-bottom: 2rem;
+    margin-top: 2rem;
     border: 1px solid var(--border-color);
 }
 
@@ -463,13 +507,13 @@ textarea.form-control {
     align-items: center;
     padding: 1.75rem 2rem;
     border-bottom: 2px solid var(--border-color);
-    background: linear-gradient(to right, var(--blush-light), rgba(249, 175, 177, 0.3));
+    background: var(--powder-blue);
 }
 
 .table-title {
     font-family: var(--font-display);
     font-size: 1.9rem;
-    color: var(--accent-dark);
+    color: var(--charcoal);
     font-weight: 400;
 }
 
@@ -483,9 +527,9 @@ table {
     border-collapse: collapse;
 }
 
-/* thead {
-    background: linear-gradient(to bottom, #FFF8F5, var(--background-light));
-} */
+thead {
+    background: white;
+}
 
 th {
     padding: 1.2rem;
@@ -496,6 +540,36 @@ th {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    background-color: #D5E1E8;
+}
+
+/* Sortable column headers */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.sortable:hover {
+    background-color: rgba(154, 181, 157, 0.1);
+}
+
+.sort-icon {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.9em;
+    color: var(--charcoal);
+    transition: color 0.2s ease;
+}
+
+.sortable:hover .sort-icon {
+    color: #7eb8b8;
+}
+
+.sort-icon.sort-active {
+    color: var(--primary);
+    font-weight: bold;
 }
 
 td {
@@ -522,46 +596,6 @@ tbody tr:hover {
 .row-actions {
     display: flex;
     gap: 0.5rem;
-}
-
-/* Pagination */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.75rem;
-    background-color: var(--background-light);
-    border-radius: 12px;
-    margin-top: 1rem;
-}
-
-.pagination button {
-    padding: 0.6rem 1.2rem;
-    border: 2px solid var(--border-color);
-    background-color: white;
-    color: var(--text-medium);
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.pagination button:hover:not(:disabled) {
-    background-color: var(--blush-light);
-    border-color: var(--primary);
-    transform: translateY(-2px);
-}
-
-.pagination button.active {
-    background-color: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-.pagination button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
 }
 
 /* Cards */
@@ -646,6 +680,7 @@ tbody tr:hover {
     padding: 1.2rem 1.75rem;
     border-radius: 10px;
     margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
     border-left: 4px solid;
 }
 
@@ -708,7 +743,6 @@ tbody tr:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(to right, var(--blush-light), rgba(249, 175, 177, 0.3));
 }
 
 .modal-title {
@@ -760,7 +794,6 @@ tbody tr:hover {
     right: -20%;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(249, 175, 177, 0.15) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -772,7 +805,6 @@ tbody tr:hover {
     left: -10%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(154, 181, 157, 0.15) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -802,9 +834,7 @@ tbody tr:hover {
 
 /* Page Header */
 .page-header {
-    background: linear-gradient(135deg, 
-        rgba(255, 216, 209, 0.5) 0%, 
-        rgba(244, 176, 146, 0.3) 100%);
+    background: var(--blush-light);
     padding: 3.5rem 2rem;
     margin-bottom: 3rem;
 }
@@ -879,11 +909,13 @@ tbody tr:hover {
 
 /* Footer */
 footer {
-    background: linear-gradient(to right, 
-        rgba(154, 181, 157, 0.3) 0%, 
-        rgba(153, 183, 198, 0.3) 100%);
+    background: linear-gradient(
+        to right,
+        rgba(154, 181, 157, 0.3) 0%,
+        rgba(153, 183, 198, 0.3) 100%
+    );
     padding: 3rem 2rem 1.5rem;
-    margin-top: 4rem;
+    margin-top: auto;
     text-align: center;
     color: var(--text-dark);
 }
@@ -966,9 +998,16 @@ footer p {
     .page-header h1 {
         font-size: 2.2rem;
     }
-    
+
+    /* Stack filter controls nicely on mobile */
     .filter-row {
         flex-direction: column;
+        flex-wrap: wrap;
+    }
+
+    .filter-item.filter-column,
+    .filter-item.filter-search {
+        flex: 1 1 100%;
     }
     
     .table-container {
