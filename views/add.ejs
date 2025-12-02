@@ -65,8 +65,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Date of Birth <span class="required">*</span></label>
-                        <input type="datetime-local" class="form-input" name="participant_dob" required>
+                        <label class="form-label">User Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="participant_username" placeholder="jdoe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password<span class="required">*</span></label>
+                        <input type="text" class="form-input" name="participant_password" placeholder="temppass" required>
                     </div>
 
                     <div class="form-group">
@@ -75,64 +80,99 @@
                             <option value="">Select a level</option>
                             <option value="admin">Admin</option>
                             <option value="participant">Participant</option>
-                            <!--UPDATE LATER: add more roles-->
+                            <option value="donor">Donor</option>
                         </select>                        
                     </div>
+                    
+                    <div>
+                        <label class="form-label">User Information</label>
 
-                    <div class="form-group">
-                        <label class="form-label">Phone Number <span class="required">*</span></label>
-                        <input type="tel" class="form-input" name="participant_phone" placeholder="1234567890" required>
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number <span class="required">*</span></label>
+                            <input type="tel" class="form-input" name="participant_phone" placeholder="1234567890" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">City <span class="required">*</span></label>
-                        <input list="cities" name="participant_city">
-                        <datalist name="participant_city" id="cities">
-                            <option value="Bountiful">Bountiful</option>
-                            <option value="Draper">Draper</option>
-                            <option value="Layton">Layton</option>
-                            <option value="Lehi">Lehi</option>
-                            <option value="Logan">Logan</option>
-                            <option value="Murray">Murray</option>
-                            <option value="Ogden">Ogden</option>
-                            <option value="Orem">Orem</option>
-                            <option value="Pleasant Grove">Pleasant Grove</option>
-                            <option value="Provo">Provo</option>
-                            <option value="Riverton">Riverton</option>
-                            <option value="Salt Lake City">Salt Lake City</option>
-                            <option value="Sandy">Sandy</option>
-                            <option value="Spanish Fork">Spanish Fork</option>
-                            <option value="St. George">St. George</option>
-                            <option value="Taylorsville">Taylorsville</option>
-                            <option value="West Jordan">West Jordan</option>
-                            <option value="West Valley City">West Valley City</option>
-                        </datalist>
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">Email <span class="required">*</span></label>
+                            <input type="email" class="form-input" name="participant_email" placeholder="example@google.com" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Zip Code <span class="required">*</span></label>
-                        <input type="number" class="form-input" name="participant_zip" placeholder="12345" maxlength="5" required>
-                    </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="datetime-local" class="form-input" name="participant_dob"><!--UPDATE LATER: Require for user registration-->
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">School or Employer <span class="required">*</span></label>
-                        <input type="text" class="form-input" name="username" placeholder="BYU" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Field of Interest <span class="required">*</span></label>
-                        <select class="form-select" name="level" required>
-                            <option value="">Select an Interest</option>
-                            <option value="STEM">STEM</option>
-                            <option value="Arts">Arts</option>
-                            <option value="Both">Both</option>
-                        </select>                        
+                        <div class="form-group">
+                            <label class="form-label">City <span class="required">*</span></label>
+                            <input list="cities" name="participant_city">
+                            <datalist name="participant_city" id="cities">
+                                <option value="Bountiful">Bountiful</option>
+                                <option value="Draper">Draper</option>
+                                <option value="Layton">Layton</option>
+                                <option value="Lehi">Lehi</option>
+                                <option value="Logan">Logan</option>
+                                <option value="Murray">Murray</option>
+                                <option value="Ogden">Ogden</option>
+                                <option value="Orem">Orem</option>
+                                <option value="Pleasant Grove">Pleasant Grove</option>
+                                <option value="Provo">Provo</option>
+                                <option value="Riverton">Riverton</option>
+                                <option value="Salt Lake City">Salt Lake City</option>
+                                <option value="Sandy">Sandy</option>
+                                <option value="Spanish Fork">Spanish Fork</option>
+                                <option value="St. George">St. George</option>
+                                <option value="Taylorsville">Taylorsville</option>
+                                <option value="West Jordan">West Jordan</option>
+                                <option value="West Valley City">West Valley City</option>
+                            </datalist>
+                        </div>
+    
+                        <div class="form-group">
+                            <label class="form-label">Zip Code <span class="required">*</span></label>
+                            <input type="number" class="form-input" name="participant_zip" placeholder="12345" maxlength="5" required>
+                        </div>
+    
+                        <div class="form-group">
+                            <label class="form-label">School or Employer</label>
+                            <input type="text" class="form-input" name="participant_school_or_employer" placeholder="BYU"><!--UPDATE LATER: Require for user registration-->
+                        </div>
+    
+                        <div class="form-group">
+                            <label class="form-label">Field of Interest</label><!--UPDATE LATER: Require for user registration-->
+                            <select class="form-select" name="level">
+                                <option value="">Select an Interest</option>
+                                <option value="STEM">STEM</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Both">Both</option>
+                            </select>                        
+                        </div>
                     </div>
 
                     <button type="submit" class="submit-btn">Add User</button>
-                    <a href="/participants" class="back-btn">Back to Database</a>
+                    <a href="/participants" class="back-btn">Back to Participant List</a>
                 </form>
-                </div>
+            <!-- Add-Events Form -->
+            <%} else if (table === "events"){%>
+                <form id="signupForm" class="signup-form" action="/add/events" method="POST">
+                    <br><br>
+                    <p class="text" style="text-align: center;">Please add any neccesary information for the event.</p>
+
+                    
+
+                    <button type="submit" class="submit-btn">Add Events</button>
+                    <a href="/events" class="back-btn">Back to Events List</a>
+                </form>
+            <!-- Add-survey Form -->
+            <%} else if (table === "surveys"){%>
+                <form id="signupForm" class="signup-form" action="/add/surveys" method="POST">
+                    <br><br>
+                    <p class="text" style="text-align: center;">Please add any neccesary information for the survey.</p>
+
+                    <!--Input forms-->
+
+                    <button type="submit" class="submit-btn">Add Survey</button>
+                    <a href="/surveys" class="back-btn">Back to Survey Results</a>
+                </form>
             <!-- Add-milestones Form -->
             <%} else if (table === "milestones"){%>
                 <form id="signupForm" class="signup-form" action="/add/milestones" method="POST">
@@ -142,41 +182,19 @@
                     
 
                     <button type="submit" class="submit-btn">Add Milestones</button>
-                    <a href="/milestones" class="back-btn">Back to Database</a>
+                    <a href="/milestones" class="back-btn">Back to Milestones</a>
                 </form>
-            <!-- Add-milestones Form -->
-            <%} else if (table === "milestones"){%>
-                <form id="signupForm" class="signup-form" action="/add/milestones" method="POST">
-                    <br><br>
-                    <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
-
-                    <!--Input forms-->
-
-                    <button type="submit" class="submit-btn">Add Milestones</button>
-                    <a href="/milestones" class="back-btn">Back to Database</a>
-                </form>
-            <!-- Add-Events Form -->
-            <%} else if (table === "events"){%>
-                <form id="signupForm" class="signup-form" action="/add/events" method="POST">
-                    <br><br>
-                    <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
-
-                    <!--Input forms-->
-
-                    <button type="submit" class="submit-btn">Add Events</button>
-                    <a href="/events" class="back-btn">Back to Database</a>
-                </form>
-            <!-- Add-Events Form -->
-            <%} else if (table === "events"){%>
-                <form id="signupForm" class="signup-form" action="/add/events" method="POST">
-                    <br><br>
-                    <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
-
-                    <!--Input forms-->
-
-                    <button type="submit" class="submit-btn">Add Events</button>
-                    <a href="/events" class="back-btn">Back to Database</a>
-                </form>
+            <!--Add Donations Form-->
+            <%} else if (table === "donations"){%>
+                    <form id="signupForm" class="signup-form" action="/add/donations" method="POST">
+                        <br><br>
+                        <p class="text" style="text-align: center;">Please add any neccesary information for the milestone.</p>
+    
+                        
+    
+                        <button type="submit" class="submit-btn">Add Donation</button>
+                        <a href="/donations" class="back-btn">Back to Donations</a>
+                    </form>
             <!-- Add-Order Form -->
             <%} else { %>
                 <form id="signupForm" class="signup-form" action="/add/orders" method="POST">
