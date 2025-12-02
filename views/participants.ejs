@@ -80,6 +80,7 @@
                             <select name="searchColumn" id="searchColumn" class="form-control">
                                 <option value="participant_first_name" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_first_name') ? 'selected' : (!filters || !filters.searchColumn) ? 'selected' : '' %>>First Name</option>
                                 <option value="participant_last_name" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_last_name') ? 'selected' : '' %>>Last Name</option>
+                                <option value="participant_last_name" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'username') ? 'selected' : '' %>>Username</option>
                                 <option value="participant_email" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_email') ? 'selected' : '' %>>Email</option>
                                 <option value="participant_phone" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_phone') ? 'selected' : '' %>>Phone</option>
                                 <option value="participant_city" <%= (typeof filters !== 'undefined' && filters.searchColumn === 'participant_city') ? 'selected' : '' %>>City</option>
@@ -354,6 +355,7 @@
                             <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
                             <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" data-column="username">Username <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_email">Email <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_phone">Phone <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_dob">Date of Birth <span class="sort-icon">⇅</span></th>
@@ -387,6 +389,7 @@
                                     <td><input type="checkbox" class="row-checkbox" value="<%= p.participant_email %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
                                     <td><%= p.participant_first_name %></td>
                                     <td><%= p.participant_last_name %></td>
+                                    <td><%= p.username %></td>
                                     <td><%= p.participant_email %></td>
                                     <td><%= p.participant_phone %></td>
                                     <td><%= formattedDOB %></td>
@@ -449,415 +452,414 @@
             }
 
         // Filter Toggle
-        document.getElementById('toggleFilters').addEventListener('click', function() {
-            const filterSection = document.getElementById('filterSection');
-            const buttonText = document.getElementById('filterButtonText');
-            
-            if (filterSection.style.display === 'none' || filterSection.style.display === '') {
-                filterSection.style.display = 'block';
-                buttonText.textContent = 'Hide Filters';
-                // Store that user opened filters
-                sessionStorage.setItem('filtersVisible', 'true');
-            } else {
-                filterSection.style.display = 'none';
-                buttonText.textContent = 'Filters';
-                // Store that user closed filters
-                sessionStorage.setItem('filtersVisible', 'false');
-            }
-        });
+            document.getElementById('toggleFilters').addEventListener('click', function() {
+                const filterSection = document.getElementById('filterSection');
+                const buttonText = document.getElementById('filterButtonText');
+                
+                if (filterSection.style.display === 'none' || filterSection.style.display === '') {
+                    filterSection.style.display = 'block';
+                    buttonText.textContent = 'Hide Filters';
+                    // Store that user opened filters
+                    sessionStorage.setItem('filtersVisible', 'true');
+                } else {
+                    filterSection.style.display = 'none';
+                    buttonText.textContent = 'Filters';
+                    // Store that user closed filters
+                    sessionStorage.setItem('filtersVisible', 'false');
+                }
+            });
 
 
         // On page load, check if filters should be visible
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterSection = document.getElementById('filterSection');
-            const buttonText = document.getElementById('filterButtonText');
-            const filtersVisible = sessionStorage.getItem('filtersVisible');
-            
-            // Show filters if user previously opened them OR if filters are active
-            const hasActiveFilters = '<%= (typeof filters !== "undefined" && filters && ((filters.city && !filters.city.includes("all")) || (filters.school && !filters.school.includes("all")) || (filters.interest && !filters.interest.includes("all")) || (filters.donations && !filters.donations.includes("all")))) ? "true" : "false" %>';
-            
-            if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters)) {
-                filterSection.style.display = 'block';
-                buttonText.textContent = 'Hide Filters';
-            }
-        });
-
+            document.addEventListener('DOMContentLoaded', function() {
+                const filterSection = document.getElementById('filterSection');
+                const buttonText = document.getElementById('filterButtonText');
+                const filtersVisible = sessionStorage.getItem('filtersVisible');
+                
+                // Show filters if user previously opened them OR if filters are active
+                const hasActiveFilters = '<%= (typeof filters !== "undefined" && filters && ((filters.city && !filters.city.includes("all")) || (filters.school && !filters.school.includes("all")) || (filters.interest && !filters.interest.includes("all")) || (filters.donations && !filters.donations.includes("all")))) ? "true" : "false" %>';
+                
+                if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters)) {
+                    filterSection.style.display = 'block';
+                    buttonText.textContent = 'Hide Filters';
+                }
+            });
 
         // Search Form Submission - Preserve filter checkboxes
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            // Get all checked city values
-            const checkedCities = Array.from(document.querySelectorAll('.city-checkbox:checked')).map(cb => cb.value);
-            document.getElementById('hiddenCityFilters').value = JSON.stringify(checkedCities);
-            
-            // Get all checked school values
-            const checkedSchools = Array.from(document.querySelectorAll('.school-checkbox:checked')).map(cb => cb.value);
-            document.getElementById('hiddenSchoolFilters').value = JSON.stringify(checkedSchools);
-            
-            // Get all checked interest values
-            const checkedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
-            document.getElementById('hiddenInterestFilters').value = JSON.stringify(checkedInterests);
-            
-            // Get all checked donations values
-            const checkedDonations = Array.from(document.querySelectorAll('.donations-checkbox:checked')).map(cb => cb.value);
-            document.getElementById('hiddenDonationsFilters').value = JSON.stringify(checkedDonations);
-        });
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                // Get all checked city values
+                const checkedCities = Array.from(document.querySelectorAll('.city-checkbox:checked')).map(cb => cb.value);
+                document.getElementById('hiddenCityFilters').value = JSON.stringify(checkedCities);
+                
+                // Get all checked school values
+                const checkedSchools = Array.from(document.querySelectorAll('.school-checkbox:checked')).map(cb => cb.value);
+                document.getElementById('hiddenSchoolFilters').value = JSON.stringify(checkedSchools);
+                
+                // Get all checked interest values
+                const checkedInterests = Array.from(document.querySelectorAll('.interest-checkbox:checked')).map(cb => cb.value);
+                document.getElementById('hiddenInterestFilters').value = JSON.stringify(checkedInterests);
+                
+                // Get all checked donations values
+                const checkedDonations = Array.from(document.querySelectorAll('.donations-checkbox:checked')).map(cb => cb.value);
+                document.getElementById('hiddenDonationsFilters').value = JSON.stringify(checkedDonations);
+            });
 
         // Filter Form Submission - Preserve search values
-        document.getElementById('filterForm').addEventListener('submit', function(e) {
-            // Update hidden fields with current search values
-            document.getElementById('filterSearchColumn').value = document.getElementById('searchColumn').value;
-            document.getElementById('filterSearchValue').value = document.getElementById('searchValue').value;
-        });
+            document.getElementById('filterForm').addEventListener('submit', function(e) {
+                // Update hidden fields with current search values
+                document.getElementById('filterSearchColumn').value = document.getElementById('searchColumn').value;
+                document.getElementById('filterSearchValue').value = document.getElementById('searchValue').value;
+            });
 
         // Column Sorting
-        let currentSortColumn = '<%= (typeof filters !== "undefined" && filters.sortColumn) ? filters.sortColumn : "" %>';
-        let currentSortOrder = '<%= (typeof filters !== "undefined" && filters.sortOrder) ? filters.sortOrder : "asc" %>';
+            let currentSortColumn = '<%= (typeof filters !== "undefined" && filters.sortColumn) ? filters.sortColumn : "" %>';
+            let currentSortOrder = '<%= (typeof filters !== "undefined" && filters.sortOrder) ? filters.sortOrder : "asc" %>';
 
         // Update sort icons on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (currentSortColumn) {
-                updateSortIcons(currentSortColumn, currentSortOrder);
-            }
-        });
-
-        function updateSortIcons(column, order) {
-            // Reset all icons
-            document.querySelectorAll('.sort-icon').forEach(icon => {
-                icon.textContent = '⇅';
-                icon.classList.remove('sort-active');
+            document.addEventListener('DOMContentLoaded', function() {
+                if (currentSortColumn) {
+                    updateSortIcons(currentSortColumn, currentSortOrder);
+                }
             });
 
-            // Update the active column icon
-            const activeHeader = document.querySelector(`th[data-column="${column}"]`);
-            if (activeHeader) {
-                const icon = activeHeader.querySelector('.sort-icon');
-                icon.classList.add('sort-active');
-                icon.textContent = order === 'asc' ? '↑' : '↓';
+            function updateSortIcons(column, order) {
+                // Reset all icons
+                document.querySelectorAll('.sort-icon').forEach(icon => {
+                    icon.textContent = '⇅';
+                    icon.classList.remove('sort-active');
+                });
+
+                // Update the active column icon
+                const activeHeader = document.querySelector(`th[data-column="${column}"]`);
+                if (activeHeader) {
+                    const icon = activeHeader.querySelector('.sort-icon');
+                    icon.classList.add('sort-active');
+                    icon.textContent = order === 'asc' ? '↑' : '↓';
+                }
             }
-        }
 
         // Handle column header clicks
-        document.querySelectorAll('.sortable').forEach(header => {
-            header.addEventListener('click', function() {
-                const column = this.getAttribute('data-column');
-                let order = 'asc';
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.getAttribute('data-column');
+                    let order = 'asc';
 
-                // Toggle order if clicking the same column
-                if (column === currentSortColumn) {
-                    order = currentSortOrder === 'asc' ? 'desc' : 'asc';
-                }
+                    // Toggle order if clicking the same column
+                    if (column === currentSortColumn) {
+                        order = currentSortOrder === 'asc' ? 'desc' : 'asc';
+                    }
 
-                // Create a form and submit with sorting parameters
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/sort-participants';
+                    // Create a form and submit with sorting parameters
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/sort-participants';
 
-                // Add sort parameters
-                const sortColumnInput = document.createElement('input');
-                sortColumnInput.type = 'hidden';
-                sortColumnInput.name = 'sortColumn';
-                sortColumnInput.value = column;
-                form.appendChild(sortColumnInput);
+                    // Add sort parameters
+                    const sortColumnInput = document.createElement('input');
+                    sortColumnInput.type = 'hidden';
+                    sortColumnInput.name = 'sortColumn';
+                    sortColumnInput.value = column;
+                    form.appendChild(sortColumnInput);
 
-                const sortOrderInput = document.createElement('input');
-                sortOrderInput.type = 'hidden';
-                sortOrderInput.name = 'sortOrder';
-                sortOrderInput.value = order;
-                form.appendChild(sortOrderInput);
+                    const sortOrderInput = document.createElement('input');
+                    sortOrderInput.type = 'hidden';
+                    sortOrderInput.name = 'sortOrder';
+                    sortOrderInput.value = order;
+                    form.appendChild(sortOrderInput);
 
-                // Preserve existing filters by reading from DOM (captures current state)
-                const searchColumn = document.getElementById('searchColumn')?.value;
-                const searchValue = document.getElementById('searchValue')?.value;
-                
-                if (searchColumn) {
-                    const searchColumnInput = document.createElement('input');
-                    searchColumnInput.type = 'hidden';
-                    searchColumnInput.name = 'searchColumn';
-                    searchColumnInput.value = searchColumn;
-                    form.appendChild(searchColumnInput);
-                }
-                
-                if (searchValue) {
-                    const searchValueInput = document.createElement('input');
-                    searchValueInput.type = 'hidden';
-                    searchValueInput.name = 'searchValue';
-                    searchValueInput.value = searchValue;
-                    form.appendChild(searchValueInput);
-                }
+                    // Preserve existing filters by reading from DOM (captures current state)
+                    const searchColumn = document.getElementById('searchColumn')?.value;
+                    const searchValue = document.getElementById('searchValue')?.value;
+                    
+                    if (searchColumn) {
+                        const searchColumnInput = document.createElement('input');
+                        searchColumnInput.type = 'hidden';
+                        searchColumnInput.name = 'searchColumn';
+                        searchColumnInput.value = searchColumn;
+                        form.appendChild(searchColumnInput);
+                    }
+                    
+                    if (searchValue) {
+                        const searchValueInput = document.createElement('input');
+                        searchValueInput.type = 'hidden';
+                        searchValueInput.name = 'searchValue';
+                        searchValueInput.value = searchValue;
+                        form.appendChild(searchValueInput);
+                    }
 
-                // Preserve filter checkboxes (reads current checked state)
-                document.querySelectorAll('.city-checkbox:checked').forEach(cb => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'city';
-                    input.value = cb.value;
-                    form.appendChild(input);
+                    // Preserve filter checkboxes (reads current checked state)
+                    document.querySelectorAll('.city-checkbox:checked').forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'city';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    document.querySelectorAll('.school-checkbox:checked').forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'school';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    document.querySelectorAll('.interest-checkbox:checked').forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'interest';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    document.querySelectorAll('.donations-checkbox:checked').forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'donations';
+                        input.value = cb.value;
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
                 });
-
-                document.querySelectorAll('.school-checkbox:checked').forEach(cb => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'school';
-                    input.value = cb.value;
-                    form.appendChild(input);
-                });
-
-                document.querySelectorAll('.interest-checkbox:checked').forEach(cb => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'interest';
-                    input.value = cb.value;
-                    form.appendChild(input);
-                });
-
-                document.querySelectorAll('.donations-checkbox:checked').forEach(cb => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'donations';
-                    input.value = cb.value;
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                form.submit();
             });
-        });
 
         // Filter checkbox handling - City
-        const cityCheckboxes = document.querySelectorAll('.city-checkbox');
-        const cityAllCheckbox = document.querySelector('.city-checkbox[value="all"]');
-        
-        cityCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.value === 'all' && this.checked) {
-                    cityCheckboxes.forEach(cb => {
-                        if (cb.value !== 'all') cb.checked = false;
-                    });
-                } else if (this.value !== 'all' && this.checked) {
-                    cityAllCheckbox.checked = false;
-                } else if (this.value !== 'all' && !this.checked) {
-                    const anyChecked = Array.from(cityCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
-                    if (!anyChecked) {
-                        cityAllCheckbox.checked = true;
+            const cityCheckboxes = document.querySelectorAll('.city-checkbox');
+            const cityAllCheckbox = document.querySelector('.city-checkbox[value="all"]');
+            
+            cityCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.value === 'all' && this.checked) {
+                        cityCheckboxes.forEach(cb => {
+                            if (cb.value !== 'all') cb.checked = false;
+                        });
+                    } else if (this.value !== 'all' && this.checked) {
+                        cityAllCheckbox.checked = false;
+                    } else if (this.value !== 'all' && !this.checked) {
+                        const anyChecked = Array.from(cityCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
+                        if (!anyChecked) {
+                            cityAllCheckbox.checked = true;
+                        }
                     }
-                }
+                });
             });
-        });
 
         // Filter checkbox handling - School
-        const schoolCheckboxes = document.querySelectorAll('.school-checkbox');
-        const schoolAllCheckbox = document.querySelector('.school-checkbox[value="all"]');
-        
-        schoolCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.value === 'all' && this.checked) {
-                    schoolCheckboxes.forEach(cb => {
-                        if (cb.value !== 'all') cb.checked = false;
-                    });
-                } else if (this.value !== 'all' && this.checked) {
-                    schoolAllCheckbox.checked = false;
-                } else if (this.value !== 'all' && !this.checked) {
-                    const anyChecked = Array.from(schoolCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
-                    if (!anyChecked) {
-                        schoolAllCheckbox.checked = true;
+            const schoolCheckboxes = document.querySelectorAll('.school-checkbox');
+            const schoolAllCheckbox = document.querySelector('.school-checkbox[value="all"]');
+            
+            schoolCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.value === 'all' && this.checked) {
+                        schoolCheckboxes.forEach(cb => {
+                            if (cb.value !== 'all') cb.checked = false;
+                        });
+                    } else if (this.value !== 'all' && this.checked) {
+                        schoolAllCheckbox.checked = false;
+                    } else if (this.value !== 'all' && !this.checked) {
+                        const anyChecked = Array.from(schoolCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
+                        if (!anyChecked) {
+                            schoolAllCheckbox.checked = true;
+                        }
                     }
-                }
+                });
             });
-        });
 
         // Filter checkbox handling - Interest
-        const interestCheckboxes = document.querySelectorAll('.interest-checkbox');
-        const interestAllCheckbox = document.querySelector('.interest-checkbox[value="all"]');
-        
-        interestCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.value === 'all' && this.checked) {
-                    interestCheckboxes.forEach(cb => {
-                        if (cb.value !== 'all') cb.checked = false;
-                    });
-                } else if (this.value !== 'all' && this.checked) {
-                    interestAllCheckbox.checked = false;
-                } else if (this.value !== 'all' && !this.checked) {
-                    const anyChecked = Array.from(interestCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
-                    if (!anyChecked) {
-                        interestAllCheckbox.checked = true;
+            const interestCheckboxes = document.querySelectorAll('.interest-checkbox');
+            const interestAllCheckbox = document.querySelector('.interest-checkbox[value="all"]');
+            
+            interestCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.value === 'all' && this.checked) {
+                        interestCheckboxes.forEach(cb => {
+                            if (cb.value !== 'all') cb.checked = false;
+                        });
+                    } else if (this.value !== 'all' && this.checked) {
+                        interestAllCheckbox.checked = false;
+                    } else if (this.value !== 'all' && !this.checked) {
+                        const anyChecked = Array.from(interestCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
+                        if (!anyChecked) {
+                            interestAllCheckbox.checked = true;
+                        }
                     }
-                }
+                });
             });
-        });
 
         // Filter checkbox handling - Donations
-        const donationsCheckboxes = document.querySelectorAll('.donations-checkbox');
-        const donationsAllCheckbox = document.querySelector('.donations-checkbox[value="all"]');
-        
-        donationsCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.value === 'all' && this.checked) {
-                    donationsCheckboxes.forEach(cb => {
-                        if (cb.value !== 'all') cb.checked = false;
-                    });
-                } else if (this.value !== 'all' && this.checked) {
-                    donationsAllCheckbox.checked = false;
-                } else if (this.value !== 'all' && !this.checked) {
-                    const anyChecked = Array.from(donationsCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
-                    if (!anyChecked) {
-                        donationsAllCheckbox.checked = true;
+            const donationsCheckboxes = document.querySelectorAll('.donations-checkbox');
+            const donationsAllCheckbox = document.querySelector('.donations-checkbox[value="all"]');
+            
+            donationsCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.value === 'all' && this.checked) {
+                        donationsCheckboxes.forEach(cb => {
+                            if (cb.value !== 'all') cb.checked = false;
+                        });
+                    } else if (this.value !== 'all' && this.checked) {
+                        donationsAllCheckbox.checked = false;
+                    } else if (this.value !== 'all' && !this.checked) {
+                        const anyChecked = Array.from(donationsCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
+                        if (!anyChecked) {
+                            donationsAllCheckbox.checked = true;
+                        }
                     }
-                }
+                });
             });
-        });
 
         // Checkbox Selection Handling
-        const selectAllCheckbox = document.getElementById('selectAll');
-        const bulkActionsBar = document.getElementById('bulkActionsBar');
-        const selectedCountSpan = document.getElementById('selectedCount');
-        const editButton = document.getElementById('editSelected');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const bulkActionsBar = document.getElementById('bulkActionsBar');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const editButton = document.getElementById('editSelected');
 
-        selectAllCheckbox.addEventListener('change', function() {
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            updateBulkActions();
-        });
-
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('row-checkbox')) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
                 updateBulkActions();
-            }
-        });
+            });
 
-        function updateBulkActions() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const count = checkedBoxes.length;
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('row-checkbox')) {
+                    updateBulkActions();
+                }
+            });
 
-            if (count > 0) {
-                bulkActionsBar.style.display = 'block';
-                selectedCountSpan.textContent = count + ' selected';
-                
-                if (count === 1) {
-                    editButton.style.display = 'inline-block';
+            function updateBulkActions() {
+                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                const count = checkedBoxes.length;
+
+                if (count > 0) {
+                    bulkActionsBar.style.display = 'block';
+                    selectedCountSpan.textContent = count + ' selected';
+                    
+                    if (count === 1) {
+                        editButton.style.display = 'inline-block';
+                    } else {
+                        editButton.style.display = 'none';
+                    }
                 } else {
+                    bulkActionsBar.style.display = 'none';
                     editButton.style.display = 'none';
                 }
-            } else {
-                bulkActionsBar.style.display = 'none';
-                editButton.style.display = 'none';
-            }
 
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-            selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
-        }
+                const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
+            }
 
         // Clear Selection
-        document.getElementById('clearSelection').addEventListener('click', function() {
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.checked = false;
+            document.getElementById('clearSelection').addEventListener('click', function() {
+                const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                selectAllCheckbox.checked = false;
+                updateBulkActions();
             });
-            selectAllCheckbox.checked = false;
-            updateBulkActions();
-        });
 
         // Edit Selected (single item)
-        document.getElementById('editSelected').addEventListener('click', function() {
-            const checkedBox = document.querySelector('.row-checkbox:checked');
-            if (checkedBox) {
-                const participantId = checkedBox.value;
-                window.location.href = '/participants/edit/' + participantId;
-            }
-        });
-
-        // Delete Selected (bulk)
-        document.getElementById('deleteSelected').addEventListener('click', function() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const ids = Array.from(checkedBoxes).map(cb => cb.value);
-            const count = ids.length;
-            
-            let confirmMessage;
-            if (count === 1) {
-                const name = checkedBoxes[0].getAttribute('data-name');
-                confirmMessage = `Are you sure you want to delete ${name}?`;
-            } else {
-                confirmMessage = `Are you sure you want to delete ${count} participants?`;
-            }
-            
-            showDeleteConfirmation(confirmMessage, function() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/participants/delete-multiple';
-                
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'ids';
-                input.value = JSON.stringify(ids);
-                form.appendChild(input);
-                
-                document.body.appendChild(form);
-                form.submit();
-            });
-        });
-
-        // Delete Confirmation Modal
-        function showDeleteConfirmation(message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'modal active';
-            modal.id = 'deleteModal';
-            
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Confirm Deletion</h3>
-                        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p style="font-size: 1.1rem; color: #666;">${message}</p>
-                        <p style="margin-top: 1rem; color: #999;">This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
-                        <button class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-                closeDeleteModal();
-                onConfirm();
-            });
-            
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    closeDeleteModal();
+            document.getElementById('editSelected').addEventListener('click', function() {
+                const checkedBox = document.querySelector('.row-checkbox:checked');
+                if (checkedBox) {
+                    const participantId = checkedBox.value;
+                    window.location.href = '/participants/edit/' + participantId;
                 }
             });
-        }
 
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            if (modal) {
-                modal.remove();
+        // Delete Selected (bulk)
+            document.getElementById('deleteSelected').addEventListener('click', function() {
+                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                const count = ids.length;
+                
+                let confirmMessage;
+                if (count === 1) {
+                    const name = checkedBoxes[0].getAttribute('data-name');
+                    confirmMessage = `Are you sure you want to delete ${name}?`;
+                } else {
+                    confirmMessage = `Are you sure you want to delete ${count} participants?`;
+                }
+                
+                showDeleteConfirmation(confirmMessage, function() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/participants/delete-multiple';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids';
+                    input.value = JSON.stringify(ids);
+                    form.appendChild(input);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            });
+
+        // Delete Confirmation Modal
+            function showDeleteConfirmation(message, onConfirm) {
+                const modal = document.createElement('div');
+                modal.className = 'modal active';
+                modal.id = 'deleteModal';
+                
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Confirm Deletion</h3>
+                            <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p style="font-size: 1.1rem; color: #666;">${message}</p>
+                            <p style="margin-top: 1rem; color: #999;">This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+                            <button class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                    closeDeleteModal();
+                    onConfirm();
+                });
+                
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeDeleteModal();
+                    }
+                });
             }
-        }
+
+            function closeDeleteModal() {
+                const modal = document.getElementById('deleteModal');
+                if (modal) {
+                    modal.remove();
+                }
+            }
 
         // Clear Filters Button
-        document.getElementById('clearFilters').addEventListener('click', function() {
-            // Clear the session storage when clearing filters
-            sessionStorage.removeItem('filtersVisible');
-            window.location.href = '/participants';
-        });
+            document.getElementById('clearFilters').addEventListener('click', function() {
+                // Clear the session storage when clearing filters
+                sessionStorage.removeItem('filtersVisible');
+                window.location.href = '/participants';
+            });
 
         // Auto-hide success/error messages after 5 seconds
-        const alertMessages = document.querySelectorAll('.alert');
-        alertMessages.forEach(alert => {
-            setTimeout(() => {
-                alert.style.transition = 'opacity 0.5s';
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 500);
-            }, 5000);
-        });
+            const alertMessages = document.querySelectorAll('.alert');
+            alertMessages.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
     </script>
 </body>
 </html>

@@ -14,7 +14,7 @@
     --peach: #F4B092;
     --raspberry: #CE325B;
     
-    /* Functional Colors - Updated to use softer primary */
+    /* Functional Colors */
     --primary: #CE325B;
     --primary-hover: #3A3F3B;
     --secondary: var(--lavender);
@@ -205,14 +205,14 @@ nav {
 }
 
 .btn-primary {
-    background-color: var(--primary);
+    background-color: var(--sage);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-hover);
+    background-color: #7a9d7d;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(206, 50, 91, 0.3);
+    box-shadow: 0 6px 16px rgba(154, 181, 157, 0.4);
 }
 
 .btn-secondary {
@@ -245,13 +245,20 @@ nav {
 }
 
 .btn-add {
-    background-color: var(--cream);
-    color: var(--charcoal);
+    background-color: white;
+    color: var(--powder-blue);
 }
 
 .btn-add:hover {
-    background-color: var(--charcoal);
-    color: var(--cream);
+    background-color: var(--powder-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(153, 183, 198, 0.4);
+}
+
+.btn-add a {
+    color: inherit;
+    text-decoration: none;
 }
 
 .btn-outline {
@@ -310,17 +317,286 @@ nav {
     box-shadow: 0 4px 12px rgba(151, 142, 196, 0.25);
 }
 
-/* Forms */
+/* ============================================ */
+/* MODERN FORM STYLES */
+/* ============================================ */
+
+.add-card {
+    max-width: 900px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(58, 63, 59, 0.08);
+    overflow: hidden;
+}
+
+.modern-form {
+    padding: 3rem;
+}
+
+.form-section {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.section-description {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 0;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.form-group.focused .form-label {
+    color: var(--primary);
 }
 
 .form-label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
     color: var(--text-medium);
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
 }
+
+.required {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+    background-color: var(--background-light);
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(206, 50, 91, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-input:hover,
+.form-select:hover {
+    border-color: var(--secondary);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* Select Dropdown Styling */
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233A3F3B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+}
+
+.form-select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23CE325B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+/* Input with Prefix (for currency, etc.) */
+.input-with-prefix {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-prefix {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-medium);
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.form-input-with-prefix {
+    padding-left: 2.5rem;
+}
+
+/* Radio Button Styling */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.radio-group-inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    position: relative;
+}
+
+.radio-label:hover {
+    border-color: var(--secondary);
+    background-color: rgba(151, 142, 196, 0.05);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(151, 142, 196, 0.1);
+}
+
+.radio-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-label input[type="radio"]:checked ~ .radio-custom {
+    opacity: 1;
+}
+
+.radio-label input[type="radio"]:checked ~ .radio-text strong {
+    color: var(--primary);
+}
+
+.radio-label:has(input[type="radio"]:checked) {
+    border-color: var(--primary);
+    background-color: rgba(206, 50, 91, 0.05);
+    box-shadow: 0 2px 12px rgba(206, 50, 91, 0.15);
+}
+
+.radio-custom {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.radio-custom::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.radio-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1;
+}
+
+.radio-text strong {
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-size: 1.05rem;
+}
+
+.radio-text small {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+/* Inline radio buttons (smaller style) */
+.radio-group-inline .radio-label {
+    padding: 0.7rem 1.2rem;
+    flex: 0 1 auto;
+}
+
+.radio-group-inline .radio-label:hover {
+    transform: translateY(-2px);
+}
+
+.radio-group-inline .radio-text {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-color);
+    margin-top: 2rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state h2 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--text-medium);
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* ============================================ */
+/* FILTER & FORM CONTROL STYLES */
+/* ============================================ */
 
 .form-control {
     width: 100%;
@@ -382,17 +658,14 @@ textarea.form-control {
     min-width: 0;
 }
 
-/* Dropdown column (searchColumn) */
 .filter-item.filter-column {
     flex: 0 0 220px;
 }
 
-/* Search + buttons area */
 .filter-item.filter-search {
     flex: 1 1 auto;
 }
 
-/* Search Input/Button Height Consistency */
 .search-input-group {
     display: flex;
     gap: 0.5rem;
@@ -418,19 +691,16 @@ textarea.form-control {
     padding: 0.7rem 1.8rem;
 }
 
-/* Advanced filter section (the part you toggle open) */
 .advanced-filter-section {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
 }
 
-/* Hidden utility class for JS toggling */
 .is-hidden {
     display: none;
 }
 
-/* "Filter Options" heading */
 .filter-options-title {
     color: #7eb8b8;
     margin-bottom: 1rem;
@@ -438,20 +708,17 @@ textarea.form-control {
     font-weight: 600;
 }
 
-/* Card titles inside filters */
 .filter-card-title {
     color: #666;
     font-size: 1rem;
     margin: 0;
 }
 
-/* Scrollable card body used for long lists (city/school) */
 .filter-card-scroll {
     max-height: 200px;
     overflow-y: auto;
 }
 
-/* Checkbox labels inside filter panels */
 .filter-checkbox-label {
     display: block;
     margin-bottom: 0.5rem;
@@ -459,7 +726,6 @@ textarea.form-control {
     color: var(--text-medium);
 }
 
-/* Bottom action bar (Apply / Clear) */
 .filter-actions {
     margin-top: 1.5rem;
     border-top: 1px solid var(--border-color);
@@ -470,24 +736,11 @@ textarea.form-control {
     flex: 0.8;
 }
 
-/* Filter Cards Grid */
 .filter-cards-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
-}
-
-@media (max-width: 1200px) {
-    .filter-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .filter-cards-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Tables */
@@ -544,7 +797,6 @@ th {
     background-color: #D5E1E8;
 }
 
-/* Sortable column headers */
 .sortable {
     cursor: pointer;
     user-select: none;
@@ -788,6 +1040,10 @@ tbody tr:hover {
     overflow: hidden;
 }
 
+.hero-compact {
+    padding: 3.5rem 2rem;
+}
+
 .hero::before {
     content: '';
     position: absolute;
@@ -826,11 +1082,22 @@ tbody tr:hover {
     letter-spacing: -0.5px;
 }
 
+.hero-compact h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+}
+
 .hero p {
     font-size: 1.25rem;
     color: var(--text-medium);
     margin-bottom: 2.5rem;
     line-height: 1.7;
+}
+
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-medium);
+    margin-bottom: 0;
 }
 
 /* Page Header */
@@ -974,6 +1241,12 @@ footer p {
 .gap-3 { gap: 2rem; }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .filter-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .nav-container {
         padding: 1rem 1.5rem;
@@ -995,12 +1268,15 @@ footer p {
     .hero h1 {
         font-size: 2.5rem;
     }
+
+    .hero-compact h1 {
+        font-size: 2rem;
+    }
     
     .page-header h1 {
         font-size: 2.2rem;
     }
 
-    /* Stack filter controls nicely on mobile */
     .filter-row {
         flex-direction: column;
         flex-wrap: wrap;
@@ -1010,6 +1286,10 @@ footer p {
     .filter-item.filter-search {
         flex: 1 1 100%;
     }
+
+    .filter-cards-grid {
+        grid-template-columns: 1fr;
+    }
     
     .table-container {
         overflow-x: auto;
@@ -1017,6 +1297,27 @@ footer p {
     
     table {
         min-width: 600px;
+    }
+
+    /* Form responsive */
+    .modern-form {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    .radio-group-inline {
+        flex-direction: column;
     }
 }
 
@@ -1033,5 +1334,17 @@ footer p {
     
     .logo a {
         font-size: 1.4rem;
+    }
+
+    .modern-form {
+        padding: 1.5rem 1rem;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    .add-card {
+        margin: 2rem auto;
     }
 }
