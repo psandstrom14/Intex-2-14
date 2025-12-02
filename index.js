@@ -296,7 +296,7 @@ app.post('/sort-participants', (req, res) => {
 // ADD PAGE: 
 app.get('/add/:table',(req,res) => {
     res.render("add"); 
-});s
+});
 
 // EVENT MAINTENANCE PAGE: 
 app.get('/events',(req,res) => {
