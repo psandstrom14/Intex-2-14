@@ -63,26 +63,23 @@ app.use(express.urlencoded({ extended: true })); // Makes working with HTML form
 //     next();
 // });
 
-// Global authentication middleware - runs on EVERY request (Needed for login functionality)
-app.use((req, res, next) => {
-  // Skip authentication for specific login routes
-  if (
-    req.path === "/" ||
-    req.path === "/login" ||
-    req.path === "/logout" ||
-    req.path === "/signUp"
-  ) {
-    //continue with the request path
-    return next();
-  }
+    // Global authentication middleware - runs on EVERY request (Needed for login functionality)
+    app.use((req, res, next) => {
+        // Skip authentication for specific login routes
+        if (req.path === '/' || req.path === '/index' || req.path === '/about' || req.path === '/performance' || req.path === '/calendar' || req.path === '/donate_now' || req.path === '/login' || req.path === '/logout') {
+            //continue with the request path
+            return next();
+        }
 
-  // Check if user is logged in for all other routes
-  if (req.session.isLoggedIn) {
-    next(); // User is logged in, continue
-  } else {
-    res.render("login", { error_message: "Please log in to access this page" });
-  }
-});
+        // Check if user is logged in for all other routes
+        if (req.session.isLoggedIn) {
+            next(); // User is logged in, continue
+        } 
+        else {
+            res.render("login", { error_message: "Please log in to access this page" });
+        }
+    });
+
 /* ROUTES */
 // HOME PAGE: general landing page that displays information about the company
 app.get("/", (req, res) => {
@@ -100,188 +97,160 @@ app.get("/performance", (req, res) => {
 });
 
 // CALENDAR PAGE: will allow anyone to see the events. If logged in, will have event registration functionality
-app.get("/calendar", async (req, res) => {
-  // Helper function to format time from 24-hour to 12-hour format
-  function formatTime(timeString) {
-    if (!timeString) return "";
-
-    // If it's already formatted (contains AM/PM), return as is
-    if (timeString.includes("AM") || timeString.includes("PM")) {
-      return timeString;
-    }
-
-    // Handle time string formats like "14:30:00" or "14:30"
-    const timeParts = timeString.toString().split(":");
-    let hours = parseInt(timeParts[0]);
-    const minutes = timeParts[1] || "00";
-
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-
-    return `${hours}:${minutes} ${ampm}`;
-  }
-
-  // code for calendar information
-  try {
-    // Get flash messages
-    const sessionData = req.session || {};
-    const message = sessionData.flashMessage || "";
-    const messageType = sessionData.flashType || "success";
-    sessionData.flashMessage = null;
-    sessionData.flashType = null;
-
-    // Get user's registered events if logged in
-    let userRegisteredEventIds = [];
-    if (req.session.user && req.session.user.id) {
-      const userRegistrations = await knex("event_registrations")
-        .where("participant_id", req.session.user.id)
-        .whereIn("registration_status", ["registered", "attended"])
-        .select("event_id");
-
-      userRegisteredEventIds = userRegistrations.map((reg) => reg.event_id);
-    }
-
-    // Calculate date range for next 3 months
-    const today = new Date();
-    const endDate = new Date(today);
-    endDate.setMonth(endDate.getMonth() + 3);
-
-    // Format dates for SQL query (YYYY-MM-DD)
-    const startDateStr = today.toISOString().split("T")[0];
-    const endDateStr = endDate.toISOString().split("T")[0];
-
-    // Get all events in the next 3 months using Knex
-    const events = await knex("events")
-      .select(
-        "event_id",
-        "event_name",
-        "event_date",
-        "event_start_time",
-        "event_end_time",
-        "event_location",
-        "event_capacity",
-        "event_registration_deadline_date",
-        "event_registration_deadline_time"
-      )
-      .where("event_date", ">=", startDateStr)
-      .where("event_date", "<=", endDateStr)
-      .orderBy("event_date", "asc")
-      .orderBy("event_start_time", "asc");
-
-    // For each event, count the number of registrations
-    const eventsWithCounts = await Promise.all(
-      events.map(async (event) => {
-        const registrationCount = await knex("event_registrations")
-          .where("event_id", event.event_id)
-          .where(function () {
-            this.where("registration_attended_flag", 1)
-              .orWhere("registration_status", "registered")
-              .orWhere("registration_status", "attended");
-          })
-          .count("* as count")
-          .first();
-
-        // Check if current user is registered for this event
-        const isUserRegistered = userRegisteredEventIds.includes(
-          event.event_id
-        );
-
-        // return count of registered per event
-        return {
-          ...event,
-          registered_count: parseInt(registrationCount.count) || 0,
-          user_registered: isUserRegistered,
-        };
-      })
-    );
-
-    // Build month data structures
-    const months = [];
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    for (let i = 0; i < 3; i++) {
-      const monthDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
-      const year = monthDate.getFullYear();
-      const monthNum = monthDate.getMonth() + 1;
-      const monthName = monthNames[monthDate.getMonth()];
-
-      // Get first day of week (0 = Sunday, 6 = Saturday)
-      const startDay = monthDate.getDay();
-
-      // Get number of days in month
-      const daysInMonth = new Date(year, monthNum, 0).getDate();
-
-      // Create events object organized by date
-      const monthEvents = {};
-      eventsWithCounts.forEach((event) => {
-        const eventDate = new Date(event.event_date);
-        if (
-          eventDate.getMonth() === monthDate.getMonth() &&
-          eventDate.getFullYear() === year
-        ) {
-          // Convert event_date to YYYY-MM-DD string for the key
-          const dateKey = eventDate.toISOString().split("T")[0];
-          if (!monthEvents[dateKey]) {
-            monthEvents[dateKey] = [];
-          }
-
-          // Format times for display (convert from 24-hour to 12-hour format)
-          const formattedEvent = {
-            event_id: event.event_id,
-            event_name: event.event_name,
-            event_date: event.event_date,
-            start_time: formatTime(event.event_start_time),
-            end_time: formatTime(event.event_end_time),
-            location: event.event_location,
-            capacity: event.event_capacity,
-            registered_count: event.registered_count,
-            user_registered: event.user_registered,
-            registration_deadline: event.event_registration_deadline_date,
-          };
-          monthEvents[dateKey].push(formattedEvent);
+    app.get('/calendar', async (req, res) => {
+        // Helper function to format time from 24-hour to 12-hour format
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            
+            // If it's already formatted (contains AM/PM), return as is
+            if (timeString.includes('AM') || timeString.includes('PM')) {
+                return timeString;
+            }
+            
+            // Handle time string formats like "14:30:00" or "14:30"
+            const timeParts = timeString.toString().split(':');
+            let hours = parseInt(timeParts[0]);
+            const minutes = timeParts[1] || '00';
+            
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            
+            return `${hours}:${minutes} ${ampm}`;
         }
-      });
-
-      months.push({
-        name: monthName,
-        year: year,
-        monthNum: monthNum,
-        startDay: startDay,
-        daysInMonth: daysInMonth,
-        events: monthEvents,
-      });
-    }
-
-    // Get today's date string for highlighting
-    const todayStr = today.toISOString().split("T")[0];
-
-    res.render("calendar", {
-      title: "Event Calendar",
-      months: months,
-      today: todayStr,
-      message: message,
-      messageType: messageType,
-      isLoggedIn: !!(req.session.user && req.session.user.id),
+        
+        // code for calendar information
+        try {
+            // Get flash messages
+            const sessionData = req.session || {};
+            const message = sessionData.flashMessage || '';
+            const messageType = sessionData.flashType || 'success';
+            sessionData.flashMessage = null;
+            sessionData.flashType = null;
+            
+            // Get user's registered events if logged in
+            let userRegisteredEventIds = [];
+            if (req.session.user && req.session.user.id) {
+                const userRegistrations = await knex('event_registrations')
+                    .where('participant_id', req.session.user.id)
+                    .whereIn('registration_status', ['registered', 'attended'])
+                    .select('event_id');
+                
+                userRegisteredEventIds = userRegistrations.map(reg => reg.event_id);
+            }
+            
+            // Calculate date range for next 3 months
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setMonth(endDate.getMonth() + 3);
+            
+            // Format dates for SQL query (YYYY-MM-DD)
+            const startDateStr = today.toISOString().split('T')[0];
+            const endDateStr = endDate.toISOString().split('T')[0];
+            
+            // Get all events in the next 3 months using Knex
+            const events = await knex('events')
+                .select('event_id','event_name','event_date','event_start_time','event_end_time','event_location','event_capacity','registration_deadline_date','registration_deadline_time')
+                .where('event_date', '>=', startDateStr)
+                .where('event_date', '<=', endDateStr)
+                .orderBy('event_date', 'asc')
+                .orderBy('event_start_time', 'asc');
+            
+            // For each event, count the number of registrations
+            const eventsWithCounts = await Promise.all(events.map(async (event) => {
+                const registrationCount = await knex('event_registrations')
+                    .where('event_id', event.event_id)
+                    .where(function() {
+                        this.where('registration_attended_flag', 1)
+                            .orWhere('registration_status', 'registered')
+                            .orWhere('registration_status', 'attended');
+                    })
+                    .count('* as count')
+                    .first();
+                
+                // Check if current user is registered for this event
+                const isUserRegistered = userRegisteredEventIds.includes(event.event_id);
+                
+                // return count of registered per event
+                return {
+                    ...event,
+                    registered_count: parseInt(registrationCount.count) || 0,
+                    user_registered: isUserRegistered
+                };
+            }));
+            
+            // Build month data structures
+            const months = [];
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            for (let i = 0; i < 3; i++) {
+                const monthDate = new Date(today.getFullYear(), today.getMonth() + i, 1);
+                const year = monthDate.getFullYear();
+                const monthNum = monthDate.getMonth() + 1;
+                const monthName = monthNames[monthDate.getMonth()];
+                
+                // Get first day of week (0 = Sunday, 6 = Saturday)
+                const startDay = monthDate.getDay();
+                
+                // Get number of days in month
+                const daysInMonth = new Date(year, monthNum, 0).getDate();
+                
+                // Create events object organized by date
+                const monthEvents = {};
+                eventsWithCounts.forEach(event => {
+                    const eventDate = new Date(event.event_date);
+                    if (eventDate.getMonth() === monthDate.getMonth() && 
+                        eventDate.getFullYear() === year) {
+                        // Convert event_date to YYYY-MM-DD string for the key
+                        const dateKey = eventDate.toISOString().split('T')[0];
+                        if (!monthEvents[dateKey]) {
+                            monthEvents[dateKey] = [];
+                        }
+                        
+                        // Format times for display (convert from 24-hour to 12-hour format)
+                        const formattedEvent = {
+                            event_id: event.event_id,
+                            event_name: event.event_name,
+                            event_date: event.event_date,
+                            start_time: formatTime(event.event_start_time),
+                            end_time: formatTime(event.event_end_time),
+                            location: event.event_location,
+                            capacity: event.event_capacity,
+                            registered_count: event.registered_count,
+                            user_registered: event.user_registered,
+                            registration_deadline: event.registration_deadline_date
+                        };
+                        monthEvents[dateKey].push(formattedEvent);
+                    }
+                });
+                
+                months.push({
+                    name: monthName,
+                    year: year,
+                    monthNum: monthNum,
+                    startDay: startDay,
+                    daysInMonth: daysInMonth,
+                    events: monthEvents
+                });
+            }
+            
+            // Get today's date string for highlighting
+            const todayStr = today.toISOString().split('T')[0];
+            
+            res.render('calendar', {
+                title: 'Event Calendar',
+                months: months,
+                today: todayStr,
+                message: message,
+                messageType: messageType,
+                isLoggedIn: !!(req.session.user && req.session.user.id)
+            });
+            
+        } catch (err) {
+            console.error('Error loading calendar:', err);
+            res.status(500).send('Error loading calendar: ' + err.message);
+        }
     });
-  } catch (err) {
-    console.error("Error loading calendar:", err);
-    res.status(500).send("Error loading calendar: " + err.message);
-  }
-});
 
 // ADD EVENT REGISTRATION FUNCTIONALITY (USER END):
 // this is the functionality that allows a user to register for an event from the "calendar page"
