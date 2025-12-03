@@ -98,6 +98,8 @@ app.use((req, res, next) => {
   if (req.session.isLoggedIn) {
     next(); // User is logged in, continue
   } else {
+    // Store the original URL they wanted to access
+    req.session.returnTo = req.originalUrl || req.url;
     res.render("login", { error_message: "Please log in to access this page" });
   }
 });
@@ -126,7 +128,12 @@ app.post("/login", (req, res) => {
           role: user.participant_role,
         };
         req.session.isLoggedIn = true;
-        res.redirect("/profile/" + user.participant_id);
+
+        // Check if there's a stored return URL
+        const returnTo =
+          req.session.returnTo || `/profile/${user.participant_id}`;
+        delete req.session.returnTo; // Clear it after use
+        res.redirect(returnTo);
       } else {
         res.render("login", { error_message: "Invalid credentials" });
       }
