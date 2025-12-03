@@ -48,7 +48,7 @@ CREATE TABLE event_types (
 -- =======================
 CREATE TABLE events (
     event_id                         INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    event_type_id                    INTEGER REFERENCES event_types(event_type_id),
+    event_type_id                    INTEGER ,
     event_name                       VARCHAR(255),
     event_date                       DATE,
     event_start_time                 TIME,
@@ -64,8 +64,8 @@ CREATE TABLE events (
 -- =======================
 CREATE TABLE event_registrations (
     event_registration_id       INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    participant_id              INTEGER REFERENCES participants(participant_id),
-    event_id                    INTEGER REFERENCES events(event_id),
+    participant_id              INTEGER ,
+    event_id                    INTEGER ,
     registration_status         VARCHAR(50),
     registration_attended_flag  INTEGER,
     registration_created_at_date DATE,
@@ -79,7 +79,7 @@ CREATE TABLE event_registrations (
 -- =======================
 CREATE TABLE donations (
     donation_id      INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    participant_id   INTEGER REFERENCES participants(participant_id),
+    participant_id   INTEGER ,
     donation_date    DATE,
     donation_amount  NUMERIC(10,2)
 );
@@ -89,7 +89,7 @@ CREATE TABLE donations (
 -- =======================
 CREATE TABLE milestones (
     milestone_id       INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    participant_id     INTEGER REFERENCES participants(participant_id),
+    participant_id     INTEGER ,
     milestone_title    VARCHAR(255),
     milestone_date     DATE,
     milestone_category VARCHAR(100)
@@ -100,7 +100,7 @@ CREATE TABLE milestones (
 -- =======================
 CREATE TABLE survey_results (
     survey_id                    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    event_registration_id        INTEGER REFERENCES event_registrations(event_registration_id),
+    event_registration_id        INTEGER ,
     survey_satisfaction_score    NUMERIC(4,2),
     survey_usefulness_score      NUMERIC(4,2),
     survey_instructor_score      NUMERIC(4,2),
