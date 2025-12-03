@@ -62,7 +62,7 @@
     // Global authentication middleware - runs on EVERY request (Needed for login functionality)
     app.use((req, res, next) => {
         // Skip authentication for specific login routes
-        if (req.path === '/' || req.path === '/login' || req.path === '/logout' || req.path === '/signUp') {
+        if (req.path === '/' || req.path === '/index' || req.path === '/about' || req.path === '/performance' || req.path === '/calender' || req.path === '/donate_now' || req.path === '/login' || req.path === '/logout') {
             //continue with the request path
             return next();
         }
