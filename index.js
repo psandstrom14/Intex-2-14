@@ -76,15 +76,15 @@ app.post("/login", (req, res) => {
 
   knex
     .select()
-    .from("users")
-    .where({ username: username, password: password })
+    .from("participants")
+    .where({ participant_username: username, participant_password: password })
     .first()
     .then((user) => {
       if (user) {
         req.session.user = {
-          id: user.id,
-          username: user.username,
-          level: user.level,
+          id: user.participant_id,
+          username: user.participant_username,
+          role: user.participant_role,
         };
         res.redirect("/user_profile");
       } else {
