@@ -1,13 +1,13 @@
-    // Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
-    // This code will allow users of a non profit to manage visitor information, user information, events, milestones, and donations
+// Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+// This code will allow users of a non profit to manage visitor information, user information, events, milestones, and donations
 
-    // REQUIRE LIBRARIES AND STORE IN VARIABLE (if applicable):
-    require("dotenv").config(); // DOTENV: loads ENVIROMENT VARIABLES from .env file; Allows you to use process.env
-    const express = require("express"); // EXPRESS: helps with web development
-    const session = require("express-session"); // EXPRESS SESSION: needed for session variable. Stored on the server to hold data; Essentially adds a new property to every req object that allows you to store a value per session.
-    let path = require("path"); // PATH: helps create safe paths when working with file/folder locations
-    let bodyParser = require("body-parser"); // BODY-PARSER: Allows you to read the body of incoming HTTP requests and makes that data available on req.body
-    const knex = require("knex")({ // KNEX: allows you to work with SQL databases
+// REQUIRE LIBRARIES AND STORE IN VARIABLE (if applicable):
+require("dotenv").config(); // DOTENV: loads ENVIROMENT VARIABLES from .env file; Allows you to use process.env
+const express = require("express"); // EXPRESS: helps with web development
+const session = require("express-session"); // EXPRESS SESSION: needed for session variable. Stored on the server to hold data; Essentially adds a new property to every req object that allows you to store a value per session.
+let path = require("path"); // PATH: helps create safe paths when working with file/folder locations
+let bodyParser = require("body-parser"); // BODY-PARSER: Allows you to read the body of incoming HTTP requests and makes that data available on req.body
+const knex = require("knex")({ // KNEX: allows you to work with SQL databases
     client: "pg", // connect to PostgreSQL (put database name here if something else)
     connection: { // connect to the database. If you deploy this to an internet host, you need to use process.env.DATABASE_URL
         host: process.env.RDS_HOSTNAME || "localhost",
@@ -15,97 +15,79 @@
         password: process.env.RDS_PASSWORD || "admin",
         database: process.env.RDS_DB_NAME || "EllaRises",
         port: process.env.RDS_PORT || 5432,
-    }
-    });
+    }});
 
-    function paramToArray(val, defaultVal = ["all"]) {
-    if (!val) return defaultVal;
-    return Array.isArray(val) ? val : [val];
-    }
-
-    // For surveys: map logical column names (from UI) to real DB columns (with table aliases)
-    const SURVEY_SEARCHABLE_COLUMNS = [
-    'full_name',               // NEW
-    'participant_first_name',
-    'participant_last_name',
-    'event_name',
-    'event_date',
-    'survey_nps_bucket'
-    ];
-
-    const SURVEY_COLUMN_MAP = {
-    full_name: null, // special-cased in code below
-    participant_first_name: 'p.participant_first_name',
-    participant_last_name: 'p.participant_last_name',
-    event_name: 'e.event_name',
-    event_date: 'e.event_date',
-    survey_nps_bucket: 's.survey_nps_bucket'
-    };
-
-    // CREATE VARIABLES:
+// CREATE VARIABLES:
     let app = express(); // creates an express object called app
     const port = process.env.PORT || 3000; // Creates variable to store port. Uses .env variable "PORT". You can also just leave that out if aren't using .env
 
-    // PATHS:
+// PATHS:
     app.set("view engine", "ejs"); // Allows you to use EJS for the web pages - requires a views folder and all files are .ejs
     app.use("/images", express.static(path.join(__dirname, "images"))); // allows you to create path for images (in folder titled "images")
     app.use(express.static("public"));
     app.use(
-    session({
-    secret: process.env.SESSION_SECRET || "intex-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    })
-    );
+        session({
+        secret: process.env.SESSION_SECRET || "intex-secret-key",
+        resave: false,
+        saveUninitialized: false,
+        }));
 
-    // MIDDLEWARE:
+// OTHER SETUP:
+    // Ensures a value is returned as an array, using a default if value is empty.
+    function paramToArray(val, defaultVal = ["all"]) {
+        if (!val) return defaultVal;
+        return Array.isArray(val) ? val : [val];
+    };
+
+// MIDDLEWARE:
     app.use(express.urlencoded({ extended: true })); // Makes working with HTML forms a lot easier. Takes inputs and stores them in req.body (for post) or req.query (for get).
 
-    // HOME PAGE:
+// HOME PAGE:
     app.get("/", (req, res) => {
-    res.render("index");
+        res.render("index");
     });
 
-    // ABOUT PAGE:
+// ABOUT PAGE:
     app.get("/about", (req, res) => {
-    res.render("about");
+        res.render("about");
     });
 
-    // DONATE NOW PAGE:
+// DONATE NOW PAGE:
     app.get("/donate_now", (req, res) => {
-    res.render("donate_now");
+        res.render("donate_now");
     });
 
-    // LOGIN PAGE:
-    app.get("/login", (req, res) => {
-    res.render("login");
+// LOGIN PAGE:
+    // Route to display Login Page
+    app.get("/login", (req, res) => { 
+        res.render("login");
     });
 
+    // Route to log user in
     app.post("/login", (req, res) => {
-    let username = req.body.username;
-    let password = req.body.password;
+        let username = req.body.username;
+        let password = req.body.password;
 
-    knex
-    .select()
-    .from("users")
-    .where({ username: username, password: password })
-    .first()
-    .then((user) => {
-        if (user) {
-        req.session.user = {
-            id: user.id,
-            username: user.username,
-            level: user.level,
-        };
-        res.redirect("/user_profile");
-        } else {
-        res.render("login", { error_message: "Invalid credentials" });
-        }
-    })
-    .catch((err) => {
-        console.error(err);
-        res.render("login", { error_message: "Database error" });
-    });
+        knex
+        .select()
+        .from("users")
+        .where({ username: username, password: password })
+        .first()
+        .then((user) => {
+            if (user) {
+            req.session.user = {
+                id: user.id,
+                username: user.username,
+                level: user.level,
+            };
+            res.redirect("/user_profile");
+            } else {
+            res.render("login", { error_message: "Invalid credentials" });
+            }
+        }).catch((err) => {
+            console.error(err);
+            res.render("login", { error_message: "Login error" });
+        });
     });
 
     // ADD ENTRY PAGE:
@@ -344,6 +326,24 @@
     });
 
     // SURVEY MAINTENANCE PAGE (uses survey_results as the DB table)
+        // For surveys: map logical column names (from UI) to real DB columns (with table aliases)
+        const SURVEY_SEARCHABLE_COLUMNS = [
+            'full_name',               // NEW
+            'participant_first_name',
+            'participant_last_name',
+            'event_name',
+            'event_date',
+            'survey_nps_bucket'
+            ];
+        
+            const SURVEY_COLUMN_MAP = {
+            full_name: null, // special-cased in code below
+            participant_first_name: 'p.participant_first_name',
+            participant_last_name: 'p.participant_last_name',
+            event_name: 'e.event_name',
+            event_date: 'e.event_date',
+            survey_nps_bucket: 's.survey_nps_bucket'
+            };
     app.get('/surveys', async (req, res) => {
         try {
         // flash messages
