@@ -91,7 +91,7 @@ try {
     res.render("login", { error_message: "Database error" });
 }
 });
-  
+
 // ADD ENTRY PAGE:
 app.get('/add/:table', async (req, res) => {
 const table_name = req.params.table;
@@ -323,7 +323,7 @@ app.get("/participants", async (req, res) => {
         message: "Error loading participants",
         messageType: "danger",
         filters: {
-        searchColumn: "full_name",
+        searchColumn: "participant_first_name",
         searchValue: "",
         city: ["all"],
         school: ["all"],
