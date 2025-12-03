@@ -233,24 +233,13 @@
 
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
-                            <select class="form-select" name="event_type_id" id="eventSelect" required>
-                                <option value="">Select an Event</option>
-                                <option value="1">Mentor Office Hours</option>
-                                <option value="2">Robotics Lab Saturday</option>
-                                <option value="3">Girls in STEAM Mentoring</option>
-                                <option value="4">Monthly Coding Club</option>
-                                <option value="5">Intro to Painting Class</option>
-                                <option value="6">Data Science Study Group</option>
-                                <option value="7">Leadership Circle Meetup</option>
-                                <option value="8">Web Dev Bootcamp Night</option>
-                                <option value="9">Ella Rises Annual Leadership Conference</option>
-                                <option value="10">Monthly Art Studio Workshop</option>
-                                <option value="11">STEAM Summit & Expo</option>
-                                <option value="12">AI for Beginners Bootcamp</option>
-                                <option value="13">Digital Design Workshop</option>
-                                <option value="14">Community STEM Hackathon</option>
-                                <option value="15">Women in Tech & Art Showcase</option>
-                            </select>
+                            <select class="form-select" name="event_name" id="eventSelect" required>
+                            <option value="">Select an Event</option>
+                            <% events.forEach(e => { %>
+                                <option value="<%= e.event_name %>"><%= e.event_name %></option>
+                            <% }) %>
+                        </select>
+
                             <input type="hidden" name="event_name" id="eventNameInput">    
                         </div>
 

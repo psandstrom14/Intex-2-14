@@ -252,23 +252,15 @@
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
                             <select class="form-select" name="event_type_id" id="eventSelect" required>
-                                <option value="">Select an Event</option>
-                                <option value="1"  <%= info.event_type_id == 1  || info.event_type_id === '1'  ? 'selected' : '' %>>Mentor Office Hours</option>
-                                <option value="2"  <%= info.event_type_id == 2  || info.event_type_id === '2'  ? 'selected' : '' %>>Robotics Lab Saturday</option>
-                                <option value="3"  <%= info.event_type_id == 3  || info.event_type_id === '3'  ? 'selected' : '' %>>Girls in STEAM Mentoring</option>
-                                <option value="4"  <%= info.event_type_id == 4  || info.event_type_id === '4'  ? 'selected' : '' %>>Monthly Coding Club</option>
-                                <option value="5"  <%= info.event_type_id == 5  || info.event_type_id === '5'  ? 'selected' : '' %>>Intro to Painting Class</option>
-                                <option value="6"  <%= info.event_type_id == 6  || info.event_type_id === '6'  ? 'selected' : '' %>>Data Science Study Group</option>
-                                <option value="7"  <%= info.event_type_id == 7  || info.event_type_id === '7'  ? 'selected' : '' %>>Leadership Circle Meetup</option>
-                                <option value="8"  <%= info.event_type_id == 8  || info.event_type_id === '8'  ? 'selected' : '' %>>Web Dev Bootcamp Night</option>
-                                <option value="9"  <%= info.event_type_id == 9  || info.event_type_id === '9'  ? 'selected' : '' %>>Ella Rises Annual Leadership Conference</option>
-                                <option value="10" <%= info.event_type_id == 10 || info.event_type_id === '10' ? 'selected' : '' %>>Monthly Art Studio Workshop</option>
-                                <option value="11" <%= info.event_type_id == 11 || info.event_type_id === '11' ? 'selected' : '' %>>STEAM Summit & Expo</option>
-                                <option value="12" <%= info.event_type_id == 12 || info.event_type_id === '12' ? 'selected' : '' %>>AI for Beginners Bootcamp</option>
-                                <option value="13" <%= info.event_type_id == 13 || info.event_type_id === '13' ? 'selected' : '' %>>Digital Design Workshop</option>
-                                <option value="14" <%= info.event_type_id == 14 || info.event_type_id === '14' ? 'selected' : '' %>>Community STEM Hackathon</option>
-                                <option value="15" <%= info.event_type_id == 15 || info.event_type_id === '15' ? 'selected' : '' %>>Women in Tech & Art Showcase</option>
-                            </select>
+    <option value="">Select an Event Type</option>
+    <% event_types.forEach(t => { %>
+        <option value="<%= t.event_type_id %>" 
+            <%= info && info.event_type_id == t.event_type_id ? "selected" : "" %>>
+            <%= t.event_type_name %>
+        </option>
+    <% }) %>
+</select>
+
                             <input type="hidden" name="event_name" id="eventNameInput" value="<%= info.event_name || '' %>">    
                         </div>
 
@@ -401,23 +393,12 @@
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
                             <select class="form-select" name="event_name" id="eventSelect" required>
-                                <option value="">Select an Event</option>
-                                <option value="Mentor Office Hours"                      <%= info.event_name === 'Mentor Office Hours' ? 'selected' : '' %>>Mentor Office Hours</option>
-                                <option value="Robotics Lab Saturday"                   <%= info.event_name === 'Robotics Lab Saturday' ? 'selected' : '' %>>Robotics Lab Saturday</option>
-                                <option value="Girls in STEAM Mentoring"                <%= info.event_name === 'Girls in STEAM Mentoring' ? 'selected' : '' %>>Girls in STEAM Mentoring</option>
-                                <option value="Monthly Coding Club"                    <%= info.event_name === 'Monthly Coding Club' ? 'selected' : '' %>>Monthly Coding Club</option>
-                                <option value="Intro to Painting Class"                <%= info.event_name === 'Intro to Painting Class' ? 'selected' : '' %>>Intro to Painting Class</option>
-                                <option value="Data Science Study Group"               <%= info.event_name === 'Data Science Study Group' ? 'selected' : '' %>>Data Science Study Group</option>
-                                <option value="Leadership Circle Meetup"               <%= info.event_name === 'Leadership Circle Meetup' ? 'selected' : '' %>>Leadership Circle Meetup</option>
-                                <option value="Web Dev Bootcamp Night"                 <%= info.event_name === 'Web Dev Bootcamp Night' ? 'selected' : '' %>>Web Dev Bootcamp Night</option>
-                                <option value="Ella Rises Annual Leadership Conference" <%= info.event_name === 'Ella Rises Annual Leadership Conference' ? 'selected' : '' %>>Ella Rises Annual Leadership Conference</option>
-                                <option value="Monthly Art Studio Workshop"            <%= info.event_name === 'Monthly Art Studio Workshop' ? 'selected' : '' %>>Monthly Art Studio Workshop</option>
-                                <option value="STEAM Summit & Expo"                    <%= info.event_name === 'STEAM Summit & Expo' ? 'selected' : '' %>>STEAM Summit & Expo</option>
-                                <option value="AI for Beginners Bootcamp"              <%= info.event_name === 'AI for Beginners Bootcamp' ? 'selected' : '' %>>AI for Beginners Bootcamp</option>
-                                <option value="Digital Design Workshop"                <%= info.event_name === 'Digital Design Workshop' ? 'selected' : '' %>>Digital Design Workshop</option>
-                                <option value="Community STEM Hackathon"               <%= info.event_name === 'Community STEM Hackathon' ? 'selected' : '' %>>Community STEM Hackathon</option>
-                                <option value="Women in Tech & Art Showcase"           <%= info.event_name === 'Women in Tech & Art Showcase' ? 'selected' : '' %>>Women in Tech & Art Showcase</option>
-                            </select>
+                                    <option value="">Select an Event</option>
+                                    <% events.forEach(e => { %>
+                                        <option value="<%= e.event_name %>"><%= e.event_name %></option>
+                                    <% }) %>
+                                </select>
+
                         </div>
                         
                         <div class="form-group">
