@@ -15,6 +15,7 @@
         password: process.env.RDS_PASSWORD || "Hopethisworks1",
         database: process.env.RDS_DB_NAME || "ebdb",
         port: process.env.RDS_PORT || 5432,
+        ssl: { rejectUnauthorized: false }
     }});
 
 // CREATE VARIABLES:
