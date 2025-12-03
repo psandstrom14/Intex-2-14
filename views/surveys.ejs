@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surveys - ß Rises</title>
+    <title>Surveys - Ella Rises</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -75,9 +75,11 @@
             <div class="table-header">
                 <h2 class="table-title">Ella Rises Surveys</h2>
                 <div class="table-actions">
-                    <button class="btn btn-add">
-                        <a href="/add/surveys">+ Add Survey</a>
-                    </button>
+                    <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
+                        <button class="btn btn-add">
+                            <a href="/add/surveys">+ Add Survey</a>
+                        </button>
+                    <% } %>
                 </div>
             </div>
 
@@ -336,25 +338,29 @@
             </div>
 
             <!-- Bulk Actions Bar -->
-            <div id="bulkActionsBar" style="display: none; background-color: #f8f0f0; padding: 1rem 1.5rem; border-bottom: 1px solid #e0e0e0;">
-                <div class="flex-between">
-                    <div>
-                        <span id="selectedCount" style="font-weight: 600; color: #666;">0 selected</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="btn btn-secondary btn-small" id="editSelected" style="display: none;"> Edit </button>
-                        <button class="btn btn-danger btn-small" id="deleteSelected"> Delete Selected </button>
-                        <button class="btn btn-outline btn-small" id="clearSelection"> Clear Selection</button>
+            <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
+                <div id="bulkActionsBar" style="display: none; background-color: #f8f0f0; padding: 1rem 1.5rem; border-bottom: 1px solid #e0e0e0;">
+                    <div class="flex-between">
+                        <div>
+                            <span id="selectedCount" style="font-weight: 600; color: #666;">0 selected</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-secondary btn-small" id="editSelected" style="display: none;"> Edit </button>
+                            <button class="btn btn-danger btn-small" id="deleteSelected"> Delete Selected </button>
+                            <button class="btn btn-outline btn-small" id="clearSelection"> Clear Selection</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <% } %>
 
             <!-- Table -->
             <div>
                 <table>
                     <thead>
                         <tr>
+                            <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                             <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
+                            <% } %>
                             <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="event_name">Event Name <span class="sort-icon">⇅</span></th>
@@ -392,6 +398,7 @@
                                     }
                                 %>
                                 <tr>
+                                    <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                                     <td>
                                         <input
                                             type="checkbox"
@@ -399,6 +406,7 @@
                                             value="<%= s.survey_id %>"
                                             data-name="<%= s.participant_first_name %> <%= s.participant_last_name %> - <%= s.event_name %>">
                                     </td>
+                                    <% } %>
                                     <td><%= s.participant_first_name %></td>
                                     <td><%= s.participant_last_name %></td>
                                     <td><%= s.event_name %></td>
@@ -415,7 +423,7 @@
                             <% }); %>
                         <% } else { %>
                             <tr>
-                                <td colspan="13" style="text-align: center; padding: 3rem; color: #999;">
+                                <td colspan="<%= (isLoggedIn && role && role.toLowerCase() === 'admin') ? '13' : '12' %>" style="text-align: center; padding: 3rem; color: #999;">
                                     No surveys found. Click "Add Survey" to get started.
                                 </td>
                             </tr>
@@ -434,8 +442,7 @@
 
     <script>
         // Make filters object available to client-side JS
-        const filters = JSON.stringify(filters || {});
-
+        const filters = JSON.parse('<%- JSON.stringify(filters || {}) %>');
 
         // NAV DROPDOWN
         let dropdownTimeout;
