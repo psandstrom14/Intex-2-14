@@ -456,104 +456,104 @@
     });
 
 // ADD ENTRY PAGE:
-app.get('/add/:table', async (req, res) => {
-    const table_name = req.params.table;
-    let events = [];
-    
-    if (table_name === "survey_results") {
-        events = await knex("events")
-            .select("event_id", "event_name", "event_date", "event_start_time", "event_end_time")
-            .orderBy(["event_name", "event_date", "event_start_time"]);
-    }
-    
-    res.render("add", { table_name, events });
-    });
-    
-    // ADD SURVEY (INSERT INTO survey_results)
-    app.post("/add/survey", async (req, res) => {
-    // NOTE: This is still a simple placeholder; update later to match your add.ejs form and real columns
-    const { event_name, event_id /* plus any other survey fields */ } = req.body;
-    
-    try {
-        await knex("survey_results").insert({
-            event_name: event_name, // adjust to real column names when wiring form
-            event_id: event_id
-            // other survey columns here...
-        });
-    
-    res.redirect("/surveys");
-    } catch (err) {
-    console.error("Error inserting survey:", err);
-    res.status(500).send("Error saving survey");
-    }
-    });
-    
-    // DELETE FUNCTIONALITY:
-    // Map tables to primary key columns
-    const deleteConfig = {
-    participants: "participant_id",
-    events: "event_id",
-    surveys: "survey_id",
-    milestones: "milestone_id",
-    donations: "donation_id",
-    users: "user_id",
-    };
-    
-    app.post("/delete-multiple", async (req, res) => {
-    try {
-        const { table, ids, message } = req.body;
-    
-        const idColumn = deleteConfig[table];
-        if (!idColumn) {
-        console.error("Delete attempted on invalid table:", table);
-        return res.status(400).send("Invalid table");
+    app.get('/add/:table', async (req, res) => {
+        const table_name = req.params.table;
+        let events = [];
+        
+        if (table_name === "survey_results") {
+            events = await knex("events")
+                .select("event_id", "event_name", "event_date", "event_start_time", "event_end_time")
+                .orderBy(["event_name", "event_date", "event_start_time"]);
         }
-    
-        let idArray = [];
-        if (typeof ids === "string") {
-        // ids might come as a JSON string like '["1","2","3"]'
+        
+        res.render("add", { table_name, events });
+        });
+        
+        // ADD SURVEY (INSERT INTO survey_results)
+        app.post("/add/survey", async (req, res) => {
+        // NOTE: This is still a simple placeholder; update later to match your add.ejs form and real columns
+        const { event_name, event_id /* plus any other survey fields */ } = req.body;
+        
         try {
-            idArray = JSON.parse(ids);
-        } catch (parseErr) {
-            console.error("Error parsing ids JSON:", parseErr);
-            // fall back: single id in string
-            idArray = [ids];
+            await knex("survey_results").insert({
+                event_name: event_name, // adjust to real column names when wiring form
+                event_id: event_id
+                // other survey columns here...
+            });
+        
+        res.redirect("/surveys");
+        } catch (err) {
+        console.error("Error inserting survey:", err);
+        res.status(500).send("Error saving survey");
         }
-        } else if (Array.isArray(ids)) {
-        idArray = ids;
-        }
-    
-        if (!Array.isArray(idArray) || idArray.length === 0) {
-        // nothing to delete; just go back
-        return res.redirect("/" + table);
-        }
-    
-        const deletedCount = await knex(table)
-        .whereIn(idColumn, idArray)
-        .del();
-    
-        // store flash message in session (guard req.session)
-        const sessionData = req.session || {};
-        sessionData.flashMessage =
-        message || `${deletedCount} record(s) deleted`;
-        sessionData.flashType = "success";
-    
-        res.redirect("/" + table);
-    } catch (err) {
-        console.error("Error deleting records:", err);
-        console.error("Error details:", {
-        message: err.message,
-        code: err.code,
-        detail: err.detail,
         });
-    
-        const sessionData = req.session || {};
-        sessionData.flashMessage = "Error deleting record(s)";
-        sessionData.flashType = "danger";
-    
-        res.redirect("/" + (req.body.table || ""));
-    }
-    });
+        
+        // DELETE FUNCTIONALITY:
+        // Map tables to primary key columns
+        const deleteConfig = {
+        participants: "participant_id",
+        events: "event_id",
+        surveys: "survey_id",
+        milestones: "milestone_id",
+        donations: "donation_id",
+        users: "user_id",
+        };
+        
+        app.post("/delete-multiple", async (req, res) => {
+        try {
+            const { table, ids, message } = req.body;
+        
+            const idColumn = deleteConfig[table];
+            if (!idColumn) {
+            console.error("Delete attempted on invalid table:", table);
+            return res.status(400).send("Invalid table");
+            }
+        
+            let idArray = [];
+            if (typeof ids === "string") {
+            // ids might come as a JSON string like '["1","2","3"]'
+            try {
+                idArray = JSON.parse(ids);
+            } catch (parseErr) {
+                console.error("Error parsing ids JSON:", parseErr);
+                // fall back: single id in string
+                idArray = [ids];
+            }
+            } else if (Array.isArray(ids)) {
+            idArray = ids;
+            }
+        
+            if (!Array.isArray(idArray) || idArray.length === 0) {
+            // nothing to delete; just go back
+            return res.redirect("/" + table);
+            }
+        
+            const deletedCount = await knex(table)
+            .whereIn(idColumn, idArray)
+            .del();
+        
+            // store flash message in session (guard req.session)
+            const sessionData = req.session || {};
+            sessionData.flashMessage =
+            message || `${deletedCount} record(s) deleted`;
+            sessionData.flashType = "success";
+        
+            res.redirect("/" + table);
+        } catch (err) {
+            console.error("Error deleting records:", err);
+            console.error("Error details:", {
+            message: err.message,
+            code: err.code,
+            detail: err.detail,
+            });
+        
+            const sessionData = req.session || {};
+            sessionData.flashMessage = "Error deleting record(s)";
+            sessionData.flashType = "danger";
+        
+            res.redirect("/" + (req.body.table || ""));
+        }
+        });
 
 // START TO LISTEN (& tell command line)
 app.listen(port, () => console.log("the server has started to listen"));
