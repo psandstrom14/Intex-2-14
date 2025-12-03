@@ -21,22 +21,26 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
                 <li><a href="/donate_now">Donate Now</a></li>
-                <!--UPDATE LATER: make it so it will only display dropdown if user is logged in and has roles Admin/sponsor-->
-                <li class="dropdown">
-                    <span class="dropdown-toggle">
-                        <a href="#" class="selected-nav">Pages ▾</a>
-                    </span>
-                    <ul class="dropdown-menu">
-                        <li><a href="/users">Users</a></li>
-                        <li><a href="/participants">Participants</a></li>
-                        <li><a href="/events">Events</a></li>
-                        <li><a href="/surveys">Surveys</a></li>
-                        <li><a href="/milestones">Milestones</a></li>
-                        <li><a href="/donations">Donations</a></li>
-                    </ul>
-                </li>
-                <!--UPDATE LATER: make it so that it will say "logout" if user is logged in-->
-                <li><a href="/login" class="login-btn">Login</a></li>
+                <% if (isLoggedIn && role && (role.toLowerCase() === 'admin' || role.toLowerCase() === 'sponsor')) { %>
+                    <li class="dropdown">
+                        <span class="dropdown-toggle">
+                            <a href="#" class="selected-nav">Pages ▾</a>
+                        </span>
+                        <ul class="dropdown-menu">
+                            <li><a href="/users">Users</a></li>
+                            <li><a href="/participants">Participants</a></li>
+                            <li><a href="/events">Events</a></li>
+                            <li><a href="/surveys">Surveys</a></li>
+                            <li><a href="/milestones">Milestones</a></li>
+                            <li><a href="/donations">Donations</a></li>
+                        </ul>
+                    </li>
+                <% } %>
+                <% if (isLoggedIn) { %>
+                    <li><a href="/logout" class="login-btn">Logout</a></li>
+                <% } else { %>
+                    <li><a href="/login" class="login-btn">Login</a></li>
+                <% } %>
             </ul>
         </div>
     </nav>
