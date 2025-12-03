@@ -10,11 +10,12 @@
     const knex = require("knex")({ // KNEX: allows you to work with SQL databases
     client: "pg", // connect to PostgreSQL (put database name here if something else)
     connection: { // connect to the database. If you deploy this to an internet host, you need to use process.env.DATABASE_URL
-        host: process.env.RDS_HOSTNAME || "localhost",
-        user: process.env.RDS_USERNAME || "postgres",
-        password: process.env.RDS_PASSWORD || "admin",
-        database: process.env.RDS_DB_NAME || "EllaRises",
+        host: process.env.RDS_HOSTNAME || "awseb-e-zmtvhhdgpm-stack-awsebrdsdatabase-cjcdmyxevp9y.c128cucaotxd.us-east-2.rds.amazonaws.com",
+        user: process.env.RDS_USERNAME || "intex214",
+        password: process.env.RDS_PASSWORD || "Hopethisworks1",
+        database: process.env.RDS_DB_NAME || "ebdb",
         port: process.env.RDS_PORT || 5432,
+        ssl: { rejectUnauthorized: false }
     }});
 
 // CREATE VARIABLES:
