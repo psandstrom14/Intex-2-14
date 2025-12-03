@@ -328,7 +328,7 @@
                             <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
                             <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
-                            <th class="sortable" data-column="username">Username <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" data-column="participant_username">Username <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_email">Email <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_phone">Phone <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_dob">Date of Birth <span class="sort-icon">⇅</span></th>
@@ -359,7 +359,7 @@
                                     <td><input type="checkbox" class="row-checkbox" value="<%= p.participant_id %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
                                     <td><%= p.participant_first_name %></td>
                                     <td><%= p.participant_last_name %></td>
-                                    <td><%= p.username %></td>
+                                    <td><%= p.participant_username %></td>
                                     <td><%= p.participant_email %></td>
                                     <td><%= p.participant_phone %></td>
                                     <td><%= formattedDOB %></td>
