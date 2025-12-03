@@ -7,6 +7,7 @@ const express = require("express"); // EXPRESS: helps with web development
 const session = require("express-session"); // EXPRESS SESSION: needed for session variable. Stored on the server to hold data; Essentially adds a new property to every req object that allows you to store a value per session.
 let path = require("path"); // PATH: helps create safe paths when working with file/folder locations
 let bodyParser = require("body-parser"); // BODY-PARSER: Allows you to read the body of incoming HTTP requests and makes that data available on req.body
+<<<<<<< HEAD
 const knex = require("knex")({ // KNEX: allows you to work with SQL databases
     client: "pg", // connect to PostgreSQL (put database name here if something else)
     connection: { // connect to the database. If you deploy this to an internet host, you need to use process.env.DATABASE_URL
@@ -16,6 +17,60 @@ const knex = require("knex")({ // KNEX: allows you to work with SQL databases
         database: process.env.RDS_DB_NAME || "EllaRises",
         port: process.env.RDS_PORT || 5432,
     }});
+=======
+const knex = require("knex")({
+  // KNEX: allows you to work with SQL databases
+  client: "pg", // connect to PostgreSQL (put database name here if something else)
+  connection: {
+    // connect to the database. If you deploy this to an internet host, you need to use process.env.DATABASE_URL
+    host: process.env.RDS_HOSTNAME || "localhost",
+    user: process.env.RDS_USERNAME || "postgres",
+    password: process.env.RDS_PASSWORD || "admin",
+    database: process.env.RDS_DB_NAME || "ella_rising",
+    port: process.env.RDS_PORT || 5432,
+  },
+});
+
+// Add this debugging code to test database connection:
+knex
+  .raw("SELECT current_database()")
+  .then((result) => {
+    console.log("Database connection successful!");
+    console.log("Connected to database:", result.rows[0].current_database);
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err.message);
+    console.error("Full error:", err);
+  });
+
+function paramToArray(val, defaultVal = ["all"]) {
+  if (!val) return defaultVal;
+  return Array.isArray(val) ? val : [val];
+}
+
+// For surveys: map logical column names (from UI) to real DB columns (with table aliases)
+const SURVEY_COLUMN_MAP = {
+  participant_first_name: "p.participant_first_name",
+  participant_last_name: "p.participant_last_name",
+  event_name: "e.event_name",
+  event_date: "e.event_date",
+  survey_satisfaction_score: "s.survey_satisfaction_score",
+  survey_usefulness_score: "s.survey_usefulness_score",
+  survey_instructor_score: "s.survey_instructor_score",
+  survey_recommendation_score: "s.survey_recommendation_score",
+  survey_overall_score: "s.survey_overall_score",
+  survey_nps_bucket: "s.survey_nps_bucket",
+  survey_submission_date: "s.survey_submission_date",
+};
+
+const SURVEY_SEARCHABLE_COLUMNS = [
+  "participant_first_name",
+  "participant_last_name",
+  "event_name",
+  "event_date",
+  "survey_nps_bucket",
+];
+>>>>>>> a8eabed5cdb7c43a00eef8a8d409bb3f00769db2
 
 // CREATE VARIABLES:
     let app = express(); // creates an express object called app
@@ -58,9 +113,42 @@ const knex = require("knex")({ // KNEX: allows you to work with SQL databases
     });
 
 // LOGIN PAGE:
+<<<<<<< HEAD
     // Route to display Login Page
     app.get("/login", (req, res) => { 
         res.render("login");
+=======
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+app.post("/login", (req, res) => {
+  let username = req.body.username;
+  let password = req.body.password;
+
+  knex
+    .select()
+    .from("users")
+    .where({ username: username, password: password })
+    .first()
+    .then((user) => {
+      if (user) {
+        req.session.user = {
+          id: user.id,
+          username: user.username,
+          level: user.level,
+        };
+        res.redirect("/user_profile");
+      } else {
+        console.log("Invalid credentials for:", username); // Add this
+        res.render("login", { error_message: "Invalid credentials" });
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Database error during login:", err.message); // Improve this
+      console.error("Full error:", err); // Add this
+      res.render("login", { error_message: "Database error" });
+>>>>>>> a8eabed5cdb7c43a00eef8a8d409bb3f00769db2
     });
 
     // Route to log user in
@@ -170,10 +258,34 @@ const knex = require("knex")({ // KNEX: allows you to work with SQL databases
     res.redirect("/" + (req.body.table || ""));
     }
     });
+<<<<<<< HEAD
 
     // USER MAINTENANCE PAGE:
     app.get("/users", (req, res) => {
     res.render("users");
+=======
+  } catch (err) {
+    console.error("❌ Error loading participants:", err);
+    console.error("Error details:", {
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+    });
+    res.render("participants", {
+      participant: [],
+      message: "Error loading participants",
+      messageType: "danger",
+      filters: {
+        searchColumn: "participant_first_name",
+        searchValue: "",
+        city: ["all"],
+        school: ["all"],
+        interest: ["all"],
+        donations: ["all"],
+        sortColumn: "",
+        sortOrder: "asc",
+      },
+>>>>>>> a8eabed5cdb7c43a00eef8a8d409bb3f00769db2
     });
 
     // PARTICIPANT MAINTENANCE PAGE:
