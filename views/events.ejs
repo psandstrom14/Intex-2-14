@@ -478,7 +478,7 @@
             const buttonText = document.getElementById('filterButtonText');
             const filtersVisible = sessionStorage.getItem('filtersVisible_events');
 
-            const hasActiveFilters = '<%= ((filters.eventNames && !filters.eventNames.includes("all")) || (filters.locations && !filters.locations.includes("all")) || (filters.eventTypes && !filters.eventTypes.includes("all")) || (filters.months && !filters.months.includes("all")) || (filters.years && !filters.years.includes("all"))) ? "true" : "false" %>';
+            const hasActiveFilters = "<%= ((filters.eventNames && !filters.eventNames.includes('all')) || (filters.locations && !filters.locations.includes('all')) || (filters.eventTypes && !filters.eventTypes.includes('all')) || (filters.months && !filters.months.includes('all')) || (filters.years && !filters.years.includes('all'))) ? 'true' : 'false' %>";
 
             if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters === 'true')) {
                 filterSection.style.display = 'block';
@@ -487,8 +487,8 @@
         });
 
         // SORTING
-        let currentSortColumn = '<%= filters.sortColumn || "" %>';
-        let currentSortOrder = '<%= filters.sortOrder || "asc" %>';
+        let currentSortColumn = "<%= filters.sortColumn || '' %>";
+        let currentSortOrder = "<%= filters.sortOrder || 'asc' %>";
 
         document.addEventListener('DOMContentLoaded', function() {
             if (currentSortColumn) {

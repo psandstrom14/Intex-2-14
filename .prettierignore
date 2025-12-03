@@ -1,3 +1,4 @@
-# Ignore EJS template files - Prettier doesn't support EJS syntax
+# Ignore EJS template files - Prettier doesn't support EJS synta 
+
 *.ejs
 

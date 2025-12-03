@@ -530,8 +530,8 @@
 
 
         // SORTING
-        let currentSortColumn = '<%= filters.sortColumn || "" %>';
-        let currentSortOrder = '<%= filters.sortOrder || "asc" %>';
+        let currentSortColumn = "<%= filters.sortColumn || '' %>";
+        let currentSortOrder = "<%= filters.sortOrder || 'asc' %>";
 
         document.addEventListener('DOMContentLoaded', function() {
             if (currentSortColumn) {

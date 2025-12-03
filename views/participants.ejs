@@ -468,7 +468,7 @@
             const buttonText = document.getElementById('filterButtonText');
             const filtersVisible = sessionStorage.getItem('filtersVisible_participants');
 
-            const hasActiveFilters = '<%= ((filters.city && !filters.city.includes("all")) || (filters.school && !filters.school.includes("all")) || (filters.interest && !filters.interest.includes("all")) || (filters.donations && !filters.donations.includes("all"))) ? "true" : "false" %>';
+            const hasActiveFilters = "<%= ((filters.city && !filters.city.includes('all')) || (filters.school && !filters.school.includes('all')) || (filters.interest && !filters.interest.includes('all')) || (filters.donations && !filters.donations.includes('all'))) ? 'true' : 'false' %>";
 
             if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters === 'true')) {
                 filterSection.style.display = 'block';
@@ -477,8 +477,8 @@
         });
 
         // SORTING
-        let currentSortColumn = '<%= filters.sortColumn || "" %>';
-        let currentSortOrder = '<%= filters.sortOrder || "asc" %>';
+        let currentSortColumn = "<%= filters.sortColumn || '' %>";
+        let currentSortOrder = "<%= filters.sortOrder || 'asc' %>";
 
         document.addEventListener('DOMContentLoaded', function() {
             if (currentSortColumn) {
