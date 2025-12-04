@@ -337,7 +337,7 @@
                     <thead>
                         <tr>
                             <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="selectAll"></th>
+                            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="selectAll" aria-label="Select all events"></th>
                             <% } %>
                             <th class="sortable" data-column="event_name" style="min-width: 140px; width: auto; white-space: normal; padding: 0.8rem 0.6rem;">Event Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="event_date" style="min-width: 90px; width: auto; white-space: normal; padding: 0.8rem 0.6rem;">Event <br>Date <span class="sort-icon">⇅</span></th>
@@ -385,7 +385,7 @@
                                 %>
                                 <tr>
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                                    <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= e.event_id %>" data-name="<%= e.event_name %>"></td>
+                                    <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= e.event_id %>" data-name="<%= e.event_name %>" aria-label="Select event <%= e.event_name %>"></td>
                                     <% } %>
                                     <td style="max-width: none; min-width: 140px; padding: 0.8rem 0.6rem;"><%= e.event_name %></td>
                                     <td style="max-width: none; min-width: 90px; padding: 0.8rem 0.6rem;"><%= formattedDate %></td>

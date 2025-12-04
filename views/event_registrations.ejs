@@ -282,7 +282,7 @@
                     <thead>
                         <tr>
                             <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="selectAll"></th>
+                            <th style="width: 40px; min-width: 40px;"><input type="checkbox" id="selectAll" aria-label="Select all event registrations"></th>
                             <% } %>
                             <th class="sortable" data-column="participant_first_name" style="min-width: 120px; width: auto; white-space: normal; padding: 0.8rem 0.6rem;">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name" style="min-width: 120px; width: auto; white-space: normal; padding: 0.8rem 0.6rem;">Last Name <span class="sort-icon">⇅</span></th>
@@ -319,7 +319,7 @@
                                 %>
                                 <tr>
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                                    <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= er.event_registration_id %>" data-name="<%= er.participant_first_name %> <%= er.participant_last_name %> - <%= er.event_name %>"></td>
+                                    <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= er.event_registration_id %>" data-name="<%= er.participant_first_name %> <%= er.participant_last_name %> - <%= er.event_name %>" aria-label="Select registration for <%= er.participant_first_name %> <%= er.participant_last_name %> - <%= er.event_name %>"></td>
                                     <% } %>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= er.participant_first_name %></td>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= er.participant_last_name %></td>

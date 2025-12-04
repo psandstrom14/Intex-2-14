@@ -341,7 +341,7 @@
                     <thead>
                         <tr>
                             <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                            <th style="width: 40px;"><input type="checkbox" id="selectAll"></th>
+                            <th style="width: 40px;"><input type="checkbox" id="selectAll" aria-label="Select all participants"></th>
                             <% } %>
                             <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
@@ -372,7 +372,7 @@
                                 %>
                                 <tr>
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                                    <td><input type="checkbox" class="row-checkbox" value="<%= p.participant_id %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
+                                    <td><input type="checkbox" class="row-checkbox" value="<%= p.participant_id %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>" aria-label="Select participant <%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
                                     <% } %>
                                     <!--FORMAT LINK CHANGE-->
                                     <td><a href="/profile/<%= p.participant_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_first_name %></a></td>
