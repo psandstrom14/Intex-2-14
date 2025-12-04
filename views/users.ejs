@@ -38,7 +38,8 @@
                             <a href="#" class="selected-nav">Pages ▾</a>
                         </span>
                         <ul class="dropdown-menu">
-                            <li><a href="/users">Participants</a></li>
+                            <li><a href="/users">Users</a></li>
+                            <li><a href="/participants">Participants</a></li>
                             <li><a href="/events">Events</a></li>
                             <li><a href="/event_registrations">Event Registrations</a></li>
                             <li><a href="/surveys">Surveys</a></li>
@@ -80,7 +81,7 @@
                 <div class="table-actions">
                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                         <button class="btn btn-add">
-                            <a href="/add/users">+ Add Participant</a>
+                            <a href="/add/participants">+ Add Participant</a>
                         </button>
                     <% } %>
                 </div>
@@ -639,7 +640,7 @@
             const checkedBox = document.querySelector('.row-checkbox:checked');
             if (checkedBox) {
                 const participantId = checkedBox.value;
-                window.location.href = '/edit/users/' + participantId;
+                window.location.href = '/edit/participants/' + participantId;
             }
         });
 

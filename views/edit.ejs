@@ -40,7 +40,7 @@
                         </span>
                         <ul class="dropdown-menu">
                             <li><a href="/users">Participants</a></li>
-                            <li><a href="/events">Events</a></li>
+                            <li><a href="/participants">Participants</a></li>
                             <li><a href="/event_registrations">Event Registrations</a></li>
                             <li><a href="/surveys">Surveys</a></li>
                             <li><a href="/milestones">Milestones</a></li>
@@ -71,8 +71,8 @@
     <div class="container">
         <div class="add-card">
             <!-- Edit-Participant Form -->
-            <% if (table_name === "users" || table_name === "participants") { %>
-                <form id="addForm" class="modern-form" action="/edit/users/<%= info.participant_id %>" method="POST">
+            <% if (table_name === "users") { %>
+                <form id="addForm" class="modern-form" action="/edit/participants/<%= info.participant_id %>" method="POST">
                     
                     <div class="form-section">
                         <h2 class="section-title">Basic Information</h2>
@@ -241,7 +241,7 @@
                     </div>
 
                     <div class="form-actions">
-                        <a href="/users" class="btn btn-secondary">Cancel</a>
+                        <a href="/participants" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Edit Participant</button>
                     </div>
                 </form>
