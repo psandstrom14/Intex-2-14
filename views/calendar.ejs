@@ -60,7 +60,7 @@
     <section class="hero hero-compact">
         <div class="hero-content">
             <h1>Event Calendar</h1>
-            <p class="hero-subtitle">Click on an event below to learn more about the event details & to register for the event!</p>
+            <p class="hero-subtitle">Click on an event below to learn more about the event details<%= isLoggedIn ? ' & to register for the event!' : '!' %></p>
         </div>
     </section>
 
@@ -99,7 +99,7 @@
             <button class="calendar-nav-btn calendar-nav-next" id="nextBtn">›</button>
 
             <!-- Calendar Grid -->
-            <div class="calendar-grid" id="calendarGrid" data-total-months="<%= months.length %>">
+            <div class="calendar-grid" id="calendarGrid" data-total-months="<%= months.length %>" data-is-logged-in="<%= isLoggedIn %>">
                 <% 
                 // Loop through the three months
                 for (let i = 0; i < months.length; i++) { 
@@ -335,11 +335,151 @@
         </div>
     </div>
 
-    <!-- Footer -->
+    <!--Footer-->
     <footer>
         <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>
-        <p style="margin-top: 1rem; font-size: 0.9rem;">Making a difference, one woman at a time.</p>
+        <p class="footer-subtext">Making a difference, one woman at a time.</p>
+
+        <div class="custom-language-selector">
+            <button class="language-dropdown-btn" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguage">
+                    <% if (language === 'es') { %>🌐 Español
+                    <% } else if (language === 'fr') { %>🌐 Français
+                    <% } else if (language === 'de') { %>🌐 Deutsch
+                    <% } else if (language === 'pt') { %>🌐 Português
+                    <% } else if (language === 'ar') { %>🌐 العربية
+                    <% } else if (language === 'zh-CN') { %>🌐 中文
+                    <% } else if (language === 'ja') { %>🌐 日本語
+                    <% } else if (language === 'ko') { %>🌐 한국어
+                    <% } else { %>🌐 English <% } %>
+                </span>
+                <span class="dropdown-arrow">▾</span>
+            </button>
+            <div class="language-dropdown-menu" id="languageDropdown">
+                <a href="#" onclick="changeLanguage('en'); return false;">English</a>
+                <a href="#" onclick="changeLanguage('es'); return false;">Español</a>
+                <a href="#" onclick="changeLanguage('fr'); return false;">Français</a>
+                <a href="#" onclick="changeLanguage('de'); return false;">Deutsch</a>
+                <a href="#" onclick="changeLanguage('pt'); return false;">Português</a>
+                <a href="#" onclick="changeLanguage('ar'); return false;">العربية</a>
+                <a href="#" onclick="changeLanguage('zh-CN'); return false;">中文</a>
+                <a href="#" onclick="changeLanguage('ja'); return false;">日本語</a>
+                <a href="#" onclick="changeLanguage('ko'); return false;">한국어</a>
+            </div>
+        </div>
+
+        <div id="google_translate_element" style="display:none;"></div>
+
+        <script>
+            const LANGUAGE_NAMES = {
+                'en': '🌐 English',
+                'es': '🌐 Español',
+                'fr': '🌐 Français',
+                'de': '🌐 Deutsch',
+                'pt': '🌐 Português',
+                'ar': '🌐 العربية',
+                'zh-CN': '🌐 中文',
+                'ja': '🌐 日本語',
+                'ko': '🌐 한국어'
+            };
+
+            // From server-side session (res.locals.language)
+            const SESSION_LANGUAGE = '<%= language || "en" %>';
+
+            // Initialize Google Translate widget – no extra logic here
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,es,fr,de,pt,ar,zh-CN,ja,ko',
+                    autoDisplay: false
+                }, 'google_translate_element');
+            }
+
+            function getGoogTransLang() {
+                // Looks for cookie like: googtrans=/auto/es
+                const match = document.cookie.match(/(?:^|;)\s*googtrans=\/auto\/([^;]+)/);
+                return match ? match[1] : null;
+            }
+
+            function setLanguageLabel(lang) {
+                const el = document.getElementById('currentLanguage');
+                if (!el) return;
+                el.textContent = LANGUAGE_NAMES[lang] || LANGUAGE_NAMES['en'];
+            }
+
+            function applyLanguage(lang, isInit) {
+                const combo = document.querySelector('.goog-te-combo');
+                if (!combo) {
+                    // Wait for Google widget to finish rendering
+                    setTimeout(() => applyLanguage(lang, isInit), 200);
+                    return;
+                }
+
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+                setLanguageLabel(lang);
+
+                if (!isInit) {
+                    // Persist to your session on the server
+                    fetch('/set-language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lang })
+                    }).catch(() => {});
+                    // Optional: localStorage helper if you want it
+                    localStorage.setItem('selectedLanguage', lang);
+                    toggleLanguageDropdown(false);
+                }
+            }
+
+            function changeLanguage(lang) {
+                applyLanguage(lang, false);
+            }
+
+            function toggleLanguageDropdown(forceClose) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (!dropdown) return;
+                if (forceClose === false) {
+                    dropdown.classList.remove('show');
+                } else {
+                    dropdown.classList.toggle('show');
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-language-selector')) {
+                    toggleLanguageDropdown(false);
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Make sure the label matches whatever we think the language is
+                setLanguageLabel(SESSION_LANGUAGE);
+
+                const cookieLang = getGoogTransLang();
+                const storedLang = localStorage.getItem('selectedLanguage');
+
+                // Priority: Google cookie > session > localStorage
+                const preferred =
+                    cookieLang ||
+                    (SESSION_LANGUAGE && SESSION_LANGUAGE !== 'undefined' ? SESSION_LANGUAGE : null) ||
+                    storedLang ||
+                    'en';
+
+                // If preferred is English, just leave as-is (no translate flicker)
+                if (preferred === 'en') {
+                    setLanguageLabel('en');
+                    return;
+                }
+
+                // Apply preferred language once widget is ready
+                setTimeout(() => applyLanguage(preferred, true), 500);
+            });
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     </footer>
+
 
     <script>
     // Wait for DOM to be fully loaded
@@ -355,14 +495,16 @@
         // Store pending cancellation info
         let pendingCancellation = null;
 
-        // Get total months from data attribute
+        // Get total months and login status from data attributes
         const calendarGrid = document.getElementById('calendarGrid');
         const totalMonths = parseInt(calendarGrid.getAttribute('data-total-months')) || 3;
+        const isLoggedIn = calendarGrid.getAttribute('data-is-logged-in') === 'true';
 
         // Initialize everything when DOM is ready
         function init() {
             console.log('Initializing calendar...');
             console.log('Total months:', totalMonths);
+            console.log('User logged in:', isLoggedIn);
             
             updateNavigationButtons();
             setupEventListeners();
@@ -639,11 +781,19 @@
                 deadlineSection.style.display = 'none';
             }
 
-            // Handle footer buttons based on registration status
+            // Handle footer buttons based on login and registration status
             const footer = document.getElementById('eventModalFooter');
             footer.innerHTML = '';
             
-            if (userRegistered) {
+            // Check if user is logged in
+            if (!isLoggedIn) {
+                // User is not logged in - show login button
+                footer.innerHTML = `
+                    <a href="/login" class="btn btn-primary btn-large btn-block">
+                        Login to Register
+                    </a>
+                `;
+            } else if (userRegistered) {
                 // User is already registered - show status and cancel button
                 footer.innerHTML = `
                     <div style="display: flex; flex-direction: column; gap: 1rem; width: 100%;">
