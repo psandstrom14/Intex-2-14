@@ -910,8 +910,8 @@ app.get("/profile/:id", async (req, res) => {
             totalRegistrations: totalRegistrations,
             // Session data for navigation
             isLoggedIn: req.session.isLoggedIn || false,
-            userId: req.session.userId || null,
-            role: req.session.role || null
+            userId: req.session.user?.id || null,
+            role: req.session.user?.role || null
         });
     } catch (error) {
         console.error("Error loading profile dashboard:", error);

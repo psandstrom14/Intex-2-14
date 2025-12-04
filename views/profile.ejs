@@ -28,13 +28,13 @@
           </div>
           <ul class="nav-links">
               <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
+              <li><a href="/about" class="selected-nav">About</a></li>
               <li><a href="/performance">Performance</a></li>
               <li><a href="/calendar">Calendar</a></li>
               <li><a href="/donate_now">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>" class="selected-nav">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>">Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>
