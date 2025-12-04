@@ -1440,7 +1440,30 @@ app.get("/edit/:table/:id", async (req, res) => {
   const primaryKey = primaryKeyByTable[table_name];
 
   try {
-    const info = await knex(table_name).where(primaryKey, id).first();
+    let info;
+
+    // Special handling for survey_results - need to join to get event info
+    if (table_name === "survey_results") {
+      info = await knex("survey_results as s")
+        .join(
+          "event_registrations as er",
+          "s.event_registration_id",
+          "er.event_registration_id"
+        )
+        .join("events as e", "er.event_id", "e.event_id")
+        .join("participants as p", "er.participant_id", "p.participant_id")
+        .where("s.survey_id", id)
+        .select(
+          "s.*",
+          "e.event_id",
+          "e.event_name",
+          "e.event_date",
+          "p.participant_id"
+        )
+        .first();
+    } else {
+      info = await knex(table_name).where(primaryKey, id).first();
+    }
 
     let events = [];
     let event_types = [];

@@ -684,6 +684,193 @@
                         <button type="submit" class="btn btn-primary">Edit Donation</button>
                     </div>
                 </form>
+            <% } else if (table_name === "survey_results") { %>
+                <form id="addForm" class="modern-form" action="/edit/survey_results/<%= info.survey_id %>" method="POST">
+                    
+                    <div class="form-section">
+                        <h2 class="section-title">Participant Information</h2>
+                        <p class="section-description">Who is this survey for?</p>
+                        <div class="form-group">
+                            <label class="form-label">Participant ID <span class="required">*</span></label>
+                            <input 
+                                type="number" 
+                                class="form-input" 
+                                name="participant_id" 
+                                value="<%= info.participant_id || '' %>"
+                                min="1" 
+                                required>
+                            <span class="form-hint">Must be an existing participant</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Event Selection</h2>
+                        <p class="section-description">Select the event this survey is for</p>
+
+                        <div class="form-group">
+                            <label class="form-label">Event Name <span class="required">*</span></label>
+                            <select class="form-select" name="event_name" id="eventSelect" required>
+                                <option value="">Select an Event</option>
+                                <% events.forEach(ev => { %>
+                                    <option value="<%= ev.event_name %>" <%= info.event_name === ev.event_name ? 'selected' : '' %>>
+                                        <%= ev.event_name %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Event Date & Time <span class="required">*</span></label>
+                            <select class="form-select" name="event_id" id="eventInstanceSelect" required>
+                                <option value="">Select an Event</option>
+                                <% events.forEach(ev => { %>
+                                    <option value="<%= ev.event_id %>" <%= info.event_id == ev.event_id ? 'selected' : '' %>>
+                                        <%= ev.event_date %> <% if (ev.event_start_time && ev.event_end_time) { %>(<%= ev.event_start_time %>–<%= ev.event_end_time %>)<% } else if (ev.event_start_time) { %>(<%= ev.event_start_time %>)<% } %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Survey Questions</h2>
+                        <p class="section-description">We would love to know how you felt about this event!</p>
+                        <p class="section-description">Please rank how you felt (on a scale of 0-5)</p>
+
+                        <!-- Survey: Satisfaction -->
+                        <div class="form-group">
+                            <label class="form-label">I felt satisfied with this event. <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                    <label class="radio-label">
+                                        <input 
+                                            type="radio" 
+                                            name="survey_satisfaction_score" 
+                                            value="<%= i %>" 
+                                            <%= info.survey_satisfaction_score == i ? 'checked' : '' %>
+                                            required>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">
+                                            <strong><%= i %></strong>
+                                            <% if (i === 0) { %><small>Strongly disagree</small><% } %>
+                                            <% if (i === 5) { %><small>Strongly agree</small><% } %>
+                                        </span>
+                                    </label>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Survey: Usefulness -->
+                        <div class="form-group">
+                            <label class="form-label">This event was extremely helpful. <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                    <label class="radio-label">
+                                        <input 
+                                            type="radio" 
+                                            name="survey_usefulness_score" 
+                                            value="<%= i %>" 
+                                            <%= info.survey_usefulness_score == i ? 'checked' : '' %>
+                                            required>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">
+                                            <strong><%= i %></strong>
+                                            <% if (i === 0) { %><small>Strongly disagree</small><% } %>
+                                            <% if (i === 5) { %><small>Strongly agree</small><% } %>
+                                        </span>
+                                    </label>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Survey: Instructor -->
+                        <div class="form-group">
+                            <label class="form-label">The event instructor was extremely helpful. <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                    <label class="radio-label">
+                                        <input 
+                                            type="radio" 
+                                            name="survey_instructor_score" 
+                                            value="<%= i %>" 
+                                            <%= info.survey_instructor_score == i ? 'checked' : '' %>
+                                            required>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">
+                                            <strong><%= i %></strong>
+                                            <% if (i === 0) { %><small>Strongly disagree</small><% } %>
+                                            <% if (i === 5) { %><small>Strongly agree</small><% } %>
+                                        </span>
+                                    </label>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Survey: Recommendation -->
+                        <div class="form-group">
+                            <label class="form-label">I would recommend this event to family and friends. <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                    <label class="radio-label">
+                                        <input 
+                                            type="radio" 
+                                            name="survey_recommendation_score" 
+                                            value="<%= i %>" 
+                                            <%= info.survey_recommendation_score == i ? 'checked' : '' %>
+                                            required>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">
+                                            <strong><%= i %></strong>
+                                            <% if (i === 0) { %><small>Strongly disagree</small><% } %>
+                                            <% if (i === 5) { %><small>Strongly agree</small><% } %>
+                                        </span>
+                                    </label>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Survey: Overall -->
+                        <div class="form-group">
+                            <label class="form-label">Overall, I really enjoyed and appreciated this event. <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <% for (let i = 0; i <= 5; i++) { %>
+                                    <label class="radio-label">
+                                        <input 
+                                            type="radio" 
+                                            name="survey_overall_score" 
+                                            value="<%= i %>" 
+                                            <%= info.survey_overall_score == i ? 'checked' : '' %>
+                                            required>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">
+                                            <strong><%= i %></strong>
+                                            <% if (i === 0) { %><small>Strongly disagree</small><% } %>
+                                            <% if (i === 5) { %><small>Strongly agree</small><% } %>
+                                        </span>
+                                    </label>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="form-group">
+                            <label class="form-label" for="survey_comments">Additional comments</label>
+                            <textarea
+                                id="survey_comments"
+                                name="survey_comments"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Share any thoughts or suggestions about this event..."
+                            ><%= info.survey_comments || '' %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/surveys" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Edit Survey</button>
+                    </div>
+                </form>
+
             <% } else { %>
                 <div class="empty-state">
                     <h2>No Form Available</h2>
