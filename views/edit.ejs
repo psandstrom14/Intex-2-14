@@ -392,13 +392,31 @@
 
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
-                            <select class="form-select" name="event_name" id="eventSelect" required>
-                                    <option value="">Select an Event</option>
-                                    <% events.forEach(e => { %>
-                                        <option value="<%= e.event_name %>"><%= e.event_name %></option>
-                                    <% }) %>
-                                </select>
-
+                            <% 
+                                const seenEventNamesEdit = new Set();
+                                const uniqueEventNamesEdit = [];
+                                events.forEach(e => {
+                                    if (e.event_name && !seenEventNamesEdit.has(e.event_name)) {
+                                        seenEventNamesEdit.add(e.event_name);
+                                        uniqueEventNamesEdit.push(e.event_name);
+                                    }
+                                });
+                            %>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                name="event_name" 
+                                list="eventNamesEditList" 
+                                placeholder="Start typing to select or add"
+                                value="<%= info.event_name || '' %>"
+                                required
+                            >
+                            <datalist id="eventNamesEditList">
+                                <% uniqueEventNamesEdit.forEach(name => { %>
+                                    <option value="<%= name %>"></option>
+                                <% }) %>
+                            </datalist>
+                            <span class="form-hint">Choose an existing event name or type a new one</span>
                         </div>
                         
                         <div class="form-group">

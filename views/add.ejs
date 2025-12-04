@@ -328,24 +328,30 @@
 
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
-                            <select class="form-select" name="event_name" id="eventSelect" required>
-                                <option value="">Select an Event</option>
-                                <option value="Mentor Office Hours">Mentor Office Hours</option>
-                                <option value="Robotics Lab Saturday">Robotics Lab Saturday</option>
-                                <option value="Girls in STEAM Mentoring">Girls in STEAM Mentoring</option>
-                                <option value="Monthly Coding Club">Monthly Coding Club</option>
-                                <option value="Intro to Painting Class">Intro to Painting Class</option>
-                                <option value="Data Science Study Group">Data Science Study Group</option>
-                                <option value="Leadership Circle Meetup">Leadership Circle Meetup</option>
-                                <option value="Web Dev Bootcamp Night">Web Dev Bootcamp Night</option>
-                                <option value="Ella Rises Annual Leadership Conference">Ella Rises Annual Leadership Conference</option>
-                                <option value="Monthly Art Studio Workshop">Monthly Art Studio Workshop</option>
-                                <option value="STEAM Summit & Expo">STEAM Summit & Expo</option>
-                                <option value="AI for Beginners Bootcamp">AI for Beginners Bootcamp</option>
-                                <option value="Digital Design Workshop">Digital Design Workshop</option>
-                                <option value="Community STEM Hackathon">Community STEM Hackathon</option>
-                                <option value="Women in Tech & Art Showcase">Women in Tech & Art Showcase</option>
-                            </select>
+                            <% 
+                                const seenEventNames = new Set();
+                                const uniqueEventNames = [];
+                                events.forEach(e => {
+                                    if (e.event_name && !seenEventNames.has(e.event_name)) {
+                                        seenEventNames.add(e.event_name);
+                                        uniqueEventNames.push(e.event_name);
+                                    }
+                                });
+                            %>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                name="event_name" 
+                                list="eventNamesList" 
+                                placeholder="Start typing to select or add"
+                                required
+                            >
+                            <datalist id="eventNamesList">
+                                <% uniqueEventNames.forEach(name => { %>
+                                    <option value="<%= name %>"></option>
+                                <% }) %>
+                            </datalist>
+                            <span class="form-hint">Choose an existing event name or type a new one</span>
                         </div>
                         
                         <div class="form-group">
