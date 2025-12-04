@@ -256,7 +256,7 @@
     <% event_types.forEach(t => { %>
         <option value="<%= t.event_type_id %>" 
             <%= info && info.event_type_id == t.event_type_id ? "selected" : "" %>>
-            <%= t.event_type_name %>
+            <%= t.event_name %>
         </option>
     <% }) %>
 </select>

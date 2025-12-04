@@ -1303,8 +1303,8 @@ app.get("/add/:table", async (req, res) => {
   // Load event types *only* for the events form
   if (table_name === "events") {
     event_types = await knex("event_types")
-      .select("event_type_id", "event_type_name")
-      .orderBy("event_type_name");
+      .select("event_type_id", "event_name")
+      .orderBy("event_name");
   }
 
   // Load actual events for survey + event_registration + events pages
@@ -1338,8 +1338,8 @@ app.get("/add/:table/:id", async (req, res) => {
   // Event types for Events form
   if (table_name === "events") {
     event_types = await knex("event_types")
-      .select("event_type_id", "event_type_name")
-      .orderBy("event_type_name");
+      .select("event_type_id", "event_name")
+      .orderBy("event_name");
   }
 
   // Events list for dropdowns
@@ -1481,10 +1481,27 @@ app.get("/edit/:table/:id", async (req, res) => {
     let events = [];
     let event_types = [];
 
-    if (table_name === "events") {
-      event_types = await knex("event_types")
-        .select("event_type_id", "event_type_name")
-        .orderBy("event_type_name");
+        if (table_name === "events") {
+            event_types = await knex("event_types")
+                .select("event_type_id", "event_name")
+                .orderBy("event_name");
+        }
+
+        if (
+            table_name === "event_registration" ||
+            table_name === "survey_results" ||
+            table_name === "events"
+        ) {
+            events = await knex("events")
+                .select("event_id", "event_name", "event_date", "event_start_time", "event_end_time")
+                .orderBy(["event_name", "event_date", "event_start_time"]);
+        }
+
+        res.render("edit", { table_name, info, id, events, event_types });
+
+    } catch (err) {
+        console.error("Error fetching entry:", err.message);
+        res.status(500).redirect(`/${table_name}`);
     }
 
     if (
