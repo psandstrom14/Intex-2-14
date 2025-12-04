@@ -12,6 +12,9 @@
     <link rel="icon" type="image/x-icon" href="/logo.ico" />
 </head>
 <body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
@@ -63,7 +66,7 @@
     </section>
 
     <!-- Database Content -->
-    <div class="container">
+    <main id="main-content" class="container">
         <!-- Success/Error Messages -->
         <% if (typeof message !== 'undefined' && message) { %>
             <div class="alert alert-<%= messageType || 'success' %>">
@@ -341,7 +344,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer>

@@ -10,6 +10,9 @@
     <link rel="icon" type="image/x-icon" href="/logo.ico" />
 </head>
 <body>
+    <!-- Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
@@ -85,6 +88,7 @@
     <% } %>
 
     <!-- Calendar Section -->
+    <main id="main-content">
     <section class="container" style="padding: 3rem 2rem;">
         
         <!-- Calendar Navigation Wrapper -->
@@ -163,9 +167,10 @@
                     </div>
                 </div>
                 <% } %>
-            </div>
         </div>
+    </div>
     </section>
+    </main>
 
     <!-- Event Modal (displays more information about the event) -->
     <div class="event-modal" id="eventModal">
