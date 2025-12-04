@@ -39,6 +39,9 @@ app.use(
         saveUninitialized: false,
     })
 );
+// MIDDLEWARE:
+app.use(express.urlencoded({ extended: true })); // for form posts
+app.use(express.json());                         // 🔹 add this line for JSON bodies
 
 // OTHER SETUP:
 // Ensures a value is returned as an array, using a default if value is empty.
@@ -403,15 +406,15 @@ app.post("/register-event/:eventId", async (req, res) => {
     const eventId = req.params.eventId;
 
     try {
-        // ===== TEMPORARY: Mock logged-in user for testing =====
-        if (!req.session.user) {
-            req.session.user = {
-                id: 70, // Change this to a valid participant_id from your database
-                username: "testuser",
-                role: "participant",
-            };
+        // Check if user is logged in
+        if (!req.session.user || !req.session.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: "You must be logged in to register",
+                redirect: "/login",
+            });
         }
-        // ===== END TEMPORARY CODE =====
+        
         // Get event details
         const event = await knex("events").where("event_id", eventId).first();
 
@@ -435,15 +438,6 @@ app.post("/register-event/:eventId", async (req, res) => {
 
         const registered = parseInt(registrationCount.count) || 0;
         const seatsLeft = event.event_capacity - registered;
-
-        // Check if user is logged in
-        if (!req.session.user) {
-            return res.status(401).json({
-                success: false,
-                message: "You must be logged in to register",
-                redirect: "/login",
-            });
-        }
 
         // Check if event is full
         if (seatsLeft <= 0) {
@@ -523,9 +517,14 @@ app.post("/cancel-registration/:eventId", async (req, res) => {
     const eventId = req.params.eventId;
 
     try {
-        // ===== TEMPORARY: Mock logged-in user =====
-        const TEST_USER_ID = 70; // ← Change this to match your test user
-        // ==========================================
+        // Check if user is logged in
+        if (!req.session.user || !req.session.user.id) {
+            return res.status(401).json({
+                success: false,
+                message: "You must be logged in to cancel registration",
+                redirect: "/login",
+            });
+        }
 
         // Get event details
         const event = await knex("events").where("event_id", eventId).first();
@@ -540,7 +539,7 @@ app.post("/cancel-registration/:eventId", async (req, res) => {
         // Check if user has a registration for this event
         const existingRegistration = await knex("event_registrations")
             .where("event_id", eventId)
-            .where("participant_id", TEST_USER_ID)
+            .where("participant_id", req.session.user.id)
             .whereIn("registration_status", ["registered", "attended"])
             .first();
 
@@ -750,6 +749,146 @@ app.get("/profile/:id", async (req, res) => {
                 parseFloat(survey.survey_overall_score) || null;
         });
 
+        // ===== QUICK VIEW DASHBOARD DATA =====
+        // Get today's date for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let upcomingEvents = [];
+        let upcomingEventsCount = 0;
+        let attendedEventsCount = 0;
+        let pendingSurveys = [];
+        let pendingSurveysCount = 0;
+
+        try {
+            // Get upcoming events (registered AND future dated)
+            upcomingEvents = await knex("event_registrations as er")
+                .join("events as e", "er.event_id", "e.event_id")
+                .where("er.participant_id", participantId)
+                .where("e.event_date", ">=", today)
+                .select(
+                    "e.event_id",
+                    "e.event_name",
+                    "e.event_date",
+                    "e.event_start_time",
+                    "e.event_end_time",
+                    "e.event_location"
+                )
+                .orderBy("e.event_date", "asc")
+                .limit(5); // Show up to 5 upcoming events
+
+            // Count of upcoming events
+            upcomingEventsCount = upcomingEvents ? upcomingEvents.length : 0;
+        } catch (error) {
+            console.error("Error fetching upcoming events:", error);
+            upcomingEvents = [];
+            upcomingEventsCount = 0;
+        }
+
+        try {
+            // Count of attended events (registration_attended_flag is stored as integer: 1 = true, 0 = false)
+            const attendedResult = await knex("event_registrations")
+                .where("participant_id", participantId)
+                .where("registration_attended_flag", 1)  // Changed from true to 1
+                .count("* as count")
+                .first();
+            
+            attendedEventsCount = attendedResult ? parseInt(attendedResult.count) || 0 : 0;
+        } catch (error) {
+            console.error("Error counting attended events:", error);
+            attendedEventsCount = 0;
+        }
+
+        try {
+            // Get pending surveys (attended events without survey results)
+            pendingSurveys = await knex("event_registrations as er")
+                .join("events as e", "er.event_id", "e.event_id")
+                .leftJoin("survey_results as sr", "er.event_registration_id", "sr.event_registration_id")
+                .where("er.participant_id", participantId)
+                .where("er.registration_attended_flag", 1)  // Changed from true to 1
+                .whereNull("sr.survey_id") // No survey result exists
+                .select(
+                    "er.event_registration_id",
+                    "e.event_name",
+                    "e.event_date"
+                )
+                .orderBy("e.event_date", "desc");
+
+            // Count of pending surveys
+            pendingSurveysCount = pendingSurveys ? pendingSurveys.length : 0;
+        } catch (error) {
+            console.error("Error fetching pending surveys:", error);
+            pendingSurveys = [];
+            pendingSurveysCount = 0;
+        }
+
+        // ===== SPONSOR & ADMIN DASHBOARD DATA =====
+        let allUpcomingEvents = [];
+        let allUpcomingEventsCount = 0;
+        let participantCount = 0;
+        let sponsorCount = 0;
+        let totalRegistrations = 0;
+
+        // Get all upcoming events (for sponsors and admins)
+        try {
+            allUpcomingEvents = await knex("events")
+                .where("event_date", ">=", today)
+                .select(
+                    "event_id",
+                    "event_name",
+                    "event_date",
+                    "event_start_time",
+                    "event_end_time",
+                    "event_location"
+                )
+                .orderBy("event_date", "asc")
+                .limit(10); // Show up to 10 upcoming events
+
+            allUpcomingEventsCount = allUpcomingEvents ? allUpcomingEvents.length : 0;
+        } catch (error) {
+            console.error("Error fetching all upcoming events:", error);
+            allUpcomingEvents = [];
+            allUpcomingEventsCount = 0;
+        }
+
+        // Get participant count (for admins)
+        try {
+            const participantResult = await knex("participants")
+                .where("participant_role", "participant")
+                .count("* as count")
+                .first();
+            
+            participantCount = participantResult ? parseInt(participantResult.count) || 0 : 0;
+        } catch (error) {
+            console.error("Error counting participants:", error);
+            participantCount = 0;
+        }
+
+        // Get sponsor count (for admins)
+        try {
+            const sponsorResult = await knex("participants")
+                .where("participant_role", "sponsor")
+                .count("* as count")
+                .first();
+            
+            sponsorCount = sponsorResult ? parseInt(sponsorResult.count) || 0 : 0;
+        } catch (error) {
+            console.error("Error counting sponsors:", error);
+            sponsorCount = 0;
+        }
+
+        // Get total registrations count (for admins)
+        try {
+            const registrationsResult = await knex("event_registrations")
+                .count("* as count")
+                .first();
+            
+            totalRegistrations = registrationsResult ? parseInt(registrationsResult.count) || 0 : 0;
+        } catch (error) {
+            console.error("Error counting registrations:", error);
+            totalRegistrations = 0;
+        }
+
         // Render the page with all data
         res.render("profile", {
             participant: participant,
@@ -757,6 +896,22 @@ app.get("/profile/:id", async (req, res) => {
             donations: donations,
             eventRegistrations: eventRegistrations,
             surveys: surveys,
+            // Participant dashboard data
+            upcomingEvents: upcomingEvents,
+            upcomingEventsCount: upcomingEventsCount,
+            attendedEventsCount: attendedEventsCount,
+            pendingSurveys: pendingSurveys,
+            pendingSurveysCount: pendingSurveysCount,
+            // Sponsor & Admin dashboard data
+            allUpcomingEvents: allUpcomingEvents,
+            allUpcomingEventsCount: allUpcomingEventsCount,
+            participantCount: participantCount,
+            sponsorCount: sponsorCount,
+            totalRegistrations: totalRegistrations,
+            // Session data for navigation
+            isLoggedIn: req.session.isLoggedIn || false,
+            userId: req.session.userId || null,
+            role: req.session.role || null
         });
     } catch (error) {
         console.error("Error loading profile dashboard:", error);

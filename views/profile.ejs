@@ -87,7 +87,10 @@
     >
       <!-- Tab Navigation -->
       <div class="tab-navigation">
-        <button class="tab-btn active" data-tab="profile">
+        <button class="tab-btn active" data-tab="quickview">
+          Quick View
+        </button>
+        <button class="tab-btn" data-tab="profile">
           Personal Information
         </button>
         <button class="tab-btn" data-tab="milestones">Milestones</button>
@@ -96,8 +99,387 @@
         <button class="tab-btn" data-tab="surveys">Survey Results</button>
       </div>
 
+      <!-- Quick View Tab (Role-Based Content) -->
+      <div id="quickview-tab" class="tab-content active">
+        
+        <!-- PARTICIPANT QUICK VIEW -->
+        <% if (participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
+          <!-- Welcome Card -->
+          <div class="dashboard-welcome-card">
+            <h2 class="dashboard-welcome-title">Welcome back, <%= participant.participant_first_name %>!</h2>
+            <p class="dashboard-welcome-text">Here's what's happening with your Ella Rises journey.</p>
+          </div>
+
+          <!-- Dashboard Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Quick Stats Card -->
+            <div class="dashboard-card dashboard-stats-card">
+              <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Your Stats</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">↑</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= upcomingEventsCount || 0 %></div>
+                    <div class="dashboard-stat-label">Upcoming Events</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">✓</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= attendedEventsCount || 0 %></div>
+                    <div class="dashboard-stat-label">Events Attended</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">★</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= milestones ? milestones.length : 0 %></div>
+                    <div class="dashboard-stat-label">Milestones Achieved</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">◉</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= pendingSurveysCount || 0 %></div>
+                    <div class="dashboard-stat-label">Surveys Pending</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="dashboard-card dashboard-actions-card">
+              <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Quick Actions</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <a href="/calendar" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">▶</span>
+                  <span class="dashboard-action-text">Browse Events</span>
+                </a>
+                <a href="/donate_now" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">♥</span>
+                  <span class="dashboard-action-text">Make a Donation</span>
+                </a>
+                <a href="/profile/<%= participant.participant_id %>?tab=milestones" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">★</span>
+                  <span class="dashboard-action-text">View Milestones</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Upcoming Events Card -->
+            <div class="dashboard-card dashboard-full-width">
+              <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Your Upcoming Events</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <% if (upcomingEvents && upcomingEvents.length > 0) { %>
+                  <div class="dashboard-event-list">
+                    <% upcomingEvents.forEach(function(event) { %>
+                      <div class="dashboard-event-item" onclick="showEventDetailsModal('<%= event.event_name.replace(/'/g, "\\'") %>', '<%= event.event_date ? new Date(event.event_date).toLocaleDateString() : "N/A" %>', '<%= event.event_start_time || "N/A" %>', '<%= event.event_end_time || "N/A" %>', '<%= event.event_location ? event.event_location.replace(/'/g, "\\'") : "N/A" %>', 'No additional details available.')">
+                        <div class="dashboard-event-icon">▶</div>
+                        <div class="dashboard-event-info">
+                          <div class="dashboard-event-name"><%= event.event_name %></div>
+                          <div class="dashboard-event-date">
+                            <%= event.event_date ? new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Date TBD' %>
+                            <% if (event.event_start_time) { %>
+                              • <%= event.event_start_time %>
+                            <% } %>
+                          </div>
+                        </div>
+                        <div class="dashboard-event-arrow">→</div>
+                      </div>
+                    <% }); %>
+                  </div>
+                <% } else { %>
+                  <div class="dashboard-empty-state">
+                    <div class="dashboard-empty-icon">○</div>
+                    <p class="dashboard-empty-text">You haven't registered for any upcoming events yet.</p>
+                    <a href="/calendar" class="btn btn-primary">Register for Events</a>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Pending Surveys Card -->
+            <div class="dashboard-card dashboard-full-width">
+              <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Surveys Awaiting Your Feedback</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <% if (pendingSurveys && pendingSurveys.length > 0) { %>
+                  <div class="dashboard-survey-list">
+                    <% pendingSurveys.forEach(function(survey) { %>
+                      <div class="dashboard-survey-item">
+                        <div class="dashboard-survey-icon">◉</div>
+                        <div class="dashboard-survey-info">
+                          <div class="dashboard-survey-name"><%= survey.event_name %></div>
+                          <div class="dashboard-survey-date">
+                            Event Date: <%= survey.event_date ? new Date(survey.event_date).toLocaleDateString() : 'N/A' %>
+                          </div>
+                        </div>
+                        <a href="/add/survey_results?event_registration_id=<%= survey.event_registration_id %>&participant_id=<%= participant.participant_id %>&event_name=<%= encodeURIComponent(survey.event_name) %>&event_date=<%= survey.event_date %>" class="btn btn-primary btn-small">Complete Survey</a>
+                      </div>
+                    <% }); %>
+                  </div>
+                <% } else { %>
+                  <div class="dashboard-empty-state">
+                    <div class="dashboard-empty-icon">✓</div>
+                    <p class="dashboard-empty-text">You're all caught up! No pending surveys at this time.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+          </div>
+        
+        <!-- DONOR QUICK VIEW -->
+        <% } else if (participant.participant_role && participant.participant_role.toLowerCase() === 'donor') { %>
+          <!-- Welcome Card -->
+          <div class="dashboard-welcome-card dashboard-welcome-donor">
+            <h2 class="dashboard-welcome-title">Welcome back, <%= participant.participant_first_name %>!</h2>
+            <p class="dashboard-welcome-text">Thank you for your generous support of Ella Rises.</p>
+          </div>
+
+          <!-- Dashboard Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- Personal Info Card -->
+            <div class="dashboard-card">
+              <div class="dashboard-card-header dashboard-card-header-donor">
+                <h3 class="dashboard-card-title">Your Information</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <div class="profile-section-content">
+                  <div class="profile-item">
+                    <span class="profile-label">Email</span>
+                    <span class="profile-value"><%= participant.participant_email || 'N/A' %></span>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-label">Phone</span>
+                    <span class="profile-value"><%= participant.participant_phone || 'N/A' %></span>
+                  </div>
+                  <div class="profile-item">
+                    <span class="profile-label">Location</span>
+                    <span class="profile-value"><%= participant.participant_city || 'N/A' %>, <%= participant.participant_state || 'N/A' %></span>
+                  </div>
+                  <div class="profile-item" style="border-bottom: none;">
+                    <span class="profile-label">Total Donations</span>
+                    <span class="profile-value profile-value-donations">$<%= participant.Total_Donations ? participant.Total_Donations.toFixed(2) : '0.00' %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="dashboard-card dashboard-actions-card">
+              <div class="dashboard-card-header dashboard-card-header-donor">
+                <h3 class="dashboard-card-title">Quick Actions</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <a href="/donate_now" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">♥</span>
+                  <span class="dashboard-action-text">Make a Donation</span>
+                </a>
+                <a href="/calendar" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">▶</span>
+                  <span class="dashboard-action-text">View Events</span>
+                </a>
+                <a href="/profile/<%= participant.participant_id %>?tab=donations" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">$</span>
+                  <span class="dashboard-action-text">View Donation History</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Upcoming Events Card -->
+            <div class="dashboard-card dashboard-full-width">
+              <div class="dashboard-card-header dashboard-card-header-donor">
+                <h3 class="dashboard-card-title">Upcoming Ella Rises Events</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <% if (allUpcomingEvents && allUpcomingEvents.length > 0) { %>
+                  <div class="dashboard-event-list">
+                    <% allUpcomingEvents.forEach(function(event) { %>
+                      <div class="dashboard-event-item" onclick="showEventDetailsModal('<%= event.event_name.replace(/'/g, "\\'") %>', '<%= event.event_date ? new Date(event.event_date).toLocaleDateString() : "N/A" %>', '<%= event.event_start_time || "N/A" %>', '<%= event.event_end_time || "N/A" %>', '<%= event.event_location ? event.event_location.replace(/'/g, "\\'") : "N/A" %>', 'No additional details available.')">
+                        <div class="dashboard-event-icon">▶</div>
+                        <div class="dashboard-event-info">
+                          <div class="dashboard-event-name"><%= event.event_name %></div>
+                          <div class="dashboard-event-date">
+                            <%= event.event_date ? new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Date TBD' %>
+                            <% if (event.event_start_time) { %>
+                              • <%= event.event_start_time %>
+                            <% } %>
+                          </div>
+                        </div>
+                        <div class="dashboard-event-arrow">→</div>
+                      </div>
+                    <% }); %>
+                  </div>
+                <% } else { %>
+                  <div class="dashboard-empty-state">
+                    <div class="dashboard-empty-icon">○</div>
+                    <p class="dashboard-empty-text">No upcoming events scheduled at this time.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+          </div>
+
+        <!-- ADMIN QUICK VIEW -->
+        <% } else if (participant.participant_role && participant.participant_role.toLowerCase() === 'admin') { %>
+          <!-- Welcome Card -->
+          <div class="dashboard-welcome-card dashboard-welcome-admin">
+            <h2 class="dashboard-welcome-title">Welcome back, <%= participant.participant_first_name %>!</h2>
+            <p class="dashboard-welcome-text">Here's your Ella Rises administrative overview.</p>
+          </div>
+
+          <!-- Dashboard Grid -->
+          <div class="dashboard-grid">
+            
+            <!-- System Stats Card -->
+            <div class="dashboard-card dashboard-stats-card">
+              <div class="dashboard-card-header dashboard-card-header-admin">
+                <h3 class="dashboard-card-title">System Overview</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">●</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= participantCount || 0 %></div>
+                    <div class="dashboard-stat-label">Participants</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">♥</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= sponsorCount || 0 %></div>
+                    <div class="dashboard-stat-label">Sponsors</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">▶</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= allUpcomingEventsCount || 0 %></div>
+                    <div class="dashboard-stat-label">Upcoming Events</div>
+                  </div>
+                </div>
+                <div class="dashboard-stat-item">
+                  <span class="dashboard-stat-icon">✓</span>
+                  <div class="dashboard-stat-info">
+                    <div class="dashboard-stat-value"><%= totalRegistrations || 0 %></div>
+                    <div class="dashboard-stat-label">Total Registrations</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="dashboard-card dashboard-actions-card">
+              <div class="dashboard-card-header dashboard-card-header-admin">
+                <h3 class="dashboard-card-title">Quick Actions</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <a href="/add/participants" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">+</span>
+                  <span class="dashboard-action-text">Add Participant</span>
+                </a>
+                <a href="/add/events" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">+</span>
+                  <span class="dashboard-action-text">Add Event</span>
+                </a>
+                <a href="/calendar" class="dashboard-action-btn">
+                  <span class="dashboard-action-icon">▶</span>
+                  <span class="dashboard-action-text">View Calendar</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Manage Tables Card -->
+            <div class="dashboard-card dashboard-full-width">
+              <div class="dashboard-card-header dashboard-card-header-admin">
+                <h3 class="dashboard-card-title">Manage Data</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <div class="dashboard-table-links">
+                  <a href="/participants" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">●</span>
+                    <span class="dashboard-table-text">Participants</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                  <a href="/events" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">▶</span>
+                    <span class="dashboard-table-text">Events</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                  <a href="/event_registrations" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">✓</span>
+                    <span class="dashboard-table-text">Event Registrations</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                  <a href="/surveys" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">◉</span>
+                    <span class="dashboard-table-text">Surveys</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                  <a href="/milestones" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">★</span>
+                    <span class="dashboard-table-text">Milestones</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                  <a href="/donations" class="dashboard-table-link">
+                    <span class="dashboard-table-icon">♥</span>
+                    <span class="dashboard-table-text">Donations</span>
+                    <span class="dashboard-table-arrow">→</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upcoming Events Card -->
+            <div class="dashboard-card dashboard-full-width">
+              <div class="dashboard-card-header dashboard-card-header-admin">
+                <h3 class="dashboard-card-title">Upcoming Events</h3>
+              </div>
+              <div class="dashboard-card-body">
+                <% if (allUpcomingEvents && allUpcomingEvents.length > 0) { %>
+                  <div class="dashboard-event-list">
+                    <% allUpcomingEvents.forEach(function(event) { %>
+                      <div class="dashboard-event-item" onclick="showEventDetailsModal('<%= event.event_name.replace(/'/g, "\\'") %>', '<%= event.event_date ? new Date(event.event_date).toLocaleDateString() : "N/A" %>', '<%= event.event_start_time || "N/A" %>', '<%= event.event_end_time || "N/A" %>', '<%= event.event_location ? event.event_location.replace(/'/g, "\\'") : "N/A" %>', 'No additional details available.')">
+                        <div class="dashboard-event-icon">▶</div>
+                        <div class="dashboard-event-info">
+                          <div class="dashboard-event-name"><%= event.event_name %></div>
+                          <div class="dashboard-event-date">
+                            <%= event.event_date ? new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Date TBD' %>
+                            <% if (event.event_start_time) { %>
+                              • <%= event.event_start_time %>
+                            <% } %>
+                          </div>
+                        </div>
+                        <div class="dashboard-event-arrow">→</div>
+                      </div>
+                    <% }); %>
+                  </div>
+                <% } else { %>
+                  <div class="dashboard-empty-state">
+                    <div class="dashboard-empty-icon">○</div>
+                    <p class="dashboard-empty-text">No upcoming events scheduled at this time.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+
+          </div>
+        <% } %>
+      </div>
+
       <!-- Personal Information Tab -->
-      <div id="profile-tab" class="tab-content active">
+      <div id="profile-tab" class="tab-content">
         <!-- Detailed Information -->
         <div class="profile-sections-grid">
           <!-- Location Information -->
@@ -605,35 +987,184 @@
         </div>
       </div>
     </div>
+
+    <!-- Event Details Modal (for Quick View) -->
+    <div id="eventDetailsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: var(--powder-blue);">
+          <h3 class="modal-title" id="eventDetailsTitle" style="color: white;"></h3>
+          <button class="modal-close" onclick="closeEventDetailsModal()" style="color: white;">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="event-modal-detail">
+            <span class="event-modal-label">Date</span>
+            <div class="event-modal-value" id="eventDetailsDate"></div>
+          </div>
+          <div class="event-modal-detail">
+            <span class="event-modal-label">Time</span>
+            <div class="event-modal-value" id="eventDetailsTime"></div>
+          </div>
+          <div class="event-modal-detail">
+            <span class="event-modal-label">Location</span>
+            <div class="event-modal-value" id="eventDetailsLocation"></div>
+          </div>
+          <div class="event-modal-detail">
+            <span class="event-modal-label">Description</span>
+            <div class="event-modal-value" id="eventDetailsDescription"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="closeEventDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
     </main>
 
-    <!-- Footer -->
+    <!--Footer-->
     <footer>
-      <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>
-      <p class="footer-subtext">Making a difference, one woman at a time.</p>
-      <p
-        class="footer-subtext"
-        style="margin-top: 0.5rem; font-size: 0.85rem; font-style: italic"
-      >
-        Thank you to our supporters who make it possible for us to accomplish
-        our goals and provide these wonderful programs for our young women!
-      </p>
-      <div id="google_translate_element"></div>
+        <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>
+        <p class="footer-subtext">Making a difference, one woman at a time.</p>
 
-      <script type="text/javascript">
-        function googleTranslateElementInit() {
-          new google.translate.TranslateElement(
-            {
-              pageLanguage: "en",
-              includedLanguages: "es,fr,de,pt,ar,zh-CN,ja,ko",
-            },
-            "google_translate_element"
-          );
-        }
-      </script>
+        <div class="custom-language-selector">
+            <button class="language-dropdown-btn" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguage">
+                    <% if (language === 'es') { %>🌐 Español
+                    <% } else if (language === 'fr') { %>🌐 Français
+                    <% } else if (language === 'de') { %>🌐 Deutsch
+                    <% } else if (language === 'pt') { %>🌐 Português
+                    <% } else if (language === 'ar') { %>🌐 العربية
+                    <% } else if (language === 'zh-CN') { %>🌐 中文
+                    <% } else if (language === 'ja') { %>🌐 日本語
+                    <% } else if (language === 'ko') { %>🌐 한국어
+                    <% } else { %>🌐 English <% } %>
+                </span>
+                <span class="dropdown-arrow">▾</span>
+            </button>
+            <div class="language-dropdown-menu" id="languageDropdown">
+                <a href="#" onclick="changeLanguage('en'); return false;">English</a>
+                <a href="#" onclick="changeLanguage('es'); return false;">Español</a>
+                <a href="#" onclick="changeLanguage('fr'); return false;">Français</a>
+                <a href="#" onclick="changeLanguage('de'); return false;">Deutsch</a>
+                <a href="#" onclick="changeLanguage('pt'); return false;">Português</a>
+                <a href="#" onclick="changeLanguage('ar'); return false;">العربية</a>
+                <a href="#" onclick="changeLanguage('zh-CN'); return false;">中文</a>
+                <a href="#" onclick="changeLanguage('ja'); return false;">日本語</a>
+                <a href="#" onclick="changeLanguage('ko'); return false;">한국어</a>
+            </div>
+        </div>
 
-      <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <div id="google_translate_element" style="display:none;"></div>
+
+        <script>
+            const LANGUAGE_NAMES = {
+                'en': '🌐 English',
+                'es': '🌐 Español',
+                'fr': '🌐 Français',
+                'de': '🌐 Deutsch',
+                'pt': '🌐 Português',
+                'ar': '🌐 العربية',
+                'zh-CN': '🌐 中文',
+                'ja': '🌐 日本語',
+                'ko': '🌐 한국어'
+            };
+
+            // From server-side session (res.locals.language)
+            const SESSION_LANGUAGE = '<%= language || "en" %>';
+
+            // Initialize Google Translate widget – no extra logic here
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,es,fr,de,pt,ar,zh-CN,ja,ko',
+                    autoDisplay: false
+                }, 'google_translate_element');
+            }
+
+            function getGoogTransLang() {
+                // Looks for cookie like: googtrans=/auto/es
+                const match = document.cookie.match(/(?:^|;)\s*googtrans=\/auto\/([^;]+)/);
+                return match ? match[1] : null;
+            }
+
+            function setLanguageLabel(lang) {
+                const el = document.getElementById('currentLanguage');
+                if (!el) return;
+                el.textContent = LANGUAGE_NAMES[lang] || LANGUAGE_NAMES['en'];
+            }
+
+            function applyLanguage(lang, isInit) {
+                const combo = document.querySelector('.goog-te-combo');
+                if (!combo) {
+                    // Wait for Google widget to finish rendering
+                    setTimeout(() => applyLanguage(lang, isInit), 200);
+                    return;
+                }
+
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+                setLanguageLabel(lang);
+
+                if (!isInit) {
+                    // Persist to your session on the server
+                    fetch('/set-language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lang })
+                    }).catch(() => {});
+                    // Optional: localStorage helper if you want it
+                    localStorage.setItem('selectedLanguage', lang);
+                    toggleLanguageDropdown(false);
+                }
+            }
+
+            function changeLanguage(lang) {
+                applyLanguage(lang, false);
+            }
+
+            function toggleLanguageDropdown(forceClose) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (!dropdown) return;
+                if (forceClose === false) {
+                    dropdown.classList.remove('show');
+                } else {
+                    dropdown.classList.toggle('show');
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-language-selector')) {
+                    toggleLanguageDropdown(false);
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Make sure the label matches whatever we think the language is
+                setLanguageLabel(SESSION_LANGUAGE);
+
+                const cookieLang = getGoogTransLang();
+                const storedLang = localStorage.getItem('selectedLanguage');
+
+                // Priority: Google cookie > session > localStorage
+                const preferred =
+                    cookieLang ||
+                    (SESSION_LANGUAGE && SESSION_LANGUAGE !== 'undefined' ? SESSION_LANGUAGE : null) ||
+                    storedLang ||
+                    'en';
+
+                // If preferred is English, just leave as-is (no translate flicker)
+                if (preferred === 'en') {
+                    setLanguageLabel('en');
+                    return;
+                }
+
+                // Apply preferred language once widget is ready
+                setTimeout(() => applyLanguage(preferred, true), 500);
+            });
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     </footer>
+
 
     <script>
       const participantId = <%- JSON.stringify(participant.participant_id) %>;
@@ -775,6 +1306,20 @@
 
       function closeCommentsModal() {
         document.getElementById('commentsModal').classList.remove('active');
+      }
+
+      // Event Details Modal Functions (for Quick View)
+      function showEventDetailsModal(name, date, startTime, endTime, location, description) {
+        document.getElementById('eventDetailsTitle').textContent = name;
+        document.getElementById('eventDetailsDate').textContent = date;
+        document.getElementById('eventDetailsTime').textContent = `${startTime} - ${endTime}`;
+        document.getElementById('eventDetailsLocation').textContent = location;
+        document.getElementById('eventDetailsDescription').textContent = description;
+        document.getElementById('eventDetailsModal').classList.add('active');
+      }
+
+      function closeEventDetailsModal() {
+        document.getElementById('eventDetailsModal').classList.remove('active');
       }
 
       // View Comments buttons
