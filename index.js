@@ -114,7 +114,7 @@ app.post("/login", (req, res) => {
         .then((user) => {
             if (user) {
                 req.session.user = {
-                    id: user.participant_id,
+                    id: user.user_id,
                     username: user.participant_username,
                     role: user.participant_role,
                 };
@@ -122,7 +122,7 @@ app.post("/login", (req, res) => {
 
                 // Check if there's a stored return URL
                 const returnTo =
-                    req.session.returnTo || `/profile/${user.participant_id}`;
+                    req.session.returnTo || `/profile/${user.user_id}`;
                 delete req.session.returnTo; // Clear it after use
                 res.redirect(returnTo);
             } else {
@@ -162,14 +162,14 @@ app.post("/signup", async (req, res) => {
 
         // Auto-login: set up the same session structure as in /login
         req.session.user = {
-            id: user.participant_id,
+            id: user.user_id,
             username: user.participant_username,
             role: user.participant_role, // make sure this column exists
         };
         req.session.isLoggedIn = true;
 
         // Redirect to their profile
-        res.redirect(`/profile/${user.participant_id}`);
+        res.redirect(`/profile/${user.user_id}`);
     } catch (err) {
         console.log("Error signing up", err.message);
         res.status(500).json({ error: err.message });
@@ -255,7 +255,7 @@ app.get("/calendar", async (req, res) => {
         let userRegisteredEventIds = [];
         if (req.session.user && req.session.user.id) {
             const userRegistrations = await knex("event_registrations")
-                .where("participant_id", req.session.user.id)
+                .where("user_id", req.session.user.id)
                 .whereIn("registration_status", ["registered", "attended"])
                 .select("event_id");
 
@@ -453,7 +453,7 @@ app.post("/register-event/:eventId", async (req, res) => {
         // Check if user is already registered
         const existingRegistration = await knex("event_registrations")
             .where("event_id", eventId)
-            .where("participant_id", req.session.user.id)
+            .where("user_id", req.session.user.id)
             .first();
 
         if (existingRegistration) {
@@ -465,7 +465,7 @@ app.post("/register-event/:eventId", async (req, res) => {
 
         // Create registration
         await knex("event_registrations").insert({
-            participant_id: req.session.user.id,
+            user_id: req.session.user.id,
             event_id: eventId,
             registration_status: "registered",
             registration_attended_flag: 0,
@@ -542,7 +542,7 @@ app.post("/cancel-registration/:eventId", async (req, res) => {
         // Check if user has a registration for this event
         const existingRegistration = await knex("event_registrations")
             .where("event_id", eventId)
-            .where("participant_id", req.session.user.id)
+            .where("user_id", req.session.user.id)
             .whereIn("registration_status", ["registered", "attended"])
             .first();
 
@@ -592,7 +592,7 @@ app.post("/add/donations", async (req, res) => {
 
     try {
         // Validate required fields
-        if (!newData.participant_id || !newData.donation_date || !newData.donation_amount) {
+        if (!newData.user_id || !newData.donation_date || !newData.donation_amount) {
             return res.json({ 
                 success: false, 
                 error: "Missing required fields" 
@@ -607,7 +607,7 @@ app.post("/add/donations", async (req, res) => {
         // Return success response
         res.json({ 
             success: true, 
-            participant_id: newData.participant_id 
+            user_id: newData.user_id 
         });
     } catch (err) {
         console.error("Error adding donation:", err); // Debug log
@@ -629,13 +629,13 @@ app.get("/profile/:id", async (req, res) => {
         const participant = await knex("users")
             .leftJoin(
                 "donations",
-                "users.participant_id",
-                "donations.participant_id"
+                "users.user_id",
+                "donations.user_id"
             )
-            .where("users.participant_id", participantId)
-            .groupBy("users.participant_id")
+            .where("users.user_id", participantId)
+            .groupBy("users.user_id")
             .select(
-                "users.participant_id",
+                "users.user_id",
                 "users.participant_email",
                 "users.participant_first_name",
                 "users.participant_last_name",
@@ -664,7 +664,7 @@ app.get("/profile/:id", async (req, res) => {
 
         // Get milestones sorted by most recent first
         const milestones = await knex("milestones")
-            .where("participant_id", participantId)
+            .where("user_id", participantId)
             .select(
                 "milestone_id",
                 "milestone_title",
@@ -675,7 +675,7 @@ app.get("/profile/:id", async (req, res) => {
 
         // Get donations sorted by most recent first (only for this participant)
         const donations = await knex("donations")
-            .where("participant_id", participantId)
+            .where("user_id", participantId)
             .select("donation_id", "donation_date", "donation_amount")
             .orderBy("donation_date", "desc");
 
@@ -687,10 +687,10 @@ app.get("/profile/:id", async (req, res) => {
         // Get event registrations with event details sorted by most recent first
         const eventRegistrations = await knex("event_registrations as er")
             .join("events as e", "er.event_id", "e.event_id")
-            .where("er.participant_id", participantId)
+            .where("er.user_id", participantId)
             .select(
                 "er.event_registration_id",
-                "er.participant_id",
+                "er.user_id",
                 "er.event_id",
                 "er.registration_status",
                 "er.registration_attended_flag",
@@ -717,7 +717,7 @@ app.get("/profile/:id", async (req, res) => {
                 "er.event_registration_id"
             )
             .innerJoin("events as e", "er.event_id", "e.event_id")
-            .where("er.participant_id", participantId)
+            .where("er.user_id", participantId)
             .select(
                 "sr.survey_id",
                 "sr.event_registration_id",
@@ -767,7 +767,7 @@ app.get("/profile/:id", async (req, res) => {
             // Get upcoming events (registered AND future dated)
             upcomingEvents = await knex("event_registrations as er")
                 .join("events as e", "er.event_id", "e.event_id")
-                .where("er.participant_id", participantId)
+                .where("er.user_id", participantId)
                 .where("e.event_date", ">=", today)
                 .select(
                     "e.event_id",
@@ -791,7 +791,7 @@ app.get("/profile/:id", async (req, res) => {
         try {
             // Count of attended events (registration_attended_flag is stored as integer: 1 = true, 0 = false)
             const attendedResult = await knex("event_registrations")
-                .where("participant_id", participantId)
+                .where("user_id", participantId)
                 .where("registration_attended_flag", 1)  // Changed from true to 1
                 .count("* as count")
                 .first();
@@ -807,7 +807,7 @@ app.get("/profile/:id", async (req, res) => {
             pendingSurveys = await knex("event_registrations as er")
                 .join("events as e", "er.event_id", "e.event_id")
                 .leftJoin("survey_results as sr", "er.event_registration_id", "sr.event_registration_id")
-                .where("er.participant_id", participantId)
+                .where("er.user_id", participantId)
                 .where("er.registration_attended_flag", 1)  // Changed from true to 1
                 .whereNull("sr.survey_id") // No survey result exists
                 .select(
@@ -856,7 +856,7 @@ app.get("/profile/:id", async (req, res) => {
 
         // Get participant count (for admins)
         try {
-            const participantResult = await knex("participants")
+            const participantResult = await knex("users")
                 .where("participant_role", "participant")
                 .count("* as count")
                 .first();
@@ -869,7 +869,7 @@ app.get("/profile/:id", async (req, res) => {
 
         // Get sponsor count (for admins)
         try {
-            const sponsorResult = await knex("participants")
+            const sponsorResult = await knex("users")
                 .where("participant_role", "sponsor")
                 .count("* as count")
                 .first();
@@ -928,7 +928,7 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
     const id = req.params.id;
 
     const primaryKeyByTable = {
-        participants: "participant_id",
+        users: "user_id",
         milestones: "milestone_id",
         events: "event_id",
         survey_results: "survey_id",
@@ -950,14 +950,14 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
                     "er.event_registration_id"
                 )
                 .join("events as e", "er.event_id", "e.event_id")
-                .join("participants as p", "er.participant_id", "p.participant_id")
+                .join("users as p", "er.user_id", "p.user_id")
                 .where("s.survey_id", id)
                 .select(
                     "s.*",
                     "e.event_id",
                     "e.event_name",
                     "e.event_date",
-                    "p.participant_id"
+                    "p.user_id"
                 )
                 .first();
         } else {
@@ -1013,7 +1013,7 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
     const updatedData = req.body;
 
     const primaryKeyByTable = {
-        users: "participant_id",
+        users: "user_id",
         milestones: "milestone_id",
         events: "event_id",
         survey_results: "survey_id",
@@ -1031,7 +1031,7 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
 
         // Always redirect back to profile with appropriate tab
         const tabMap = {
-            participants: "profile",
+            users: "profile",
             milestones: "milestones",
             donations: "donations",
             event_registrations: "events",
@@ -2300,7 +2300,7 @@ app.post("/delete/:table/:id", async (req, res) => {
 
     const primaryKeyByTable = {
         users: "user_id",
-        participants: "user_id", // backward compatibility
+        users: "user_id", // backward compatibility
         milestones: "milestone_id",
         events: "event_id",
         survey_results: "survey_id",
@@ -2327,7 +2327,7 @@ app.get("/edit/:table/:id", async (req, res) => {
 
     const primaryKeyByTable = {
         users: "user_id",
-        participants: "user_id", // backward compatibility
+        users: "user_id", // backward compatibility
         milestones: "milestone_id",
         events: "event_id",
         survey_results: "survey_id",
@@ -2410,7 +2410,7 @@ app.post("/edit/:table/:id", async (req, res) => {
 
     const primaryKeyByTable = {
         users: "user_id",
-        participants: "user_id", // backward compatibility
+        users: "user_id", // backward compatibility
         milestones: "milestone_id",
         events: "event_id",
         survey_results: "survey_id",
