@@ -350,7 +350,7 @@
 
                         <div class="form-group">
                             <label class="form-label">Participant ID <span class="required">*</span></label>
-                            <input type="number" class="form-input" name="participant_id" placeholder="Enter participant ID" min="1" required>
+                            <input type="number" class="form-input" name="user_id" placeholder="Enter participant ID" min="1" required>
                             <span class="form-hint">Must be an existing participant</span>
                         </div>
                     </div>
@@ -449,13 +449,13 @@
                         <p class="section-description">Who achieved this milestone?</p>
                             <div class="form-group">
                                 <label class="form-label">Participant ID <span class="required">*</span></label>
-                                <input type="number" class="form-input" name="participant_id" placeholder="Enter participant ID" min="1" required>
+                                <input type="number" class="form-input" name="user_id" placeholder="Enter participant ID" min="1" required>
                                 <span class="form-hint">Must be an existing participant</span>
                             </div>
                     </div>
                     <!--If ID is passed along in route: save it in a hidden form (to be passed along with the submission)-->
                     <%} else {%>
-                        <input type="hidden" name="participant_id" value="<%= pass_id %>">
+                        <input type="hidden" name="user_id" value="<%= pass_id %>">
                     <%};%>
 
                     <div class="form-section">
@@ -543,13 +543,13 @@
                         <p class="section-description">Who is this survey for?</p>
                             <div class="form-group">
                                 <label class="form-label">Participant ID <span class="required">*</span></label>
-                                <input type="number" class="form-input" name="participant_id" placeholder="Enter participant ID" min="1" required>
+                                <input type="number" class="form-input" name="user_id" placeholder="Enter participant ID" min="1" required>
                                 <span class="form-hint">Must be an existing participant</span>
                             </div>
                     </div>
                     <!--If ID is passed along in route: save it in a hidden form (to be passed along with the submission)-->
                     <%} else {%>
-                        <input type="hidden" name="participant_id" value="<%= pass_id %>">
+                        <input type="hidden" name="user_id" value="<%= pass_id %>">
                     <%};%>
 
                     <div class="form-section">
@@ -716,13 +716,13 @@
     
                             <div class="form-group">
                                 <label class="form-label">Participant ID <span class="required">*</span></label>
-                                <input type="number" class="form-input" name="participant_id" placeholder="Enter participant ID" min="1" required>
+                                <input type="number" class="form-input" name="user_id" placeholder="Enter participant ID" min="1" required>
                                 <span class="form-hint">Must be an existing participant</span>
                             </div>
                         </div>
                     <!--If ID is passed along in route: save it in a hidden form (to be passed along with the submission)-->
                     <%} else {%>
-                        <input type="hidden" name="participant_id" value="<%= pass_id %>">
+                        <input type="hidden" name="user_id" value="<%= pass_id %>">
                     <%};%>
 
                     <div class="form-section">

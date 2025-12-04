@@ -243,8 +243,8 @@
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                                     <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= d.donation_id %>" data-name="<%= d.participant_first_name %> <%= d.participant_last_name %> - $<%= formattedAmount %>" aria-label="Select donation for <%= d.participant_first_name %> <%= d.participant_last_name %> - $<%= formattedAmount %>"></td>
                                     <% } %>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= d.participant_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= d.participant_first_name %></a></td>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= d.participant_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= d.participant_last_name %></a></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= d.user_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= d.participant_first_name %></a></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= d.user_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= d.participant_last_name %></a></td>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= formattedDonationDate || 'N/A' %></td>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;">$<%= formattedAmount %></td>
                                 </tr>

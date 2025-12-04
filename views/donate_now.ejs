@@ -75,7 +75,7 @@
                 <div id="donationForm">
                     <form id="addForm" class="modern-form">
                         
-                        <input type="hidden" name="participant_id" id="participant_id" value="<%= userId %>">
+                        <input type="hidden" name="user_id" id="user_id" value="<%= userId %>">
     
                         <div class="form-section">
                             <h2 class="section-title">Donation Details</h2>
@@ -321,7 +321,7 @@
             submitBtn.textContent = 'Processing...';
             
             // Get form values
-            const participantId = document.getElementById('participant_id').value;
+            const participantId = document.getElementById('user_id').value;
             const donationDate = document.getElementById('donation_date').value;
             const donationAmount = document.getElementById('donation_amount').value;
 
@@ -335,7 +335,7 @@
 
             // Create FormData object (this is what your server expects)
             const formData = new URLSearchParams();
-            formData.append('participant_id', participantId);
+            formData.append('user_id', participantId);
             formData.append('donation_date', donationDate);
             formData.append('donation_amount', donationAmount);
 

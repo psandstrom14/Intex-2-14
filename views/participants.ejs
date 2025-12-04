@@ -377,11 +377,11 @@
                                 %>
                                 <tr>
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
-                                    <td><input type="checkbox" class="row-checkbox" value="<%= p.participant_id %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>" aria-label="Select participant <%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
+                                    <td><input type="checkbox" class="row-checkbox" value="<%= p.user_id %>" data-name="<%= p.participant_first_name %> <%= p.participant_last_name %>" aria-label="Select participant <%= p.participant_first_name %> <%= p.participant_last_name %>"></td>
                                     <% } %>
                                     <!--FORMAT LINK CHANGE-->
-                                    <td><a href="/profile/<%= p.participant_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_first_name %></a></td>
-                                    <td><a href="/profile/<%= p.participant_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_last_name %></a></td>
+                                    <td><a href="/profile/<%= p.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_first_name %></a></td>
+                                    <td><a href="/profile/<%= p.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_last_name %></a></td>
                                     <td><%= p.participant_username %></td>
                                     <td><%= p.participant_email %></td>
                                     <td><%= p.participant_phone %></td>

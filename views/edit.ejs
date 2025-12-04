@@ -74,13 +74,13 @@
         <div class="add-card">
             <!-- Edit-Participant Form -->
             <% if (table_name === "users") { %>
-                <form id="addForm" class="modern-form" action="/edit/participants/<%= info.participant_id %>" method="POST">
+                <form id="addForm" class="modern-form" action="/edit/participants/<%= info.user_id %>" method="POST">
             <% if (table_name === "users") { %>
                 <% 
                     // Use profile-specific route if coming from profile page
                     const formAction = (typeof fromProfile !== 'undefined' && fromProfile) 
-                        ? `/profile-edit/participants/${info.participant_id}` 
-                        : `/edit/participants/${info.participant_id}`;
+                        ? `/profile-edit/participants/${info.user_id}` 
+                        : `/edit/participants/${info.user_id}`;
                 %>
                 <form id="addForm" class="modern-form" action="<%= formAction %>" method="POST">
                     
@@ -254,7 +254,7 @@
                         <% 
                             // Determine cancel link based on where we came from
                             const cancelLink = (typeof fromProfile !== 'undefined' && fromProfile) 
-                                ? `/profile/${info.participant_id}?tab=profile` 
+                                ? `/profile/${info.user_id}?tab=profile` 
                                 : '/participants';
                         %>
                         <a href="<%= cancelLink %>" class="btn btn-secondary">Cancel</a>
@@ -401,10 +401,10 @@
                             <input 
                                 type="number" 
                                 class="form-input" 
-                                name="participant_id" 
+                                name="user_id" 
                                 placeholder="Enter participant ID" 
                                 min="1"
-                                value="<%= info.participant_id || '' %>"
+                                value="<%= info.user_id || '' %>"
                                 required>
                             <span class="form-hint">Must be an existing participant</span>
                         </div>
@@ -508,7 +508,7 @@
                     <div class="form-actions">
                         <% 
                             const cancelLinkReg = (typeof fromProfile !== 'undefined' && fromProfile) 
-                                ? `/profile/${info.participant_id}?tab=events` 
+                                ? `/profile/${info.user_id}?tab=events` 
                                 : '/event_registrations';
                         %>
                         <a href="<%= cancelLinkReg %>" class="btn btn-secondary">Cancel</a>
@@ -534,10 +534,10 @@
                             <input 
                                 type="number" 
                                 class="form-input" 
-                                name="participant_id" 
+                                name="user_id" 
                                 placeholder="Enter participant ID" 
                                 min="1"
-                                value="<%= info.participant_id || '' %>"
+                                value="<%= info.user_id || '' %>"
                                 required>
                             <span class="form-hint">Must be an existing participant</span>
                         </div>
@@ -656,7 +656,7 @@
                     <div class="form-actions">
                         <% 
                             const cancelLinkMile = (typeof fromProfile !== 'undefined' && fromProfile) 
-                                ? `/profile/${info.participant_id}?tab=milestones` 
+                                ? `/profile/${info.user_id}?tab=milestones` 
                                 : '/milestones';
                         %>
                         <a href="<%= cancelLinkMile %>" class="btn btn-secondary">Cancel</a>
@@ -682,10 +682,10 @@
                             <input 
                                 type="number" 
                                 class="form-input" 
-                                name="participant_id" 
+                                name="user_id" 
                                 placeholder="Enter participant ID" 
                                 min="1"
-                                value="<%= info.participant_id || '' %>"
+                                value="<%= info.user_id || '' %>"
                                 required>
                             <span class="form-hint">Must be an existing participant</span>
                         </div>
@@ -726,7 +726,7 @@
                     <div class="form-actions">
                         <% 
                             const cancelLinkDon = (typeof fromProfile !== 'undefined' && fromProfile) 
-                                ? `/profile/${info.participant_id}?tab=donations` 
+                                ? `/profile/${info.user_id}?tab=donations` 
                                 : '/donations';
                         %>
                         <a href="<%= cancelLinkDon %>" class="btn btn-secondary">Cancel</a>
@@ -749,8 +749,8 @@
                             <input 
                                 type="number" 
                                 class="form-input" 
-                                name="participant_id" 
-                                value="<%= info.participant_id || '' %>"
+                                name="user_id" 
+                                value="<%= info.user_id || '' %>"
                                 min="1" 
                                 required>
                             <span class="form-hint">Must be an existing participant</span>
@@ -922,7 +922,7 @@
                     <div class="form-actions">
                         <% 
                             const cancelLinkSurvey = (typeof fromProfile !== 'undefined' && fromProfile) 
-                                ? `/profile/${info.participant_id}?tab=surveys` 
+                                ? `/profile/${info.user_id}?tab=surveys` 
                                 : '/surveys';
                         %>
                         <a href="<%= cancelLinkSurvey %>" class="btn btn-secondary">Cancel</a>

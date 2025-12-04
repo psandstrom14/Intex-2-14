@@ -44,7 +44,6 @@
                       </span>
                       <ul class="dropdown-menu">
                           <li><a href="/users">Users</a></li>
-                          <li><a href="/participants">Participants</a></li>
                           <li><a href="/events">Events</a></li>
                           <li><a href="/event_registrations">Event Registrations</a></li>
                           <li><a href="/surveys">Surveys</a></li>
@@ -165,7 +164,7 @@
                   <span class="dashboard-action-icon">♥</span>
                   <span class="dashboard-action-text">Make a Donation</span>
                 </a>
-                <a href="/profile/<%= participant.participant_id %>?tab=milestones" class="dashboard-action-btn">
+                <a href="/profile/<%= participant.user_id %>?tab=milestones" class="dashboard-action-btn">
                   <span class="dashboard-action-icon">★</span>
                   <span class="dashboard-action-text">View Milestones</span>
                 </a>
@@ -223,7 +222,7 @@
                             Event Date: <%= survey.event_date ? new Date(survey.event_date).toLocaleDateString() : 'N/A' %>
                           </div>
                         </div>
-                        <a href="/add/survey_results?event_registration_id=<%= survey.event_registration_id %>&participant_id=<%= participant.participant_id %>&event_name=<%= encodeURIComponent(survey.event_name) %>&event_date=<%= survey.event_date %>" class="btn btn-primary btn-small">Complete Survey</a>
+                        <a href="/add/survey_results?event_registration_id=<%= survey.event_registration_id %>&user_id=<%= participant.user_id %>&event_name=<%= encodeURIComponent(survey.event_name) %>&event_date=<%= survey.event_date %>" class="btn btn-primary btn-small">Complete Survey</a>
                       </div>
                     <% }); %>
                   </div>
@@ -290,7 +289,7 @@
                   <span class="dashboard-action-icon">▶</span>
                   <span class="dashboard-action-text">View Events</span>
                 </a>
-                <a href="/profile/<%= participant.participant_id %>?tab=donations" class="dashboard-action-btn">
+                <a href="/profile/<%= participant.user_id %>?tab=donations" class="dashboard-action-btn">
                   <span class="dashboard-action-icon">$</span>
                   <span class="dashboard-action-text">View Donation History</span>
                 </a>
@@ -386,7 +385,7 @@
                 <h3 class="dashboard-card-title">Quick Actions</h3>
               </div>
               <div class="dashboard-card-body">
-                <a href="/add/participants" class="dashboard-action-btn">
+                <a href="/add/users" class="dashboard-action-btn">
                   <span class="dashboard-action-icon">+</span>
                   <span class="dashboard-action-text">Add Participant</span>
                 </a>
@@ -408,7 +407,7 @@
               </div>
               <div class="dashboard-card-body">
                 <div class="dashboard-table-links">
-                  <a href="/participants" class="dashboard-table-link">
+                  <a href="/users" class="dashboard-table-link">
                     <span class="dashboard-table-icon">●</span>
                     <span class="dashboard-table-text">Participants</span>
                     <span class="dashboard-table-arrow">→</span>
@@ -557,7 +556,7 @@
                 <div class="profile-item">
                   <label class="profile-label">Participant ID</label>
                   <div class="profile-value">
-                    #<%= participant.participant_id %>
+                    #<%= participant.user_id %>
                   </div>
                 </div>
               </div>
@@ -1058,16 +1057,16 @@
 
         <script>
             const LANGUAGE_NAMES = {
-                'en': '🌐 English',
-                'es': '🌐 Español',
-                'fr': '🌐 Français',
-                'de': '🌐 Deutsch',
-                'pt': '🌐 Português',
-                'ar': '🌐 العربية',
-                'zh-CN': '🌐 中文',
-                'ja': '🌐 日本語',
-                'ko': '🌐 한국어'
-            };
+    en: 'English',
+    es: 'Espa?ol',
+    fr: 'Fran?ais',
+    de: 'Deutsch',
+    pt: 'Portugu?s',
+    ar: 'Arabic',
+    'zh-CN': 'Chinese',
+    ja: 'Japanese',
+    ko: 'Korean'
+};
 
             // From server-side session (res.locals.language)
             const SESSION_LANGUAGE = '<%= language || "en" %>';
@@ -1168,7 +1167,7 @@
 
 
     <script>
-      const participantId = <%- JSON.stringify(participant.participant_id) %>;
+      const participantId = <%- JSON.stringify(participant.user_id) %>;
 
       // Tab Switching
       const tabButtons = document.querySelectorAll(".tab-btn");
@@ -1243,7 +1242,7 @@
 
       // Navigation functions for buttons
       function editProfile() {
-        window.location.href = `/profile-edit/participants/${participantId}`;
+        window.location.href = `/profile-edit/users/${participantId}`;
       }
 
       function addMilestone() {
@@ -1270,7 +1269,7 @@
       // Delete Account Confirmation
       document.getElementById('confirmDeleteAccountBtn').addEventListener('click', async function() {
         try {
-          const response = await fetch(`/profile-delete/participants/${participantId}`, {
+          const response = await fetch(`/profile-delete/users/${participantId}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
