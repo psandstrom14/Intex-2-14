@@ -1388,7 +1388,12 @@ app.post("/add/:table", async (req, res) => {
     req.session.flashMessage = "Error adding record: " + err.message;
     req.session.flashType = "danger";
 
-    res.redirect(`/${table_name}`);
+    // Special case: survey_results should redirect to /surveys
+    if (table_name === "survey_results") {
+      res.redirect("/surveys");
+    } else {
+      res.redirect(`/${table_name}`);
+    }
   }
 });
 
