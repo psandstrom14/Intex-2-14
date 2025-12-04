@@ -739,160 +739,155 @@ app.get("/profile/:id", async (req, res) => {
 
 /* DASHBOARD PAGES */
 // USERS MAINTENANCE PAGE:
-<<<<<<< HEAD
-app.get("/users", (req, res) => {
-    res.render("users");
-=======
 app.get("/users", async (req, res) => {
-  try {
-    // flash messages + query messages
-    const sessionData = req.session || {};
-    let message = sessionData.flashMessage || "";
-    let messageType = sessionData.flashType || "success";
+    try {
+        // flash messages + query messages
+        const sessionData = req.session || {};
+        let message = sessionData.flashMessage || "";
+        let messageType = sessionData.flashType || "success";
 
-    sessionData.flashMessage = null;
-    sessionData.flashType = null;
+        sessionData.flashMessage = null;
+        sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
-    if (!message && req.query.message) {
-      message = req.query.message;
-      messageType = req.query.messageType || "success";
-    }
-
-    // --- filtering/sorting code ---
-    let {
-      searchColumn,
-      searchValue,
-      city,
-      school,
-      interest,
-      donations,
-      sortColumn,
-      sortOrder,
-    } = req.query;
-
-    // defaults
-    searchColumn = searchColumn || "full_name";
-    sortOrder = sortOrder === "desc" ? "desc" : "asc";
-
-    // Query ALL users (no role filter)
-    let query = knex("participants");
-
-    // Filter by role - only show participants
-    query.where("participant_role", "participant");
-
-    // Case-insensitive search
-    if (searchValue && searchColumn) {
-      const term = searchValue.trim();
-      if (term) {
-        if (searchColumn === "full_name") {
-          const parts = term.split(/\s+/);
-          if (parts.length === 1) {
-            const likeOne = `%${parts[0]}%`;
-            query.where(function () {
-              this.where("participant_first_name", "ilike", likeOne).orWhere(
-                "participant_last_name",
-                "ilike",
-                likeOne
-              );
-            });
-          } else {
-            const firstLike = `%${parts[0]}%`;
-            const lastLike = `%${parts[parts.length - 1]}%`;
-            query.where(function () {
-              this.where("participant_first_name", "ilike", firstLike).andWhere(
-                "participant_last_name",
-                "ilike",
-                lastLike
-              );
-            });
-          }
-        } else {
-          const likeTerm = `%${term}%`;
-          query.whereRaw(`CAST(${searchColumn} AS TEXT) ILIKE ?`, [likeTerm]);
+        // fallback to query params (for deletes)
+        if (!message && req.query.message) {
+            message = req.query.message;
+            messageType = req.query.messageType || "success";
         }
-      }
-    }
 
-    // City filter
-    const cityArr = paramToArray(city);
-    if (!cityArr.includes("all")) {
-      query.whereIn("participant_city", cityArr);
-    }
+        // --- filtering/sorting code ---
+        let {
+            searchColumn,
+            searchValue,
+            city,
+            school,
+            interest,
+            donations,
+            sortColumn,
+            sortOrder,
+        } = req.query;
 
-    // School filter
-    const schoolArr = paramToArray(school);
-    if (!schoolArr.includes("all")) {
-      query.whereIn("participant_school_or_employer", schoolArr);
-    }
+        // defaults
+        searchColumn = searchColumn || "full_name";
+        sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // Interest filter
-    const interestArr = paramToArray(interest);
-    if (!interestArr.includes("all")) {
-      query.whereIn("participant_field_of_interest", interestArr);
-    }
+        // Query ALL users (no role filter)
+        let query = knex("participants");
 
-    // Donations filter
-    const donationsArr = paramToArray(donations);
-    if (!donationsArr.includes("all")) {
-      if (donationsArr.includes("Yes") && !donationsArr.includes("No")) {
-        query.where("total_donations", ">", 0);
-      } else if (donationsArr.includes("No") && !donationsArr.includes("Yes")) {
-        query.where((qb) => {
-          qb.where("total_donations", 0).orWhereNull("total_donations");
+        // Filter by role - only show participants
+        query.where("participant_role", "participant");
+
+        // Case-insensitive search
+        if (searchValue && searchColumn) {
+            const term = searchValue.trim();
+            if (term) {
+                if (searchColumn === "full_name") {
+                    const parts = term.split(/\s+/);
+                    if (parts.length === 1) {
+                        const likeOne = `%${parts[0]}%`;
+                        query.where(function () {
+                            this.where("participant_first_name", "ilike", likeOne).orWhere(
+                                "participant_last_name",
+                                "ilike",
+                                likeOne
+                            );
+                        });
+                    } else {
+                        const firstLike = `%${parts[0]}%`;
+                        const lastLike = `%${parts[parts.length - 1]}%`;
+                        query.where(function () {
+                            this.where("participant_first_name", "ilike", firstLike).andWhere(
+                                "participant_last_name",
+                                "ilike",
+                                lastLike
+                            );
+                        });
+                    }
+                } else {
+                    const likeTerm = `%${term}%`;
+                    query.whereRaw(`CAST(${searchColumn} AS TEXT) ILIKE ?`, [likeTerm]);
+                }
+            }
+        }
+
+        // City filter
+        const cityArr = paramToArray(city);
+        if (!cityArr.includes("all")) {
+            query.whereIn("participant_city", cityArr);
+        }
+
+        // School filter
+        const schoolArr = paramToArray(school);
+        if (!schoolArr.includes("all")) {
+            query.whereIn("participant_school_or_employer", schoolArr);
+        }
+
+        // Interest filter
+        const interestArr = paramToArray(interest);
+        if (!interestArr.includes("all")) {
+            query.whereIn("participant_field_of_interest", interestArr);
+        }
+
+        // Donations filter
+        const donationsArr = paramToArray(donations);
+        if (!donationsArr.includes("all")) {
+            if (donationsArr.includes("Yes") && !donationsArr.includes("No")) {
+                query.where("total_donations", ">", 0);
+            } else if (donationsArr.includes("No") && !donationsArr.includes("Yes")) {
+                query.where((qb) => {
+                    qb.where("total_donations", 0).orWhereNull("total_donations");
+                });
+            }
+        }
+
+        // Sorting
+        if (sortColumn) {
+            query.orderBy(sortColumn, sortOrder);
+        }
+
+        const results = await query;
+
+        const filters = {
+            searchColumn,
+            searchValue: searchValue || "",
+            city: cityArr,
+            school: schoolArr,
+            interest: interestArr,
+            donations: donationsArr,
+            sortColumn: sortColumn || "",
+            sortOrder,
+        };
+
+        res.render("users", {
+            participant: results,
+            message,
+            messageType,
+            filters,
+            isLoggedIn: req.session.isLoggedIn || false,
+            userId: req.session.user?.id || null,
+            role: req.session.user?.role || null,
         });
-      }
+    } catch (err) {
+        console.error("Error loading users:", err);
+        res.render("users", {
+            participant: [],
+            message: "Error loading users",
+            messageType: "danger",
+            filters: {
+                searchColumn: "participant_first_name",
+                searchValue: "",
+                city: ["all"],
+                school: ["all"],
+                interest: ["all"],
+                donations: ["all"],
+                sortColumn: "",
+                sortOrder: "asc",
+            },
+            isLoggedIn: req.session.isLoggedIn || false,
+            userId: req.session.user?.id || null,
+            role: req.session.user?.role || null,
+        });
     }
-
-    // Sorting
-    if (sortColumn) {
-      query.orderBy(sortColumn, sortOrder);
-    }
-
-    const results = await query;
-
-    const filters = {
-      searchColumn,
-      searchValue: searchValue || "",
-      city: cityArr,
-      school: schoolArr,
-      interest: interestArr,
-      donations: donationsArr,
-      sortColumn: sortColumn || "",
-      sortOrder,
-    };
-
-    res.render("users", {
-      participant: results,
-      message,
-      messageType,
-      filters,
-      isLoggedIn: req.session.isLoggedIn || false,
-      userId: req.session.user?.id || null,
-      role: req.session.user?.role || null,
-    });
-  } catch (err) {
-    console.error("Error loading users:", err);
-    res.render("users", {
-      participant: [],
-      message: "Error loading users",
-      messageType: "danger",
-      filters: {
-        searchColumn: "participant_first_name",
-        searchValue: "",
-        city: ["all"],
-        school: ["all"],
-        interest: ["all"],
-        donations: ["all"],
-        sortColumn: "",
-        sortOrder: "asc",
-      },
-      isLoggedIn: req.session.isLoggedIn || false,
-      userId: req.session.user?.id || null,
-      role: req.session.user?.role || null,
-    });
-  }
->>>>>>> origin/main
 });
 
 // PARTICIPANT MAINTENANCE PAGE:
@@ -906,76 +901,10 @@ app.get("/participants", async (req, res) => {
         sessionData.flashMessage = null;
         sessionData.flashType = null;
 
-<<<<<<< HEAD
         // fallback to query params (for deletes)
         if (!message && req.query.message) {
             message = req.query.message;
             messageType = req.query.messageType || "success";
-=======
-    // fallback to query params (for deletes)
-    if (!message && req.query.message) {
-      message = req.query.message;
-      messageType = req.query.messageType || "success";
-    }
-
-    // --- filtering/sorting code ---
-    let {
-      searchColumn,
-      searchValue,
-      city,
-      school,
-      interest,
-      donations,
-      sortColumn,
-      sortOrder,
-    } = req.query;
-
-    // defaults
-    searchColumn = searchColumn || "full_name";
-    sortOrder = sortOrder === "desc" ? "desc" : "asc";
-
-    let query = knex("participants");
-
-    // Filter by role - only show participants
-    query.where("participant_role", "participant");
-
-    // Case-insensitive search
-    if (searchValue && searchColumn) {
-      const term = searchValue.trim();
-      if (term) {
-        if (searchColumn === "full_name") {
-          // for full name, do this:
-          // Split "Jane Doe Smith" into parts
-          const parts = term.split(/\s+/);
-
-          if (parts.length === 1) {
-            // One word: search first OR last name
-            const likeOne = `%${parts[0]}%`;
-            query.where(function () {
-              this.where("participant_first_name", "ilike", likeOne).orWhere(
-                "participant_last_name",
-                "ilike",
-                likeOne
-              );
-            });
-          } else {
-            // Multiple words: use first piece as first name, last piece as last name
-            const firstLike = `%${parts[0]}%`;
-            const lastLike = `%${parts[parts.length - 1]}%`;
-
-            query.where(function () {
-              this.where("participant_first_name", "ilike", firstLike).andWhere(
-                "participant_last_name",
-                "ilike",
-                lastLike
-              );
-            });
-          }
-        } else {
-          // Existing behavior for single column (non full_name searches)
-          const likeTerm = `%${term}%`;
-          query.whereRaw(`CAST(${searchColumn} AS TEXT) ILIKE ?`, [likeTerm]);
->>>>>>> origin/main
         }
 
         // --- filtering/sorting code ---
@@ -996,12 +925,14 @@ app.get("/participants", async (req, res) => {
 
         let query = knex("participants");
 
+        // Filter by role - only show participants
+        query.where("participant_role", "participant");
+
         // Case-insensitive search
         if (searchValue && searchColumn) {
             const term = searchValue.trim();
             if (term) {
                 if (searchColumn === "full_name") {
-                    // for full name, do this:
                     // Split "Jane Doe Smith" into parts
                     const parts = term.split(/\s+/);
 
@@ -1009,11 +940,8 @@ app.get("/participants", async (req, res) => {
                         // One word: search first OR last name
                         const likeOne = `%${parts[0]}%`;
                         query.where(function () {
-                            this.where("participant_first_name", "ilike", likeOne).orWhere(
-                                "participant_last_name",
-                                "ilike",
-                                likeOne
-                            );
+                            this.where("participant_first_name", "ilike", likeOne)
+                                .orWhere("participant_last_name", "ilike", likeOne);
                         });
                     } else {
                         // Multiple words: use first piece as first name, last piece as last name
@@ -1021,11 +949,8 @@ app.get("/participants", async (req, res) => {
                         const lastLike = `%${parts[parts.length - 1]}%`;
 
                         query.where(function () {
-                            this.where("participant_first_name", "ilike", firstLike).andWhere(
-                                "participant_last_name",
-                                "ilike",
-                                lastLike
-                            );
+                            this.where("participant_first_name", "ilike", firstLike)
+                                .andWhere("participant_last_name", "ilike", lastLike);
                         });
                     }
                 } else {
@@ -1109,6 +1034,7 @@ app.get("/participants", async (req, res) => {
         });
     }
 });
+
 
 // EVENT MAINTENANCE PAGE:
 // EVENT MAINTENANCE PAGE:
