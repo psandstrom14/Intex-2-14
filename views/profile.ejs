@@ -97,6 +97,9 @@
         <button class="tab-btn" data-tab="milestones">Milestones</button>
         <% } %>
         <button class="tab-btn" data-tab="donations">Donations</button>
+        <% if (isLoggedIn && participant.participant_role && ['admin', 'donor', 'sponsor'].includes(participant.participant_role.toLowerCase())) { %>
+        <button class="tab-btn" data-tab="impact">Impact</button>
+        <% } %>
         <button class="tab-btn" data-tab="chatbot">Chatbot</button>
         <% if (isLoggedIn && participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
         <button class="tab-btn" data-tab="events">Event Registrations</button>
@@ -743,6 +746,31 @@
           <% } %>
         </div>
       </div>
+
+      <% if (isLoggedIn && participant.participant_role && ['admin', 'donor', 'sponsor'].includes(participant.participant_role.toLowerCase())) { %>
+        <!-- Impact Tab -->
+        <div id="impact-tab" class="tab-content">
+          <div class="table-container">
+            <div class="table-header">
+              <h2 class="table-title">Impact Dashboard</h2>
+            </div>
+            <div class="table-body" style="padding: 1.5rem;">
+              <p style="margin-bottom: 1rem;">
+                Explore the Tableau dashboard to see Ella Rises impact metrics. For a full-page view, visit the
+                <a href="/performance" target="_blank" rel="noopener">Performance page</a>.
+              </p>
+              <!-- BEGIN Impact Tableau Embed (swap this block to change dashboards) -->
+              <iframe
+                src="/performance"
+                title="Ella Rises Impact Dashboard"
+                style="width: 100%; min-height: 720px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff;"
+                allowfullscreen
+              ></iframe>
+              <!-- END Impact Tableau Embed -->
+            </div>
+          </div>
+        </div>
+      <% } %>
 
   <!-- Chatbot Tab -->
     <div id="chatbot-tab" class="tab-content">
