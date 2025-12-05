@@ -440,7 +440,12 @@
 
             <!-- Add-milestones Form -->
             <%} else if (table_name === "milestones"){%>
-                <form id="addForm" class="modern-form" action="/add/milestones" method="POST">
+                <form
+                  id="addForm"
+                  class="modern-form"
+                  action="<%= pass_id ? `/profile-add/milestones/${pass_id}` : '/add/milestones' %>"
+                  method="POST"
+                >
                     <!--Gather participant ID (if not passed along by route)-->
                     <% if (!pass_id) { %>
                     <div class="form-section">

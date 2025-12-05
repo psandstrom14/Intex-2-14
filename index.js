@@ -115,6 +115,25 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
+// Helper: allow admin or the owner of the resource (by user id)
+const requireSelfOrAdmin = (req, res, targetUserId) => {
+  if (!req.session.isLoggedIn) {
+    req.session.returnTo = req.originalUrl || req.url;
+    res.render("login", { error_message: "Please log in to access this page" });
+    return false;
+  }
+
+  const role = req.session.user?.role?.toLowerCase();
+  const sessionUserId = req.session.user?.id;
+
+  if (role !== "admin" && sessionUserId !== targetUserId) {
+    res.status(403).send("Access denied. Admin or owner privileges required.");
+    return false;
+  }
+
+  return true;
+};
+
 // LOGIN PAGE:
 // Route to display login page:
 app.get("/login", (req, res) => {
@@ -2334,6 +2353,24 @@ app.get("/add/:table/:id", requireAdmin, async (req, res) => {
   res.render("add", { table_name, events, event_types, pass_id });
 });
 
+// Participant-facing route to add their own milestones
+app.get("/profile-add/milestones/:userId", async (req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).send("Invalid participant id.");
+  }
+
+  if (!requireSelfOrAdmin(req, res, userId)) return;
+
+  // No extra data needed for milestones form
+  res.render("add", {
+    table_name: "milestones",
+    events: [],
+    event_types: [],
+    pass_id: userId,
+  });
+});
+
 // Route that adds the form inputs to the databases
 app.post("/add/:table", requireAdmin, async (req, res) => {
   let table_name = req.params.table;
@@ -2375,6 +2412,36 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
     } else {
       res.redirect(`/${table_name}`);
     }
+  }
+});
+
+// Participant-facing route to submit their own milestones
+app.post("/profile-add/milestones/:userId", async (req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).send("Invalid participant id.");
+  }
+
+  if (!requireSelfOrAdmin(req, res, userId)) return;
+
+  const { milestone_title, milestone_category, milestone_date } = req.body;
+
+  try {
+    await knex("milestones").insert({
+      user_id: userId,
+      milestone_title,
+      milestone_category,
+      milestone_date,
+    });
+
+    req.session.flashMessage = "Added Successfully!";
+    req.session.flashType = "success";
+    res.redirect(`/profile/${userId}?tab=milestones`);
+  } catch (err) {
+    console.error("Error adding milestone:", err);
+    req.session.flashMessage = "Error adding milestone: " + err.message;
+    req.session.flashType = "danger";
+    res.redirect(`/profile/${userId}?tab=milestones`);
   }
 });
 
