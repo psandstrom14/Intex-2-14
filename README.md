@@ -1,15 +1,20 @@
 # Intex
 
-<h1>Links</h1>
+<h2>Links</h2>
 <ul>
   <li><a href="https://ellarises-2-14.is404.net/">Website</a></li>
   <li><a href="https://www.canva.com/design/DAG6GvbVeoo/jnyXQWg39bAId9zxJS2MqA/edit?utm_content=DAG6GvbVeoo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton">Slides</a></li>
   <li><a href="https://public.tableau.com/views/Book_17649096419640/Dashboard?:language=en-US&publish[…]sid=&:redirect=auth&:display_count=n&:origin=viz_share_link"></a>Tableau</li>
   <li><a href=""></a>Google Collab</li>
+  <li><Rubric Videos:</li>
+   <li><a href="__">402</li>
+   <li><a href="https://www.canva.com/design/DAG6p9TZA3s/Om10R2kKIQGYT6HjSKmPlA/edit?utm_content=DAG6p9TZA3s&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton">403</li>
+   <li><a href="__">404</li>
+   <li><a href="__">415</li>
   
 </ul>
 
-<h1>Logins: </h1>
+<h2>Logins: </h2>
 <p>Admin</p>
 <ul>
   <ol>username: etgarcia</ol>
