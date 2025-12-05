@@ -32,7 +32,7 @@
               <li><a href="/donate_now">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>"  class="selected-nav" >Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>
@@ -809,12 +809,168 @@
         <div class="table-body" style="padding: 1.5rem;">
             <h2>Chat With Your Career Assistant</h2>
             <p>Ask anything about résumés, cover letters, college essays, interviews, and job applications.</p>
-          <iframe
-            src="/chatbot"
-            title="Chatbot"
-            style="width: 100%; min-height: 1000px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;"
-            allow="clipboard-write; microphone"
-          ></iframe>
+
+    <!-- Main Content -->
+    <main id="main-content" class="container">
+        <section class="mt-4">
+
+
+            <!-- CHAT INTERFACE (ADDED) -->
+            <div id="chat-container">
+                <div id="messages"></div>
+
+                <div id="input-area">
+                    <input id="input" placeholder="Ask for help… (résumés, cover letters, applications)" />
+                    <button id="send">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- CHAT LOGIC (IMPROVED) -->
+    <script>
+        const input = document.getElementById("input");
+        const sendBtn = document.getElementById("send");
+        const messagesBox = document.getElementById("messages");
+
+        // Remove empty state if it exists
+        function removeEmptyState() {
+            const emptyState = messagesBox.querySelector(".empty-state");
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+
+
+        // Add loading indicator
+        function addLoading() {
+            const loading = document.createElement("div");
+            loading.classList.add("message", "bot", "loading");
+            loading.id = "loading-indicator";
+            loading.innerHTML = '<img src="/images/Round.png" alt="Loading"><span></span><span></span><span></span>';
+            messagesBox.appendChild(loading);
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        // Remove loading indicator
+        function removeLoading() {
+            const loading = document.getElementById("loading-indicator");
+            if (loading) {
+                loading.remove();
+            }
+        }
+
+        // Send message function
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Disable input and button
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            // Remove empty state and add user message
+            removeEmptyState();
+            addMessage("user", text);
+            input.value = "";
+
+            // Add loading indicator
+            addLoading();
+
+            try {
+                const res = await fetch("/chatbot", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: text })
+                });
+
+                removeLoading();
+
+                if (!res.ok) {
+                    throw new Error("Failed to get response");
+                }
+
+                const data = await res.json();
+                addMessage("bot", data.reply);
+            } catch (error) {
+                removeLoading();
+                addMessage("bot", "Sorry, I'm having trouble responding right now. Please try again in a moment!");
+                console.error("Chatbot error:", error);
+            } finally {
+                // Re-enable input and button
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Send button click
+        sendBtn.onclick = sendMessage;
+
+        // Enter key to send
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Add message function with formatting support
+        function addMessage(role, text) {
+    const msg = document.createElement("div");
+    msg.classList.add("message", role);
+    
+    // Format the text to handle paragraphs and lists
+    const formattedText = formatBotMessage(text);
+    msg.innerHTML = formattedText;
+
+    messagesBox.appendChild(msg);
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+
+        // Format bot messages to handle paragraphs, lists, and basic formatting
+        function formatBotMessage(text) {
+    // Split into paragraphs (double line breaks)
+    let formatted = text
+        .split('\n\n')
+        .map(para => {
+            para = para.trim();
+            if (!para) return '';
+            
+            // Check if it's a list (lines starting with -, *, or numbers)
+            const lines = para.split('\n');
+            const isList = lines.length > 1 && lines.every(line => 
+                /^[\-\*\d]+[\.\)]\s/.test(line.trim()) || line.trim() === ''
+            );
+            
+            if (isList) {
+                const listItems = lines
+                    .filter(line => line.trim())
+                    .map(line => `<li>${line.replace(/^[\-\*\d]+[\.\)]\s/, '').trim()}</li>`)
+                    .join('');
+                return `<ul>${listItems}</ul>`;
+            }
+            
+            return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+        })
+        .filter(p => p)
+        .join('');
+    
+    return formatted || text;
+}
+
+        // Add empty state on page load
+        if (messagesBox.children.length === 0) {
+            const emptyState = document.createElement("div");
+            emptyState.classList.add("empty-state");
+            emptyState.textContent = "Start a conversation by asking about résumés, cover letters, or job applications...";
+            messagesBox.appendChild(emptyState);
+        }
+
+        // Focus input on load
+        input.focus();
+    </script>
         </div>
       </div>
     </div>
@@ -1298,33 +1454,35 @@
       });
 
       // Navigation Dropdown handling
+      (() => {
       let dropdownTimeout;
       const dropdown = document.querySelector(".dropdown");
       const dropdownMenu = document.querySelector(".dropdown-menu");
 
-      if (dropdown && dropdownMenu) {
-        dropdown.addEventListener("mouseenter", function () {
+        if (!(dropdown && dropdownMenu)) return;
+
+        dropdown.addEventListener("mouseenter", () => {
           clearTimeout(dropdownTimeout);
           dropdownMenu.style.display = "block";
         });
 
-        dropdown.addEventListener("mouseleave", function () {
-          dropdownTimeout = setTimeout(function () {
+        dropdown.addEventListener("mouseleave", () => {
+          dropdownTimeout = setTimeout(() => {
             dropdownMenu.style.display = "none";
           }, 200);
         });
 
-        dropdownMenu.addEventListener("mouseenter", function () {
+        dropdownMenu.addEventListener("mouseenter", () => {
           clearTimeout(dropdownTimeout);
           dropdownMenu.style.display = "block";
         });
 
-        dropdownMenu.addEventListener("mouseleave", function () {
-          dropdownTimeout = setTimeout(function () {
+        dropdownMenu.addEventListener("mouseleave", () => {
+          dropdownTimeout = setTimeout(() => {
             dropdownMenu.style.display = "none";
           }, 200);
         });
-      }
+      })();
 
       // Navigation functions for buttons
       function editProfile() {

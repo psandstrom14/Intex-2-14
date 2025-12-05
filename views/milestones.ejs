@@ -27,13 +27,13 @@
               <li><a href="/donate_now">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>"   >Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>
                   <li class="dropdown">
                       <span class="dropdown-toggle">
-                          <a href="#" >Records ▾</a>
+                          <a href="#" class="selected-nav">Records ▾</a>
                       </span>
                       <ul class="dropdown-menu">
                           <li><a href="/users">Users</a></li>

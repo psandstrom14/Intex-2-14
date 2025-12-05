@@ -1187,6 +1187,39 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
       }
     }
 
+    // Special handling for event_registrations - filter out invalid columns
+    if (table_name === "event_registrations") {
+      const { event_name, registration_attend_status, ...registrationFields } =
+        updatedData;
+
+      // Map registration_attend_status to registration_attended_flag if provided
+      if (registration_attend_status !== undefined) {
+        registrationFields.registration_attended_flag =
+          registration_attend_status === "1" || registration_attend_status === 1
+            ? 1
+            : 0;
+      }
+
+      // Only update valid event_registrations columns
+      const validColumns = [
+        "user_id",
+        "event_id",
+        "registration_status",
+        "registration_attended_flag",
+        "registration_created_at_date",
+        "registration_created_at_time",
+        "registration_check_in_date",
+        "registration_check_in_time",
+      ];
+
+      updatedData = {};
+      for (const key of validColumns) {
+        if (registrationFields[key] !== undefined) {
+          updatedData[key] = registrationFields[key];
+        }
+      }
+    }
+
     await knex(table_name).where(primaryKey, id).update(updatedData);
 
     req.session.flashMessage = "Updated Successfully!";
@@ -2865,6 +2898,39 @@ app.post("/edit/:table/:id", requireAdmin, async (req, res) => {
       for (const key of validColumns) {
         if (surveyFields[key] !== undefined) {
           updatedData[key] = surveyFields[key];
+        }
+      }
+    }
+
+    // Special handling for event_registrations - filter out invalid columns
+    if (table_name === "event_registrations") {
+      const { event_name, registration_attend_status, ...registrationFields } =
+        updatedData;
+
+      // Map registration_attend_status to registration_attended_flag if provided
+      if (registration_attend_status !== undefined) {
+        registrationFields.registration_attended_flag =
+          registration_attend_status === "1" || registration_attend_status === 1
+            ? 1
+            : 0;
+      }
+
+      // Only update valid event_registrations columns
+      const validColumns = [
+        "user_id",
+        "event_id",
+        "registration_status",
+        "registration_attended_flag",
+        "registration_created_at_date",
+        "registration_created_at_time",
+        "registration_check_in_date",
+        "registration_check_in_time",
+      ];
+
+      updatedData = {};
+      for (const key of validColumns) {
+        if (registrationFields[key] !== undefined) {
+          updatedData[key] = registrationFields[key];
         }
       }
     }

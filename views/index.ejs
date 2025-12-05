@@ -14,45 +14,47 @@
     <!-- Skip Navigation Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
- <nav>
-      <div class="nav-container">
-          <div class="logo">
-              <a href="/"><img src="/images/logo.png" alt="Ella Rises Logo"> ELLA RISES</a>
-          </div>
-          <ul class="nav-links">
-              <li><a href="/">Home</a></li>
-              <li><a href="/about">About</a></li>
-              <li><a href="/calendar">Calendar</a></li>
-              <li><a href="/donate_now">Donate Now</a></li>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="/"><img src="/images/logo.png" alt="Ella Rises Logo"> ELLA RISES</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/" class="selected-nav" >Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/performance">Performance</a></li>
+                <li><a href="/calendar">Calendar</a></li>
+                <li><a href="/donate_now">Donate Now</a></li>
 
-              <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
-              <% } %>
+                <% if (isLoggedIn && userId) { %>
+                    <li><a href="/profile/<%= userId %>">Profile</a></li>
+                <% } %>
 
-              <% if (role === "admin") { %>
-                  <li class="dropdown">
-                      <span class="dropdown-toggle">
-                          <a href="#" >Records ▾</a>
-                      </span>
-                      <ul class="dropdown-menu">
-                          <li><a href="/users">Users</a></li>
-                          <li><a href="/events">Events</a></li>
-                          <li><a href="/event_registrations">Event Registrations</a></li>
-                          <li><a href="/surveys">Surveys</a></li>
-                          <li><a href="/milestones">Milestones</a></li>
-                          <li><a href="/donations">Donations</a></li>
-                      </ul>
-                  </li>
-              <% } %>
+                <% if (role === "admin") { %>
+                    <li class="dropdown">
+                        <span class="dropdown-toggle">
+                            <a href="#">Pages ▾</a>
+                        </span>
+                        <ul class="dropdown-menu">
+                            <li><a href="/participants">Participants</a></li>
+                            <li><a href="/events">Events</a></li>
+                            <li><a href="/event_registrations">Event Registrations</a></li>
+                            <li><a href="/surveys">Surveys</a></li>
+                            <li><a href="/milestones">Milestones</a></li>
+                            <li><a href="/donations">Donations</a></li>
+                        </ul>
+                    </li>
+                <% } %>
 
-              <% if (isLoggedIn) { %>
-                  <li><a href="/logout" class="login-btn">Logout</a></li>
-              <% } else { %>
-                  <li><a href="/login" class="login-btn">Login</a></li>
-              <% } %>
-          </ul>
-      </div>
-  </nav>
+                <% if (isLoggedIn) { %>
+                    <li><a href="/logout" class="login-btn">Logout</a></li>
+                <% } else { %>
+                    <li><a href="/login" class="login-btn">Login</a></li>
+                <% } %>
+            </ul>
+        </div>
+    </nav>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -237,7 +239,7 @@
             Enroll in Ella Rises and participate in our mariachi, ballet
             folklorico and STEAM programs!
             </p>
-            <a href="/signup" class="btn btn-primary btn-large btn-charcoal">
+            <a href="/" class="btn btn-primary btn-large btn-charcoal">
             Click here to enroll!
             </a>
         </div>
@@ -276,150 +278,149 @@
         </main>
         
         <!--Footer-->
-<footer>
-    <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>
-    <p class="footer-subtext">Making a difference, one woman at a time.</p>
+    <footer>
+        <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>
+        <p class="footer-subtext">Making a difference, one woman at a time.</p>
 
-    <div class="custom-language-selector">
-        <button class="language-dropdown-btn" onclick="toggleLanguageDropdown()">
-            <span id="currentLanguage">
-                <% if (language === 'es') { %>🌐 Español
-                <% } else if (language === 'fr') { %>🌐 Français
-                <% } else if (language === 'de') { %>🌐 Deutsch
-                <% } else if (language === 'pt') { %>🌐 Português
-                <% } else if (language === 'ar') { %>🌐 العربية
-                <% } else if (language === 'zh-CN') { %>🌐 中文
-                <% } else if (language === 'ja') { %>🌐 日本語
-                <% } else if (language === 'ko') { %>🌐 한국어
-                <% } else { %>🌐 English <% } %>
-            </span>
-            <span class="dropdown-arrow">▾</span>
-        </button>
-        <div class="language-dropdown-menu" id="languageDropdown">
-            <a href="#" onclick="changeLanguage('en'); return false;">English</a>
-            <a href="#" onclick="changeLanguage('es'); return false;">Español</a>
-            <a href="#" onclick="changeLanguage('fr'); return false;">Français</a>
-            <a href="#" onclick="changeLanguage('de'); return false;">Deutsch</a>
-            <a href="#" onclick="changeLanguage('pt'); return false;">Português</a>
-            <a href="#" onclick="changeLanguage('ar'); return false;">العربية</a>
-            <a href="#" onclick="changeLanguage('zh-CN'); return false;">中文</a>
-            <a href="#" onclick="changeLanguage('ja'); return false;">日本語</a>
-            <a href="#" onclick="changeLanguage('ko'); return false;">한국어</a>
+        <div class="custom-language-selector">
+            <button class="language-dropdown-btn" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguage">
+                    <% if (language === 'es') { %>🌐 Español
+                    <% } else if (language === 'fr') { %>🌐 Français
+                    <% } else if (language === 'de') { %>🌐 Deutsch
+                    <% } else if (language === 'pt') { %>🌐 Português
+                    <% } else if (language === 'ar') { %>🌐 العربية
+                    <% } else if (language === 'zh-CN') { %>🌐 中文
+                    <% } else if (language === 'ja') { %>🌐 日本語
+                    <% } else if (language === 'ko') { %>🌐 한국어
+                    <% } else { %>🌐 English <% } %>
+                </span>
+                <span class="dropdown-arrow">▾</span>
+            </button>
+            <div class="language-dropdown-menu" id="languageDropdown">
+                <a href="#" onclick="changeLanguage('en'); return false;">English</a>
+                <a href="#" onclick="changeLanguage('es'); return false;">Español</a>
+                <a href="#" onclick="changeLanguage('fr'); return false;">Français</a>
+                <a href="#" onclick="changeLanguage('de'); return false;">Deutsch</a>
+                <a href="#" onclick="changeLanguage('pt'); return false;">Português</a>
+                <a href="#" onclick="changeLanguage('ar'); return false;">العربية</a>
+                <a href="#" onclick="changeLanguage('zh-CN'); return false;">中文</a>
+                <a href="#" onclick="changeLanguage('ja'); return false;">日本語</a>
+                <a href="#" onclick="changeLanguage('ko'); return false;">한국어</a>
+            </div>
         </div>
-    </div>
 
-    <div id="google_translate_element" style="display:none;"></div>
+        <div id="google_translate_element" style="display:none;"></div>
 
-    <script>
-        const LANGUAGE_NAMES = {
-            'en': '🌐 English',
-            'es': '🌐 Español',
-            'fr': '🌐 Français',
-            'de': '🌐 Deutsch',
-            'pt': '🌐 Português',
-            'ar': '🌐 العربية',
-            'zh-CN': '🌐 中文',
-            'ja': '🌐 日本語',
-            'ko': '🌐 한국어'
-        };
+        <script>
+            const LANGUAGE_NAMES = {
+                'en': '🌐 English',
+                'es': '🌐 Español',
+                'fr': '🌐 Français',
+                'de': '🌐 Deutsch',
+                'pt': '🌐 Português',
+                'ar': '🌐 العربية',
+                'zh-CN': '🌐 中文',
+                'ja': '🌐 日本語',
+                'ko': '🌐 한국어'
+            };
 
-        // From server-side session (res.locals.language)
-        const SESSION_LANGUAGE = '<%= language || "en" %>';
+            // From server-side session (res.locals.language)
+            const SESSION_LANGUAGE = '<%= language || "en" %>';
 
-        // Initialize Google Translate widget – no extra logic here
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,es,fr,de,pt,ar,zh-CN,ja,ko',
-                autoDisplay: false
-            }, 'google_translate_element');
-        }
-
-        function getGoogTransLang() {
-            // Looks for cookie like: googtrans=/auto/es
-            const match = document.cookie.match(/(?:^|;)\s*googtrans=\/auto\/([^;]+)/);
-            return match ? match[1] : null;
-        }
-
-        function setLanguageLabel(lang) {
-            const el = document.getElementById('currentLanguage');
-            if (!el) return;
-            el.textContent = LANGUAGE_NAMES[lang] || LANGUAGE_NAMES['en'];
-        }
-
-        function applyLanguage(lang, isInit) {
-            const combo = document.querySelector('.goog-te-combo');
-            if (!combo) {
-                // Wait for Google widget to finish rendering
-                setTimeout(() => applyLanguage(lang, isInit), 200);
-                return;
+            // Initialize Google Translate widget – no extra logic here
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,es,fr,de,pt,ar,zh-CN,ja,ko',
+                    autoDisplay: false
+                }, 'google_translate_element');
             }
 
-            combo.value = lang;
-            combo.dispatchEvent(new Event('change'));
-            setLanguageLabel(lang);
-
-            if (!isInit) {
-                // Persist to your session on the server
-                fetch('/set-language', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ lang })
-                }).catch(() => {});
-                // Optional: localStorage helper if you want it
-                localStorage.setItem('selectedLanguage', lang);
-                toggleLanguageDropdown(false);
-            }
-        }
-
-        function changeLanguage(lang) {
-            applyLanguage(lang, false);
-        }
-
-        function toggleLanguageDropdown(forceClose) {
-            const dropdown = document.getElementById('languageDropdown');
-            if (!dropdown) return;
-            if (forceClose === false) {
-                dropdown.classList.remove('show');
-            } else {
-                dropdown.classList.toggle('show');
-            }
-        }
-
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.custom-language-selector')) {
-                toggleLanguageDropdown(false);
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Make sure the label matches whatever we think the language is
-            setLanguageLabel(SESSION_LANGUAGE);
-
-            const cookieLang = getGoogTransLang();
-            const storedLang = localStorage.getItem('selectedLanguage');
-
-            // Priority: Google cookie > session > localStorage
-            const preferred =
-                cookieLang ||
-                (SESSION_LANGUAGE && SESSION_LANGUAGE !== 'undefined' ? SESSION_LANGUAGE : null) ||
-                storedLang ||
-                'en';
-
-            // If preferred is English, just leave as-is (no translate flicker)
-            if (preferred === 'en') {
-                setLanguageLabel('en');
-                return;
+            function getGoogTransLang() {
+                // Looks for cookie like: googtrans=/auto/es
+                const match = document.cookie.match(/(?:^|;)\s*googtrans=\/auto\/([^;]+)/);
+                return match ? match[1] : null;
             }
 
-            // Apply preferred language once widget is ready
-            setTimeout(() => applyLanguage(preferred, true), 500);
-        });
-    </script>
+            function setLanguageLabel(lang) {
+                const el = document.getElementById('currentLanguage');
+                if (!el) return;
+                el.textContent = LANGUAGE_NAMES[lang] || LANGUAGE_NAMES['en'];
+            }
 
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-</footer>
-      
+            function applyLanguage(lang, isInit) {
+                const combo = document.querySelector('.goog-te-combo');
+                if (!combo) {
+                    // Wait for Google widget to finish rendering
+                    setTimeout(() => applyLanguage(lang, isInit), 200);
+                    return;
+                }
+
+                combo.value = lang;
+                combo.dispatchEvent(new Event('change'));
+                setLanguageLabel(lang);
+
+                if (!isInit) {
+                    // Persist to your session on the server
+                    fetch('/set-language', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lang })
+                    }).catch(() => {});
+                    // Optional: localStorage helper if you want it
+                    localStorage.setItem('selectedLanguage', lang);
+                    toggleLanguageDropdown(false);
+                }
+            }
+
+            function changeLanguage(lang) {
+                applyLanguage(lang, false);
+            }
+
+            function toggleLanguageDropdown(forceClose) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (!dropdown) return;
+                if (forceClose === false) {
+                    dropdown.classList.remove('show');
+                } else {
+                    dropdown.classList.toggle('show');
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.custom-language-selector')) {
+                    toggleLanguageDropdown(false);
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Make sure the label matches whatever we think the language is
+                setLanguageLabel(SESSION_LANGUAGE);
+
+                const cookieLang = getGoogTransLang();
+                const storedLang = localStorage.getItem('selectedLanguage');
+
+                // Priority: Google cookie > session > localStorage
+                const preferred =
+                    cookieLang ||
+                    (SESSION_LANGUAGE && SESSION_LANGUAGE !== 'undefined' ? SESSION_LANGUAGE : null) ||
+                    storedLang ||
+                    'en';
+
+                // If preferred is English, just leave as-is (no translate flicker)
+                if (preferred === 'en') {
+                    setLanguageLabel('en');
+                    return;
+                }
+
+                // Apply preferred language once widget is ready
+                setTimeout(() => applyLanguage(preferred, true), 500);
+            });
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    </footer>
 
         <script>
         // Allow Dropdown to handle delay to increase usability
