@@ -134,6 +134,15 @@ const requireSelfOrAdmin = (req, res, targetUserId) => {
   return true;
 };
 
+const nowDate = () => {
+  const d = new Date();
+  const iso = d.toISOString();
+  return {
+    date: iso.slice(0, 10),
+    time: iso.slice(11, 19),
+  };
+};
+
 // LOGIN PAGE:
 // Route to display login page:
 app.get("/login", (req, res) => {
@@ -868,8 +877,15 @@ app.get("/profile/:id", async (req, res) => {
         )
         .where("er.user_id", participantId)
         .where("er.registration_attended_flag", 1) // Changed from true to 1
-        .whereNull("sr.survey_id") // No survey result exists
-        .select("er.event_registration_id", "e.event_name", "e.event_date")
+        .where(function () {
+          this.whereNull("sr.survey_id").orWhereNull("sr.submission_date");
+        }) // No survey submitted yet
+        .select(
+          "er.event_registration_id",
+          "er.event_id",
+          "e.event_name",
+          "e.event_date"
+        )
         .orderBy("e.event_date", "desc");
 
       // Count of pending surveys
@@ -2369,6 +2385,58 @@ app.get("/profile-add/milestones/:userId", async (req, res) => {
     events: [],
     event_types: [],
     pass_id: userId,
+    survey_prefill: null,
+  });
+});
+
+// Participant-facing route to add their own survey results for a specific registration
+app.get("/profile-add/survey_results/:eventRegistrationId", async (req, res) => {
+  const eventRegistrationId = parseInt(req.params.eventRegistrationId, 10);
+  if (!Number.isInteger(eventRegistrationId)) {
+    return res.status(400).send("Invalid event registration id.");
+  }
+
+  const registration = await knex("event_registrations as er")
+    .join("events as e", "er.event_id", "e.event_id")
+    .where("er.event_registration_id", eventRegistrationId)
+    .select(
+      "er.event_registration_id",
+      "er.user_id",
+      "er.event_id",
+      "e.event_name",
+      "e.event_date",
+      "e.event_start_time",
+      "e.event_end_time"
+    )
+    .first();
+
+  if (!registration) {
+    return res.status(404).send("Event registration not found.");
+  }
+
+  if (!requireSelfOrAdmin(req, res, registration.user_id)) return;
+
+  // Provide just the matching event to simplify the select options
+  const events = [
+    {
+      event_id: registration.event_id,
+      event_name: registration.event_name,
+      event_date: registration.event_date,
+      event_start_time: registration.event_start_time,
+      event_end_time: registration.event_end_time,
+    },
+  ];
+
+  res.render("add", {
+    table_name: "survey_results",
+    events,
+    event_types: [],
+    pass_id: registration.user_id,
+    survey_prefill: {
+      event_registration_id: registration.event_registration_id,
+      event_id: registration.event_id,
+      event_name: registration.event_name,
+    },
   });
 });
 
@@ -2443,6 +2511,60 @@ app.post("/profile-add/milestones/:userId", async (req, res) => {
     req.session.flashMessage = "Error adding milestone: " + err.message;
     req.session.flashType = "danger";
     res.redirect(`/profile/${userId}?tab=milestones`);
+  }
+});
+
+// Participant-facing route to submit their own survey results
+app.post("/profile-add/survey_results/:eventRegistrationId", async (req, res) => {
+  const eventRegistrationId = parseInt(req.params.eventRegistrationId, 10);
+  if (!Number.isInteger(eventRegistrationId)) {
+    return res.status(400).send("Invalid event registration id.");
+  }
+
+  const registration = await knex("event_registrations")
+    .where("event_registration_id", eventRegistrationId)
+    .first();
+
+  if (!registration) {
+    return res.status(404).send("Event registration not found.");
+  }
+
+  if (!requireSelfOrAdmin(req, res, registration.user_id)) return;
+
+  const {
+    survey_satisfaction_score,
+    survey_usefulness_score,
+    survey_instructor_score,
+    survey_recommendation_score,
+    survey_overall_score,
+    survey_nps_bucket,
+    survey_comments,
+  } = req.body;
+
+  const { date, time } = nowDate();
+
+  try {
+    await knex("survey_results").insert({
+      event_registration_id: eventRegistrationId,
+      survey_satisfaction_score,
+      survey_usefulness_score,
+      survey_instructor_score,
+      survey_recommendation_score,
+      survey_overall_score,
+      survey_nps_bucket,
+      survey_comments,
+      submission_date: date,
+      submission_time: time,
+    });
+
+    req.session.flashMessage = "Survey submitted!";
+    req.session.flashType = "success";
+    res.redirect(`/profile/${registration.user_id}?tab=surveys`);
+  } catch (err) {
+    console.error("Error adding survey result:", err);
+    req.session.flashMessage = "Error adding survey result: " + err.message;
+    req.session.flashType = "danger";
+    res.redirect(`/profile/${registration.user_id}?tab=surveys`);
   }
 });
 

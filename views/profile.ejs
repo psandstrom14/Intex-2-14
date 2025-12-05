@@ -231,7 +231,7 @@
                             Event Date: <%= survey.event_date ? new Date(survey.event_date).toLocaleDateString() : 'N/A' %>
                           </div>
                         </div>
-                        <a href="/add/survey_results?event_registration_id=<%= survey.event_registration_id %>&user_id=<%= participant.user_id %>&event_name=<%= encodeURIComponent(survey.event_name) %>&event_date=<%= survey.event_date %>" class="btn btn-primary btn-small">Complete Survey</a>
+                        <a href="/profile-add/survey_results/<%= survey.event_registration_id %>" class="btn btn-primary btn-small">Complete Survey</a>
                       </div>
                     <% }); %>
                   </div>
