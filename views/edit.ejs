@@ -773,8 +773,37 @@
                             <select class="form-select" name="event_id" id="eventInstanceSelect" required>
                                 <option value="">Select an Event</option>
                                 <% events.forEach(ev => { %>
+                                    <% 
+                                        let formattedDate = '';
+                                        if (ev.event_date) {
+                                            const date = new Date(ev.event_date);
+                                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                                            const day = String(date.getDate()).padStart(2, '0');
+                                            const year = date.getFullYear();
+                                            formattedDate = `${month}/${day}/${year}`;
+                                        }
+                                        
+                                        function formatTime(timeString) {
+                                            if (!timeString) return '';
+                                            if (timeString.includes('AM') || timeString.includes('PM')) return timeString;
+                                            const timeParts = timeString.toString().split(':');
+                                            let hours = parseInt(timeParts[0]);
+                                            const minutes = timeParts[1] || '00';
+                                            const ampm = hours >= 12 ? 'PM' : 'AM';
+                                            hours = hours % 12;
+                                            hours = hours ? hours : 12;
+                                            return `${hours}:${minutes} ${ampm}`;
+                                        }
+                                        
+                                        let timeDisplay = '';
+                                        if (ev.event_start_time && ev.event_end_time) {
+                                            timeDisplay = ` (${formatTime(ev.event_start_time)}–${formatTime(ev.event_end_time)})`;
+                                        } else if (ev.event_start_time) {
+                                            timeDisplay = ` (${formatTime(ev.event_start_time)})`;
+                                        }
+                                    %>
                                     <option value="<%= ev.event_id %>" <%= info.event_id == ev.event_id ? 'selected' : '' %>>
-                                        <%= ev.event_date %> <% if (ev.event_start_time && ev.event_end_time) { %>(<%= ev.event_start_time %>–<%= ev.event_end_time %>)<% } else if (ev.event_start_time) { %>(<%= ev.event_start_time %>)<% } %>
+                                        <%= formattedDate %><%= timeDisplay %>
                                     </option>
                                 <% }); %>
                             </select>
@@ -1181,12 +1210,33 @@
             const eventSelectSurvey = document.getElementById("eventSelect");
             const eventInstanceSelect = document.getElementById("eventInstanceSelect");
 
+            function formatTime(timeString) {
+                if (!timeString) return '';
+                if (timeString.includes('AM') || timeString.includes('PM')) return timeString;
+                const timeParts = timeString.toString().split(':');
+                let hours = parseInt(timeParts[0]);
+                const minutes = timeParts[1] || '00';
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                return `${hours}:${minutes} ${ampm}`;
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${month}/${day}/${year}`;
+            }
+
             function formatEventOption(ev) {
-                let label = ev.event_date;
+                let label = formatDate(ev.event_date);
                 if (ev.event_start_time && ev.event_end_time) {
-                    label += ` (${ev.event_start_time}–${ev.event_end_time})`;
+                    label += ` (${formatTime(ev.event_start_time)}–${formatTime(ev.event_end_time)})`;
                 } else if (ev.event_start_time) {
-                    label += ` (${ev.event_start_time})`;
+                    label += ` (${formatTime(ev.event_start_time)})`;
                 }
                 return label;
             }

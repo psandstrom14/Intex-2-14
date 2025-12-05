@@ -9071,3 +9071,75 @@ INSERT INTO events (event_type_id,event_name,event_date,event_start_time,event_e
 INSERT INTO events (event_type_id,event_name,event_date,event_start_time,event_end_time,event_location,event_capacity,registration_deadline_date,registration_deadline_time) VALUES ((SELECT event_type_id FROM event_types WHERE event_name='Leadership Circle Meetup' LIMIT 1),'Leadership Circle Meetup','2026-02-23','18:30:00','20:30:00','Downtown Innovation Hub',45,'2026-02-21','23:59:00');
 INSERT INTO events (event_type_id,event_name,event_date,event_start_time,event_end_time,event_location,event_capacity,registration_deadline_date,registration_deadline_time) VALUES ((SELECT event_type_id FROM event_types WHERE event_name='Girls in STEAM Mentoring' LIMIT 1),'Girls in STEAM Mentoring','2026-02-25','17:00:00','19:00:00','STEM Learning Center',40,'2026-02-23','23:59:00');
 INSERT INTO events (event_type_id,event_name,event_date,event_start_time,event_end_time,event_location,event_capacity,registration_deadline_date,registration_deadline_time) VALUES ((SELECT event_type_id FROM event_types WHERE event_name='Robotics Lab Saturday' LIMIT 1),'Robotics Lab Saturday','2026-02-28','10:00:00','13:00:00','STEM Learning Center',40,'2026-02-26','23:59:00');
+
+
+-- ==========================================
+-- INSERT SPONSOR USERS
+-- ==========================================
+INSERT INTO users (
+    participant_email,
+    participant_first_name,
+    participant_last_name,
+    participant_dob,
+    participant_role,
+    participant_phone,
+    participant_city,
+    participant_state,
+    participant_zip,
+    participant_school_or_employer,
+    participant_field_of_interest,
+    total_donations,
+    participant_username,
+    participant_password
+)
+VALUES
+-- 1
+(‘emma.richards@summitcorp.org’, ‘Emma’, ‘Richards’, ‘1982-04-15’, ‘sponsor’,
+ ‘801-555-1022’, ‘Salt Lake City’, ‘UT’, ‘84101’,
+ ‘Summit Corporate Fund’, ‘Philanthropy’, 0,
+ ‘erichards’, ‘sponsor’),
+-- 2
+(‘jacob.morris@brightfuturefoundation.com’, ‘Jacob’, ‘Morris’, ‘1978-11-02’, ‘sponsor’,
+ ‘385-555-9044’, ‘Provo’, ‘UT’, ‘84601’,
+ ‘Bright Future Foundation’, ‘Community Impact’, 0,
+ ‘jmorris’, ‘sponsor’),
+-- 3
+(‘linda.thompson@evergreengroup.net’, ‘Linda’, ‘Thompson’, ‘1969-07-23’, ‘sponsor’,
+ ‘435-555-2211’, ‘Park City’, ‘UT’, ‘84060’,
+ ‘Evergreen Group’, ‘Education’, 0,
+ ‘lthompson’, ‘sponsor’),
+-- 4
+(‘carter.wells@risehigherfund.org’, ‘Carter’, ‘Wells’, ‘1985-02-09’, ‘sponsor’,
+ ‘801-555-5522’, ‘Ogden’, ‘UT’, ‘84401’,
+ ‘Rise Higher Fund’, ‘STEM’, 0,
+ ‘cwells’, ‘sponsor’),
+-- 5
+(‘natalie.green@hopebridgealliance.org’, ‘Natalie’, ‘Green’, ‘1975-09-18’, ‘sponsor’,
+ ‘208-555-7713’, ‘Boise’, ‘ID’, ‘83702’,
+ ‘HopeBridge Alliance’, ‘Women Empowerment’, 0,
+ ‘ngreen’, ‘sponsor’),
+-- 6
+(‘steven.clark@innovista.org’, ‘Steven’, ‘Clark’, ‘1980-12-14’, ‘sponsor’,
+ ‘385-555-8874’, ‘Lehi’, ‘UT’, ‘84043’,
+ ‘Innovista’, ‘Innovation’, 0,
+ ‘sclark’, ‘sponsor’),
+-- 7
+(‘ashley.mendez@unitypartners.com’, ‘Ashley’, ‘Mendez’, ‘1990-03-29’, ‘sponsor’,
+ ‘435-555-6629’, ‘St. George’, ‘UT’, ‘84770’,
+ ‘Unity Partners’, ‘Arts’, 0,
+ ‘amendez’, ‘sponsor’),
+-- 8
+(‘robert.jensen@beaconimpact.org’, ‘Robert’, ‘Jensen’, ‘1972-08-06’, ‘sponsor’,
+ ‘801-555-9901’, ‘Orem’, ‘UT’, ‘84057’,
+ ‘Beacon Impact Foundation’, ‘Mentorship’, 0,
+ ‘rjensen’, ‘sponsor’),
+-- 9
+(‘sophia.park@northstarinitiatives.org’, ‘Sophia’, ‘Park’, ‘1988-06-11’, ‘sponsor’,
+ ‘385-555-4123’, ‘Sandy’, ‘UT’, ‘84070’,
+ ‘NorthStar Initiatives’, ‘Youth Development’, 0,
+ ‘spark’, ‘sponsor’),
+-- 10
+(‘michael.owen@empowercollective.com’, ‘Michael’, ‘Owen’, ‘1977-01-27’, ‘sponsor’,
+ ‘801-555-3309’, ‘Draper’, ‘UT’, ‘84020’,
+ ‘Empower Collective’, ‘Career Growth’, 0,
+ ‘mowen’, ‘sponsor’);

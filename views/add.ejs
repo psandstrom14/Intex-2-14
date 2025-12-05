@@ -580,21 +580,20 @@
                                     <option value="<%= survey_prefill.event_name %>"><%= survey_prefill.event_name %> (from your registration)</option>
                                 <% } %>
                                 <option value="">Select an Event</option>
-                                <option value="Mentor Office Hours">Mentor Office Hours</option>
-                                <option value="Robotics Lab Saturday">Robotics Lab Saturday</option>
-                                <option value="Girls in STEAM Mentoring">Girls in STEAM Mentoring</option>
-                                <option value="Monthly Coding Club">Monthly Coding Club</option>
-                                <option value="Intro to Painting Class">Intro to Painting Class</option>
-                                <option value="Data Science Study Group">Data Science Study Group</option>
-                                <option value="Leadership Circle Meetup">Leadership Circle Meetup</option>
-                                <option value="Web Dev Bootcamp Night">Web Dev Bootcamp Night</option>
-                                <option value="Ella Rises Annual Leadership Conference">Ella Rises Annual Leadership Conference</option>
-                                <option value="Monthly Art Studio Workshop">Monthly Art Studio Workshop</option>
-                                <option value="STEAM Summit & Expo">STEAM Summit & Expo</option>
-                                <option value="AI for Beginners Bootcamp">AI for Beginners Bootcamp</option>
-                                <option value="Digital Design Workshop">Digital Design Workshop</option>
-                                <option value="Community STEM Hackathon">Community STEM Hackathon</option>
-                                <option value="Women in Tech & Art Showcase">Women in Tech & Art Showcase</option>
+                                <% if (events && events.length > 0) { %>
+                                    <% 
+                                        const seenEventNames = new Set();
+                                        events.forEach(ev => {
+                                            const eventName = ev.event_name;
+                                            if (eventName && !seenEventNames.has(eventName)) {
+                                                seenEventNames.add(eventName);
+                                    %>
+                                                <option value="<%= eventName %>"><%= eventName %></option>
+                                    <% 
+                                            }
+                                        }); 
+                                    %>
+                                <% } %>
                             </select>
                         </div>
                         
@@ -1014,7 +1013,7 @@
                 });
             }
 
-            const allEvents =  JSON.stringify(events || [])
+            const allEvents = <%- JSON.stringify(events || []) %>;
             const eventSelectSurvey = document.getElementById("eventSelect");
             const eventInstanceSelect = document.getElementById("eventInstanceSelect");
             const surveyPrefill = <%- JSON.stringify(survey_prefill || null) %>;
