@@ -361,7 +361,7 @@
                             <span id="selectedCount" style="font-weight: 600; color: #666;">0 selected</span>
                         </div>
                         <div class="flex gap-2">
-                            <button class="btn btn-secondary btn-small" id="editSelected" style="display: none;"> Edit </button>
+                            <button class="btn btn-secondary btn-small" id="editSelected"> Edit </button>
                             <button class="btn btn-danger btn-small" id="deleteSelected"> Delete Selected </button>
                             <button class="btn btn-outline btn-small" id="clearSelection"> Clear Selection</button>
                         </div>
@@ -798,7 +798,7 @@
 
             if (count > 0 && bulkActionsBar) {
                 bulkActionsBar.style.display = 'block';
-                if (selectedCountSpan) selectedCountSpan.textContent = count + ' selected';
+                selectedCountSpan.textContent = count + ' selected';
                 if (editButton) editButton.style.display = count === 1 ? 'inline-block' : 'none';
             } else {
                 if (bulkActionsBar) bulkActionsBar.style.display = 'none';
