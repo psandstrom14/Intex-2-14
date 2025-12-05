@@ -1,6 +1,18 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display surveys, and allow CRUD (for managers) + Search/Filter/Sort capabilities.-->
-<!--This page will only be visible to users who are logged in.-->
+<!--
+    surveys.ejs - Survey Results Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing survey responses. Surveys are feedback forms that
+    participants fill out after attending events. Shows satisfaction scores, NPS buckets, comments, etc.
+    
+    The server (index.js) passes in:
+    - survey: array of survey records (joined with event_registrations, users, and events tables)
+    - filters: current filter/search/sort settings (can filter by event, satisfaction scores, NPS bucket)
+    - message/messageType: flash messages
+    
+    Surveys are linked to event registrations - each survey is tied to a specific event registration.
+    Admins can view, edit, and delete survey responses from this page.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

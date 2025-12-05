@@ -1,8 +1,17 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will dispaly events, and allow CRUD (for managers) + Search Capabilities.-->
-<!--This page will only be visible to users who are logged in.-->
-
-
+<!--
+    events.ejs - Events Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing events. Admins can view, add, edit, and delete events.
+    Events are displayed in a table with filtering by name, location, type, month, year, and search.
+    
+    The server (index.js) passes in:
+    - events: array of event records (joined with event_types table)
+    - filters: current filter/search/sort settings
+    - message/messageType: flash messages
+    
+    Events are linked to event registrations and surveys, so deleting an event may affect those records.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

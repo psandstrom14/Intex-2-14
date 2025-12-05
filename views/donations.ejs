@@ -1,6 +1,17 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display donations, and allow CRUD (for managers) + Search/Filter/Sort capabilities.-->
-<!--This page will only be visible to users who are logged in.-->
+<!--
+    donations.ejs - Donations Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing donations. Shows all donations with donor information,
+    amounts, and dates. Useful for tracking fundraising and donor contributions.
+    
+    The server (index.js) passes in:
+    - donations: array of donation records (joined with users table to show donor names)
+    - filters: current filter/search/sort settings (can filter by month/year, search by donor name)
+    - message/messageType: flash messages
+    
+    Admins can add, edit, and delete donations from this page. This helps track fundraising efforts.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

@@ -1,6 +1,18 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display the participants table.-->
-<!--Admin will be able to add/edit/delete participants. Admin/Sponsors will be able to view/filter participants-->
+<!--
+    users.ejs - Users Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing all users in the system (participants, admins, sponsors).
+    It displays a table with filtering, searching, and sorting capabilities. Admins can add,
+    edit, and delete users from this page.
+    
+    The server (index.js) passes in:
+    - participant: array of user records
+    - filters: current filter/search/sort settings
+    - message/messageType: flash messages for success/error notifications
+    
+    This page uses JavaScript to handle AJAX delete requests and form submissions.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

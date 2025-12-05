@@ -1,7 +1,18 @@
-<!--participants list (participants.ejs)-->
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display the participants table.-->
-<!--Admin will be able to add/edit/delete participants. Admin/Sponsors will be able to view/filter participants-->
+<!--
+    participants.ejs - Participants Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing participants (users with "participant" role).
+    Similar to users.ejs but filtered to only show participants (not admins/sponsors).
+    
+    The server (index.js) passes in:
+    - participant: array of participant records
+    - filters: current filter/search/sort settings
+    - message/messageType: flash messages
+    
+    This page includes filtering by city, school, interest, donations, and search by name.
+    Admins can add, edit, and delete participants from this page.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

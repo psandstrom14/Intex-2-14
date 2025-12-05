@@ -1,5 +1,15 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will allow visitors to donate and add user information-->
+<!--
+    donate_now.ejs - Donation Page
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This page allows visitors to make donations. If they're logged in, their user_id
+    is pre-filled. If not logged in, they'll need to enter their user_id manually
+    (or the form handles it differently).
+    
+    The form uses AJAX to submit donations (see JavaScript at bottom) so it can show
+    a thank you message without reloading the page. The form submits to /add/donations
+    POST route in index.js.
+-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +24,7 @@
     <!-- Skip Navigation Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
+    <!-- Standard navigation bar -->
  <nav>
       <div class="nav-container">
           <div class="logo">
@@ -64,15 +75,16 @@
     </section>
     </main>
 
-    <!--Donation Pledge Form Inputs-->
+    <!--Donation Form-->
     <!--Main Content-->
     <main id="main-content">
         <div class="container">
             <div class="add-card">
-                <!--Add Donations Form-->
+                <!-- Donation form - uses AJAX to submit (see JavaScript below) -->
                 <div id="donationForm">
                     <form id="addForm" class="modern-form">
                         
+                        <!-- Pre-fill user_id if logged in (from session) -->
                         <input type="hidden" name="user_id" id="user_id" value="<%= userId %>">
     
                         <div class="form-section">

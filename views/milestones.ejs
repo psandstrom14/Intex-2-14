@@ -1,6 +1,18 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display milestones, and allow CRUD (for managers) + Search/Filter/Sort capabilities.-->
-<!--This page will only be visible to users who are logged in.-->
+<!--
+    milestones.ejs - Milestones Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing participant milestones (achievements, accomplishments).
+    Milestones track participant progress and achievements.
+    
+    The server (index.js) passes in:
+    - milestones: array of milestone records (joined with users table to show participant names)
+    - filters: current filter/search/sort settings
+    - message/messageType: flash messages
+    
+    This page includes filtering by milestone title, category, and search by participant name.
+    Admins can add, edit, and delete milestones from this page.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

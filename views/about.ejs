@@ -1,5 +1,14 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will tell more information about ER as well as allow users to view a tableau dashboard with information about the webpage-->
+<!--
+    about.ejs - About Page
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is the public-facing "About Us" page that tells visitors about Ella Rises.
+    It includes the organization's mission, an embedded video, and information about
+    the founder. This page is accessible to everyone (no login required).
+    
+    The server (index.js) renders this page at the /about route without passing
+    any special data - it's mostly static content.
+-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +23,7 @@
     <!-- Skip Navigation Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
+    <!-- Standard navigation bar - same structure as other pages -->
     <nav>
       <div class="nav-container">
           <div class="logo">
@@ -25,10 +35,12 @@
               <li><a href="/calendar">Calendar</a></li>
               <li><a href="/donate_now">Donate Now</a></li>
 
+              <!-- Show Profile link if logged in -->
               <% if (isLoggedIn && userId) { %>
                   <li><a href="/profile/<%= userId %>">Profile</a></li>
               <% } %>
 
+              <!-- Show Records dropdown if admin -->
               <% if (role === "admin") { %>
                   <li class="dropdown">
                       <span class="dropdown-toggle">
@@ -46,6 +58,7 @@
                   </li>
               <% } %>
 
+              <!-- Show Login/Logout button based on login status -->
               <% if (isLoggedIn) { %>
                   <li><a href="/logout" class="login-btn">Logout</a></li>
               <% } else { %>
@@ -63,6 +76,7 @@
       </div>
     </section>
 
+    <!-- Embedded video explaining Ella Rises mission and impact -->
     <section class="container mt-4" style="text-align: center">
       <video
         src="https://video.wixstatic.com/video/e5f869_f075e19ca2744354bb20a65881dce28f/1080p/mp4/file.mp4"
@@ -82,7 +96,7 @@
       </video>
     </section>
 
-    <!-- Mission Section -->
+    <!-- Mission Section - explains what Ella Rises does -->
     <section class="home-mission-section">
       <div class="home-mission-content">
         <h2 class="home-mission-heading">Our Mission</h2>

@@ -1,5 +1,14 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-
+<!--
+    signup.ejs - User Registration Page
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This page allows new users to create an account. When they submit the form,
+    it sends data to the /signup POST route in index.js, which creates the user
+    account and automatically logs them in.
+    
+    The form collects personal information, contact details, location, and background.
+    All new signups are automatically assigned the "participant" role (hidden field).
+-->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +20,7 @@
 </head>
 <body>
 
+    <!-- Standard navigation bar -->
  <nav>
       <div class="nav-container">
           <div class="logo">
@@ -63,7 +73,9 @@
     <!--Main Content-->
     <div class="container">
         <div class="add-card">
+            <!-- Signup form - submits to /signup POST route in index.js -->
             <form id="addForm" class="modern-form" action="/signup" method="POST">
+                <!-- Basic Information Section -->
                 <div class="form-section">
                     <h2 class="section-title">Basic Information</h2>
                     <p class="section-description">Enter the your personal details</p>
@@ -80,6 +92,7 @@
                         </div>
                     </div>
 
+                    <!-- Username and password for login -->
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Username <span class="required">*</span></label>
@@ -94,6 +107,7 @@
                         </div>
                     </div>
 
+                    <!-- Hidden field - all new signups are participants by default -->
                     <div class="form-group">
                         <input type="hidden" name="participant_role" value="participant">    
                     </div>

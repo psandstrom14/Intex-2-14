@@ -1,6 +1,18 @@
-<!--Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom-->
-<!--This page will display event registrations, and allow CRUD (for managers) + Search/Filter/Sort capabilities.-->
-<!--This page will only be visible to users who are logged in.-->
+<!--
+    event_registrations.ejs - Event Registrations Management Page (Admin Dashboard)
+    Paris Ward, Lucas Moraes, Joshua Ethington, Parker Sandstrom
+    
+    This is an admin-only page for managing event registrations. Shows who registered for which events,
+    registration status, attendance flags, and check-in times. Useful for tracking event attendance.
+    
+    The server (index.js) passes in:
+    - eventRegistrations: array of registration records (joined with users and events tables)
+    - filters: current filter/search/sort settings (can filter by event, date, status, attendance)
+    - message/messageType: flash messages
+    
+    This page helps admins see who's registered for events, who actually attended, and manage
+    registration statuses. Admins can add, edit, and delete registrations from this page.
+-->
 
 <!DOCTYPE html>
 <html lang="en">

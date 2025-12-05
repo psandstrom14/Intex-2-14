@@ -1132,19 +1132,27 @@ app.get("/profile/:id", async (req, res) => {
   }
 });
 
-// PROFILE EDIT ROUTE (called from profile page)
+// ============================================================================
+// PROFILE EDIT ROUTES - Editing records from the profile page
+// ============================================================================
+// These routes are similar to the regular edit routes, but they redirect back
+// to the profile page instead of the list page. Used when editing from profile tabs.
+
+// Show edit form for a record from the profile page
+// The form will redirect back to profile when submitted (instead of list page)
 app.get("/profile-edit/:table/:id", async (req, res) => {
   let table_name = req.params.table;
   const id = req.params.id;
 
-  // Backward compatibility: map old "participants" to "users"
+  // Backward compatibility
   if (table_name === "participants") {
     table_name = "users";
   }
 
+  // Map table names to their primary key columns
   const primaryKeyByTable = {
     users: "user_id",
-    participants: "user_id", // backward compatibility
+    participants: "user_id",
     milestones: "milestone_id",
     events: "event_id",
     survey_results: "survey_id",
@@ -1157,7 +1165,8 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
   try {
     let info;
 
-    // Special handling for survey_results - need to join to get event info
+    // Surveys need special handling - join with event_registrations and events
+    // to get the event info for the dropdown
     if (table_name === "survey_results") {
       info = await knex("survey_results as s")
         .join(
@@ -1177,18 +1186,22 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
         )
         .first();
     } else {
+      // For other tables, just get the record directly
       info = await knex(table_name).where(primaryKey, id).first();
     }
 
+    // Load dropdown data if needed
     let events = [];
     let event_types = [];
 
+    // If editing an event, load event types for the dropdown
     if (table_name === "events") {
       event_types = await knex("event_types")
         .select("event_type_id", "event_type_name")
         .orderBy("event_type_name");
     }
 
+    // If editing surveys or registrations, load events for the dropdown
     if (
       table_name === "event_registrations" ||
       table_name === "survey_results" ||
@@ -1205,13 +1218,14 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
         .orderBy(["event_name", "event_date", "event_start_time"]);
     }
 
+    // Render edit form with fromProfile flag - this tells the form to redirect to profile
     res.render("edit", {
       table_name,
       info,
       id,
       events,
       event_types,
-      fromProfile: true, // Flag to indicate this edit came from profile
+      fromProfile: true, // This flag makes the form redirect back to profile
       isLoggedIn: req.session.isLoggedIn || false,
       userId: req.session.user?.id || null,
       role: req.session.user?.role || null,
@@ -1219,27 +1233,28 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching entry:", err.message);
-    // Redirect back to profile with error
+    // Redirect back to profile with error message
     req.session.flashMessage = "Error loading edit page: " + err.message;
     req.session.flashType = "danger";
     res.redirect(`/profile/${req.session.user.id}?tab=profile`);
   }
 });
 
-// PROFILE UPDATE ROUTE (called from edit page when editing from profile)
+// Handle form submission when editing from profile page
+// Updates the record and redirects back to profile (not list page)
 app.post("/profile-edit/:table/:id", async (req, res) => {
   let table_name = req.params.table;
   const id = req.params.id;
   let updatedData = req.body;
 
-  // Backward compatibility: map old "participants" to "users"
+  // Backward compatibility
   if (table_name === "participants") {
     table_name = "users";
   }
 
   const primaryKeyByTable = {
     users: "user_id",
-    participants: "user_id", // backward compatibility
+    participants: "user_id",
     milestones: "milestone_id",
     events: "event_id",
     survey_results: "survey_id",
@@ -1250,17 +1265,17 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
   const primaryKey = primaryKeyByTable[table_name];
 
   try {
-    // Special handling for survey_results - filter out invalid columns and handle event_registration_id
+    // Surveys need special handling - they store event_registration_id, not event_id/user_id directly
     if (table_name === "survey_results") {
       const { user_id, event_id, event_name, ...surveyFields } = updatedData;
 
-      // Get the existing survey to preserve its event_registration_id if event/user aren't changed
+      // Get existing survey to preserve event_registration_id if not changing event/user
       const existingSurvey = await knex("survey_results")
         .where("survey_id", id)
         .select("event_registration_id")
         .first();
 
-      // If event_id and user_id are provided, find the corresponding event_registration_id
+      // If they're changing the event/user, find the new event_registration_id
       if (event_id && user_id) {
         const registration = await knex("event_registrations")
           .where({ event_id: parseInt(event_id), user_id: parseInt(user_id) })
@@ -1275,7 +1290,7 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
           );
         }
       } else if (existingSurvey && existingSurvey.event_registration_id) {
-        // If event_id/user_id aren't provided, preserve the existing event_registration_id
+        // Keep the existing event_registration_id if not changing event/user
         surveyFields.event_registration_id =
           existingSurvey.event_registration_id;
       }
@@ -1575,24 +1590,29 @@ app.get("/users", requireAdmin, async (req, res) => {
   }
 });
 
-// PARTICIPANT MAINTENANCE PAGE:
+// Participants maintenance page - shows only users with "participant" role
+// Similar to /users but filtered to only show participants (not admins/sponsors)
 app.get("/participants", requireAdmin, async (req, res) => {
   try {
-    // flash messages + query messages
+    // Get flash messages (success/error messages from previous actions)
     const sessionData = req.session || {};
     let message = sessionData.flashMessage || "";
     let messageType = sessionData.flashType || "success";
 
+    // Clear flash messages after displaying them
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
+    // Fallback to query params for messages (used when deleting via AJAX)
     if (!message && req.query.message) {
       message = req.query.message;
       messageType = req.query.messageType || "success";
     }
 
-    // --- filtering/sorting code ---
+    // ============================================================================
+    // FILTERING AND SORTING - Build query based on user filters
+    // ============================================================================
+    // Users can filter by city, school, interest, donations, and search by name
     let {
       searchColumn,
       searchValue,
@@ -1604,13 +1624,14 @@ app.get("/participants", requireAdmin, async (req, res) => {
       sortOrder,
     } = req.query;
 
-    // defaults
+    // Default values if nothing specified
     searchColumn = searchColumn || "full_name";
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
+    // Start building the database query
     let query = knex("users");
 
-    // Filter by role - only show participants
+    // Important: Only show participants (filter out admins and sponsors)
     query.where("participant_role", "participant");
 
     // Case-insensitive search
@@ -1727,11 +1748,11 @@ app.get("/participants", requireAdmin, async (req, res) => {
   }
 });
 
-// EVENT MAINTENANCE PAGE:
-// EVENT MAINTENANCE PAGE:
+// Events maintenance page - admins can view and manage all events
+// Shows events with their types, dates, locations, capacity, etc.
 app.get("/events", requireAdmin, async (req, res) => {
   try {
-    // flash messages + query messages
+    // Get flash messages
     const sessionData = req.session || {};
     let message = sessionData.flashMessage || "";
     let messageType = sessionData.flashType || "success";
@@ -1739,13 +1760,16 @@ app.get("/events", requireAdmin, async (req, res) => {
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
+    // Fallback to query params for messages
     if (!message && req.query.message) {
       message = req.query.message;
       messageType = req.query.messageType || "success";
     }
 
-    // --- filtering/sorting code ---
+    // ============================================================================
+    // FILTERING AND SORTING - Build query based on filters
+    // ============================================================================
+    // Users can filter by event name, location, type, month, year, and search
     let {
       searchColumn,
       searchValue,
@@ -1758,11 +1782,11 @@ app.get("/events", requireAdmin, async (req, res) => {
       sortOrder,
     } = req.query;
 
-    // defaults
+    // Default values
     searchColumn = searchColumn || "event_name";
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // Base query with join to event_types table
+    // Join with event_types table to get event type names
     let query = knex("events as e")
       .leftJoin("event_types as et", "e.event_type_id", "et.event_type_id")
       .select(
@@ -1779,20 +1803,20 @@ app.get("/events", requireAdmin, async (req, res) => {
         "et.event_type"
       );
 
-    // Case-insensitive search
+    // Handle search - can search by event name, location, capacity, etc.
     if (searchValue && searchColumn) {
       const term = searchValue.trim();
       if (term) {
         const likeTerm = `%${term}%`;
-        // Handle different column types
+        // Special handling for numeric columns (like capacity)
         if (searchColumn === "event_capacity") {
-          // For numeric columns, try to match as number
+          // Try to match as a number if they typed a number
           const numTerm = parseInt(term);
           if (!isNaN(numTerm)) {
             query.where("e.event_capacity", numTerm);
           }
         } else {
-          // For text columns, use ILIKE
+          // For text columns, use case-insensitive search
           query.whereRaw(`CAST(e.${searchColumn} AS TEXT) ILIKE ?`, [likeTerm]);
         }
       }
@@ -1918,10 +1942,14 @@ app.get("/events", requireAdmin, async (req, res) => {
   }
 });
 
-// SURVEY MAINTENANCE PAGE: UPDATE ALL LATER
-// For surveys: map logical column names (from UI) to real DB columns (with table aliases)
+// Surveys maintenance page - shows all survey responses with filtering
+// Surveys are linked to event registrations, so we join through multiple tables
+// to show who submitted what survey for which event
+
+// Map UI column names to actual database column names (with table aliases)
+// This lets us search by friendly names like "full_name" even though it's split across columns
 const SURVEY_SEARCHABLE_COLUMNS = [
-  "full_name", // NEW
+  "full_name",
   "participant_first_name",
   "participant_last_name",
   "event_name",
@@ -1930,22 +1958,24 @@ const SURVEY_SEARCHABLE_COLUMNS = [
 ];
 
 const SURVEY_COLUMN_MAP = {
-  full_name: null, // special-cased in code below
+  full_name: null, // Special case - handled separately in code
   participant_first_name: "p.participant_first_name",
   participant_last_name: "p.participant_last_name",
   event_name: "e.event_name",
   event_date: "e.event_date",
   survey_nps_bucket: "s.survey_nps_bucket",
 };
+
 app.get("/surveys", requireAdmin, async (req, res) => {
   try {
-    // flash messages
+    // Get flash messages
     const sessionData = req.session || {};
     const message = sessionData.flashMessage || "";
     const messageType = sessionData.flashType || "success";
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
+    // Get filter parameters from query string
     let {
       searchColumn,
       searchValue,
@@ -1960,12 +1990,11 @@ app.get("/surveys", requireAdmin, async (req, res) => {
       sortOrder,
     } = req.query;
 
-    // defaults
-    // Default to "full_name" if no searchColumn provided
+    // Default to searching by full name if nothing specified
     if (!searchColumn) {
       searchColumn = "full_name";
     }
-    // Validate that the provided searchColumn is in the allowed list
+    // Security check - only allow searching by columns we've defined
     if (
       searchColumn !== "full_name" &&
       !SURVEY_SEARCHABLE_COLUMNS.includes(searchColumn)
@@ -1975,8 +2004,8 @@ app.get("/surveys", requireAdmin, async (req, res) => {
 
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // base query with joins
-    // ðŸ" if your join table has a different name, update "event_registrations" + its cols
+    // Build the main query - join survey_results with event_registrations, users, and events
+    // This lets us show participant names, event names, and survey scores all together
     let query = knex("survey_results as s")
       .join(
         "event_registrations as er",
@@ -2004,16 +2033,16 @@ app.get("/surveys", requireAdmin, async (req, res) => {
         "s.submission_time as survey_submission_time"
       );
 
-    // case-insensitive search (with full_name support)
+    // Handle search - can search by participant name, event name, etc.
     if (searchValue) {
       const term = searchValue.trim();
       if (term) {
         if (searchColumn === "full_name") {
-          // Handle full name like "Jane", "Doe", or "Jane Doe Smith"
+          // Special handling for full name search - split into first/last name parts
           const parts = term.split(/\s+/);
 
           if (parts.length === 1) {
-            // One word -> match either first OR last name
+            // One word - search first OR last name
             const likeOne = `%${parts[0]}%`;
             query.where(function () {
               this.where("p.participant_first_name", "ilike", likeOne).orWhere(
@@ -2023,7 +2052,7 @@ app.get("/surveys", requireAdmin, async (req, res) => {
               );
             });
           } else {
-            // Multiple words -> first piece as first name, last piece as last name
+            // Multiple words - first word is first name, last word is last name
             const firstLike = `%${parts[0]}%`;
             const lastLike = `%${parts[parts.length - 1]}%`;
 
@@ -2036,7 +2065,7 @@ app.get("/surveys", requireAdmin, async (req, res) => {
             });
           }
         } else {
-          // Normal single-column search
+          // Search by a single column (event name, NPS bucket, etc.)
           const dbCol = SURVEY_COLUMN_MAP[searchColumn];
           if (dbCol) {
             query.whereRaw(`CAST(${dbCol} AS TEXT) ILIKE ?`, [`%${term}%`]);
@@ -2045,43 +2074,49 @@ app.get("/surveys", requireAdmin, async (req, res) => {
       }
     }
 
-    // filters
+    // Apply filters - users can filter by event, satisfaction scores, NPS bucket, etc.
     const eventNameArr = paramToArray(eventNames);
     if (!eventNameArr.includes("all")) {
       query.whereIn("e.event_name", eventNameArr);
     }
 
+    // Filter by satisfaction score (1-5 scale)
     const satArr = paramToArray(satisfaction);
     if (!satArr.includes("all")) {
       query.whereIn("s.survey_satisfaction_score", satArr.map(Number));
     }
 
+    // Filter by usefulness score
     const usefulArr = paramToArray(usefulness);
     if (!usefulArr.includes("all")) {
       query.whereIn("s.survey_usefulness_score", usefulArr.map(Number));
     }
 
+    // Filter by instructor score
     const instrArr = paramToArray(instructor);
     if (!instrArr.includes("all")) {
       query.whereIn("s.survey_instructor_score", instrArr.map(Number));
     }
 
+    // Filter by recommendation score
     const recArr = paramToArray(recommendation);
     if (!recArr.includes("all")) {
       query.whereIn("s.survey_recommendation_score", recArr.map(Number));
     }
 
+    // Filter by overall score
     const overallArr = paramToArray(overall);
     if (!overallArr.includes("all")) {
       query.whereIn("s.survey_overall_score", overallArr.map(Number));
     }
 
+    // Filter by NPS bucket (Promoter, Passive, Detractor)
     const npsArr = paramToArray(nps);
     if (!npsArr.includes("all")) {
       query.whereIn("s.survey_nps_bucket", npsArr);
     }
 
-    // sorting
+    // Apply sorting
     if (sortColumn) {
       const sortDbCol = SURVEY_COLUMN_MAP[sortColumn];
       if (sortDbCol) {
@@ -2089,7 +2124,8 @@ app.get("/surveys", requireAdmin, async (req, res) => {
       }
     }
 
-    // Build option lists for filters (event names + NPS buckets)
+    // Get lists of available options for the filter dropdowns
+    // These queries run independently so filters always show all available options
     const eventNameOptionsPromise = knex("events")
       .distinct("event_name")
       .orderBy("event_name");
@@ -2099,12 +2135,14 @@ app.get("/surveys", requireAdmin, async (req, res) => {
       .whereNotNull("survey_nps_bucket")
       .orderBy("survey_nps_bucket");
 
+    // Run all queries in parallel for better performance
     const [eventNameRows, npsRows, results] = await Promise.all([
       eventNameOptionsPromise,
       npsOptionsPromise,
       query,
     ]);
 
+    // Clean up the results - remove any null/empty values
     const eventNameOptions = eventNameRows
       .map((r) => r.event_name)
       .filter(Boolean);
@@ -2157,10 +2195,11 @@ app.get("/surveys", requireAdmin, async (req, res) => {
   }
 });
 
-// MILESTONES MAINTENANCE PAGE:
+// Milestones maintenance page - shows all participant achievements/milestones
+// Milestones track participant accomplishments and progress
 app.get("/milestones", requireAdmin, async (req, res) => {
   try {
-    // flash messages + query messages
+    // Get flash messages
     const sessionData = req.session || {};
     let message = sessionData.flashMessage || "";
     let messageType = sessionData.flashType || "success";
@@ -2168,13 +2207,15 @@ app.get("/milestones", requireAdmin, async (req, res) => {
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
+    // Fallback to query params for messages
     if (!message && req.query.message) {
       message = req.query.message;
       messageType = req.query.messageType || "success";
     }
 
-    // --- filtering/sorting code ---
+    // ============================================================================
+    // FILTERING AND SORTING
+    // ============================================================================
     let {
       searchColumn,
       searchValue,
@@ -2184,11 +2225,11 @@ app.get("/milestones", requireAdmin, async (req, res) => {
       sortOrder,
     } = req.query;
 
-    // defaults
+    // Default values
     searchColumn = searchColumn || "full_name";
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // Base query with join to participants table
+    // Join with users table to get participant names
     let query = knex("milestones as m")
       .join("users as p", "m.user_id", "p.user_id")
       .select(
@@ -2337,10 +2378,11 @@ app.get("/milestones", requireAdmin, async (req, res) => {
   }
 });
 
-// DONATIONS MAINTENANCE PAGE:
+// Donations maintenance page - shows all donations with donor information
+// Admins can filter by date, search by donor name, and see donation amounts
 app.get("/donations", requireAdmin, async (req, res) => {
   try {
-    // flash messages + query messages
+    // Get flash messages
     const sessionData = req.session || {};
     let message = sessionData.flashMessage || "";
     let messageType = sessionData.flashType || "success";
@@ -2348,21 +2390,24 @@ app.get("/donations", requireAdmin, async (req, res) => {
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
+    // Fallback to query params for messages
     if (!message && req.query.message) {
       message = req.query.message;
       messageType = req.query.messageType || "success";
     }
 
-    // --- filtering/sorting code ---
+    // ============================================================================
+    // FILTERING AND SORTING
+    // ============================================================================
+    // Users can filter by month/year and search by donor name
     let { searchColumn, searchValue, months, years, sortColumn, sortOrder } =
       req.query;
 
-    // defaults
+    // Default values
     searchColumn = searchColumn || "full_name";
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // Base query with join to participants table
+    // Join with users table to get donor names
     let query = knex("donations as d")
       .join("users as p", "d.user_id", "p.user_id")
       .select(
@@ -2700,23 +2745,28 @@ app.get(
 );
 
 // Handle form submission for adding new records
-// This gets called when someone submits the "Add" form
+// This gets called when someone submits the "Add" form from admin dashboard pages
 app.post("/add/:table", requireAdmin, async (req, res) => {
   let table_name = req.params.table;
   let newData = req.body;
 
-  // Backward compatibility - map old table name
+  // Backward compatibility
   if (table_name === "participants") {
     table_name = "users";
   }
 
   try {
-    // Special handling for event_registrations - filter out invalid columns
+    // ============================================================================
+    // SPECIAL HANDLING FOR DIFFERENT TABLES
+    // ============================================================================
+
+    // Event registrations need special handling - filter out form-only fields
+    // and convert checkbox values to database flags
     if (table_name === "event_registrations") {
       const { event_name, registration_attend_status, ...registrationFields } =
         newData;
 
-      // Map registration_attend_status to registration_attended_flag if provided
+      // Convert checkbox value (string "1" or number 1) to database flag (0 or 1)
       if (registration_attend_status !== undefined) {
         registrationFields.registration_attended_flag =
           registration_attend_status === "1" || registration_attend_status === 1
@@ -2724,7 +2774,7 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
             : 0;
       }
 
-      // Only insert valid event_registrations columns
+      // Only allow inserting valid columns (security - prevent SQL injection)
       const validColumns = [
         "user_id",
         "event_id",
@@ -2744,14 +2794,15 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
       }
     }
 
-    // Special handling for survey_results - prevent duplicates
+    // Surveys need special handling - prevent duplicate surveys for same registration
+    // If a survey already exists for this event registration, update it instead of creating a new one
     if (table_name === "survey_results" && newData.event_registration_id) {
       const existingSurveys = await knex("survey_results")
         .where("event_registration_id", newData.event_registration_id)
         .orderBy("survey_id", "desc");
 
       if (existingSurveys.length > 0) {
-        // Find the most complete survey or use the most recent
+        // Find the most complete survey (one with actual scores) or use the most recent
         const hasData = (s) => {
           const score =
             s.survey_satisfaction_score ||
@@ -2765,7 +2816,7 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
         let surveyToUpdate =
           existingSurveys.find(hasData) || existingSurveys[0];
 
-        // Normalize empty strings to null in newData
+        // Convert empty strings to null (database expects null, not empty strings)
         const normalizeValue = (val) =>
           val === "" || val === null || val === undefined ? null : val;
         const normalizedData = { ...newData };
@@ -2783,12 +2834,12 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
           }
         });
 
-        // Update the selected survey instead of inserting
+        // Update the existing survey instead of creating a duplicate
         await knex("survey_results")
           .where("survey_id", surveyToUpdate.survey_id)
           .update(normalizedData);
 
-        // Delete any other duplicate surveys
+        // Delete any other duplicate surveys (shouldn't happen, but just in case)
         if (existingSurveys.length > 1) {
           const idsToDelete = existingSurveys
             .filter((s) => s.survey_id !== surveyToUpdate.survey_id)
@@ -2807,14 +2858,14 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
       }
     }
 
+    // For all other tables, just insert the new record
     await knex(table_name).insert(newData);
 
-    // Set flash message in session
+    // Set success message
     req.session.flashMessage = "Added Successfully!";
     req.session.flashType = "success";
 
-    // Redirect without passing options object
-    // Special case: survey_results should redirect to /surveys
+    // Redirect back to the list page (with special handling for some tables)
     if (table_name === "survey_results") {
       res.redirect("/surveys");
     } else if (table_name === "event_registrations") {
@@ -2825,11 +2876,11 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
   } catch (err) {
     console.log("Error adding record:", err.message);
 
-    // Set error flash message
+    // Set error message
     req.session.flashMessage = "Error adding record: " + err.message;
     req.session.flashType = "danger";
 
-    // Special case: survey_results should redirect to /surveys
+    // Redirect back with error (with special handling for some tables)
     if (table_name === "survey_results") {
       res.redirect("/surveys");
     } else if (table_name === "event_registrations") {
@@ -2840,13 +2891,15 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
   }
 });
 
-// Participant-facing route to submit their own milestones
+// Handle milestone submission from profile page
+// Participants can add their own milestones (achievements) to track progress
 app.post("/profile-add/milestones/:userId", async (req, res) => {
   const userId = parseInt(req.params.userId, 10);
   if (!Number.isInteger(userId)) {
     return res.status(400).send("Invalid participant id.");
   }
 
+  // Security check - users can only add milestones to their own profile
   if (!requireSelfOrAdmin(req, res, userId)) return;
 
   const { milestone_title, milestone_category, milestone_date } = req.body;
@@ -2870,7 +2923,9 @@ app.post("/profile-add/milestones/:userId", async (req, res) => {
   }
 });
 
-// Participant-facing route to submit their own survey results (requires registration id)
+// Handle survey submission from profile page
+// Participants can submit surveys after attending events they registered for
+// This route prevents duplicate surveys - if one exists, it updates it instead
 app.post(
   "/profile-add/survey_results/:eventRegistrationId",
   async (req, res) => {
@@ -2879,6 +2934,7 @@ app.post(
       return res.status(400).send("Invalid event registration id.");
     }
 
+    // Get the event registration to verify it exists and get the user_id
     const registration = await knex("event_registrations")
       .where("event_registration_id", eventRegistrationId)
       .first();
@@ -2887,8 +2943,10 @@ app.post(
       return res.status(404).send("Event registration not found.");
     }
 
+    // Security check - users can only submit surveys for their own registrations
     if (!requireSelfOrAdmin(req, res, registration.user_id)) return;
 
+    // Get survey data from form
     const {
       survey_satisfaction_score,
       survey_usefulness_score,
@@ -2899,18 +2957,21 @@ app.post(
       survey_comments,
     } = req.body;
 
+    // Get current date/time for submission timestamp
     const { date, time } = nowDate();
 
     try {
-      // Check if any surveys already exist for this event registration
+      // Check if a survey already exists for this event registration
+      // We prevent duplicates - one survey per registration
       const existingSurveys = await knex("survey_results")
         .where("event_registration_id", eventRegistrationId)
         .orderBy("survey_id", "desc"); // Get most recent first
 
-      // Normalize empty strings to null
+      // Convert empty strings to null (database expects null, not empty strings)
       const normalizeValue = (val) =>
         val === "" || val === null || val === undefined ? null : val;
 
+      // Build survey data object with normalized values
       const surveyData = {
         event_registration_id: eventRegistrationId,
         survey_satisfaction_score: normalizeValue(survey_satisfaction_score),
@@ -2927,7 +2988,8 @@ app.post(
       };
 
       if (existingSurveys.length > 0) {
-        // Find the most complete survey (one with actual data) or use the most recent
+        // Survey already exists - update it instead of creating a duplicate
+        // Find the most complete survey (one with actual scores) or use the most recent
         const hasData = (s) => {
           const score =
             s.survey_satisfaction_score ||
@@ -2939,14 +3001,14 @@ app.post(
         };
 
         let surveyToUpdate =
-          existingSurveys.find(hasData) || existingSurveys[0]; // Use first (most recent) if all are empty
+          existingSurveys.find(hasData) || existingSurveys[0];
 
-        // Update the selected survey
+        // Update the existing survey
         await knex("survey_results")
           .where("survey_id", surveyToUpdate.survey_id)
           .update(surveyData);
 
-        // Delete any other duplicate surveys for this event registration
+        // Delete any other duplicate surveys (shouldn't happen, but cleanup just in case)
         if (existingSurveys.length > 1) {
           const idsToDelete = existingSurveys
             .filter((s) => s.survey_id !== surveyToUpdate.survey_id)
@@ -2960,12 +3022,13 @@ app.post(
 
         req.session.flashMessage = "Survey updated!";
       } else {
-        // Insert new survey if none exists
+        // No survey exists - create a new one
         await knex("survey_results").insert(surveyData);
         req.session.flashMessage = "Survey submitted!";
       }
 
       req.session.flashType = "success";
+      // Redirect back to profile surveys tab
       res.redirect(`/profile/${registration.user_id}?tab=surveys`);
     } catch (err) {
       console.error("Error adding survey result:", err);
@@ -2976,19 +3039,23 @@ app.post(
   }
 );
 
-// DELETE FUNCTIONALITY:
-// route that occurs when delete button is pressed
+// ============================================================================
+// DELETE ROUTE - Remove records from database
+// ============================================================================
+// This is called via AJAX from the admin dashboard pages when clicking delete
+// Returns JSON response (not a redirect) so the page can update dynamically
 app.post("/delete/:table/:id", requireAdmin, async (req, res) => {
   let { table, id } = req.params;
 
-  // Backward compatibility: map old "participants" to "users"
+  // Backward compatibility
   if (table === "participants") {
     table = "users";
   }
 
+  // Map table names to their primary key columns
   const primaryKeyByTable = {
     users: "user_id",
-    participants: "user_id", // backward compatibility
+    participants: "user_id",
     milestones: "milestone_id",
     events: "event_id",
     survey_results: "survey_id",
@@ -2999,28 +3066,36 @@ app.post("/delete/:table/:id", requireAdmin, async (req, res) => {
   const primaryKey = primaryKeyByTable[table];
 
   try {
+    // Delete the record from the database
     await knex(table).where(primaryKey, id).del();
+    // Return success JSON - the frontend will handle removing the row from the table
     res.status(200).json({ success: true });
   } catch (err) {
     console.log("Error deleting record:", err.message);
+    // Return error JSON - the frontend will show an error message
     res.status(500).json({ error: err.message });
   }
 });
 
-// EDIT FUNCTIONALITY
-// route to display the "edit ____" page
+// ============================================================================
+// EDIT ROUTES - Show and handle edit forms
+// ============================================================================
+// These routes are for editing from the admin dashboard pages (not profile pages)
+// They redirect back to the list page after editing
+
+// Show edit form for a record - pre-fills form with existing data
 app.get("/edit/:table/:id", requireAdmin, async (req, res) => {
   let table_name = req.params.table;
   const id = req.params.id;
 
-  // Backward compatibility: map old "participants" to "users"
+  // Backward compatibility
   if (table_name === "participants") {
     table_name = "users";
   }
 
   const primaryKeyByTable = {
     users: "user_id",
-    participants: "user_id", // backward compatibility
+    participants: "user_id",
     milestones: "milestone_id",
     events: "event_id",
     survey_results: "survey_id",
@@ -3296,10 +3371,11 @@ app.post("/edit/:table/:id", requireAdmin, async (req, res) => {
   }
 });
 
-// EVENT REGISTRATIONS MAINTENANCE PAGE:
+// Event registrations maintenance page - shows who registered for which events
+// This is the admin view of all event registrations - useful for tracking attendance
 app.get("/event_registrations", requireAdmin, async (req, res) => {
   try {
-    // flash messages + query messages
+    // Get flash messages
     const sessionData = req.session || {};
     let message = sessionData.flashMessage || "";
     let messageType = sessionData.flashType || "success";
@@ -3307,13 +3383,16 @@ app.get("/event_registrations", requireAdmin, async (req, res) => {
     sessionData.flashMessage = null;
     sessionData.flashType = null;
 
-    // fallback to query params (for deletes)
+    // Fallback to query params for messages
     if (!message && req.query.message) {
       message = req.query.message;
       messageType = req.query.messageType || "success";
     }
 
-    // --- filtering/sorting code ---
+    // ============================================================================
+    // FILTERING AND SORTING
+    // ============================================================================
+    // Users can filter by event, date, registration status, attendance, etc.
     let {
       searchColumn,
       searchValue,
@@ -3326,11 +3405,11 @@ app.get("/event_registrations", requireAdmin, async (req, res) => {
       sortOrder,
     } = req.query;
 
-    // defaults
+    // Default values
     searchColumn = searchColumn || "full_name";
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
-    // Base query with joins
+    // Join with users and events tables to show participant names and event details
     let query = knex("event_registrations as er")
       .join("users as p", "er.user_id", "p.user_id")
       .join("events as e", "er.event_id", "e.event_id")
