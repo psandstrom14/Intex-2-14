@@ -350,6 +350,7 @@
                             <th class="sortable" data-column="participant_first_name">First Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_last_name">Last Name <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_username">Username <span class="sort-icon">⇅</span></th>
+                            <th class="sortable" data-column="participant_role">User Role <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_email" style="min-width: 200px;">Email <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_phone" style="min-width: 150px;">Phone <span class="sort-icon">⇅</span></th>
                             <th class="sortable" data-column="participant_dob">Date of Birth <span class="sort-icon">⇅</span></th>
@@ -382,6 +383,7 @@
                                     <td><a href="/profile/<%= p.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_first_name %></a></td>
                                     <td><a href="/profile/<%= p.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= p.participant_last_name %></a></td>
                                     <td><%= p.participant_username %></td>
+                                    <td><%= p.participant_role || 'N/A' %></td>
                                     <td><%= p.participant_email %></td>
                                     <td><%= p.participant_phone %></td>
                                     <td><%= formattedDOB %></td>
@@ -395,7 +397,7 @@
                             <% }); %>
                         <% } else { %>
                             <tr>
-                                <td colspan="<%= (isLoggedIn && role && role.toLowerCase() === 'admin') ? '13' : '12' %>" style="text-align: center; padding: 3rem; color: #999;">                                    No participants found. Click "Add Participant" to get started.
+                                <td colspan="<%= (isLoggedIn && role && role.toLowerCase() === 'admin') ? '14' : '13' %>" style="text-align: center; padding: 3rem; color: #999;">                                    No participants found. Click "Add Participant" to get started.
                                 </td>
                             </tr>
                         <% } %>

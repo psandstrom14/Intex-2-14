@@ -74,8 +74,6 @@
         <div class="add-card">
             <!-- Edit-Participant Form -->
             <% if (table_name === "users") { %>
-                <form id="addForm" class="modern-form" action="/edit/users/<%= info.user_id %>" method="POST">
-            <% if (table_name === "users") { %>
                 <% 
                     // Use profile-specific route if coming from profile page
                     const formAction = (typeof fromProfile !== 'undefined' && fromProfile) 
