@@ -1088,6 +1088,76 @@
             }
         }
 
+        // ---------------- EVENT REGISTRATIONS PAGE JS ----------------
+        if (currentTable === "event_registrations") {
+            const allEvents = <%- JSON.stringify(events || []) %>;
+            const eventSelect = document.getElementById("eventSelect");
+            const eventInstanceSelect = document.getElementById("eventInstanceSelect");
+
+            function formatEventOption(ev) {
+                let label = ev.event_date;
+                if (ev.event_start_time && ev.event_end_time) {
+                    label += ` (${ev.event_start_time}–${ev.event_end_time})`;
+                } else if (ev.event_start_time) {
+                    label += ` (${ev.event_start_time})`;
+                }
+                return label;
+            }
+
+            if (eventSelect && eventInstanceSelect) {
+                eventSelect.addEventListener("change", () => {
+                    const selectedName = eventSelect.value;
+
+                    eventInstanceSelect.innerHTML = "";
+                    eventInstanceSelect.disabled = true;
+
+                    if (!selectedName) {
+                        const opt = document.createElement("option");
+                        opt.value = "";
+                        opt.textContent = "Select an event above first";
+                        eventInstanceSelect.appendChild(opt);
+                        return;
+                    }
+
+                    const matchingEvents = allEvents.filter(ev => ev.event_name === selectedName);
+
+                    if (matchingEvents.length === 0) {
+                        const opt = document.createElement("option");
+                        opt.value = "";
+                        opt.textContent = "No dates found for this event";
+                        eventInstanceSelect.appendChild(opt);
+                        return;
+                    }
+
+                    const defaultOpt = document.createElement("option");
+                    defaultOpt.value = "";
+                    defaultOpt.textContent = "Select a Date/Time";
+                    eventInstanceSelect.appendChild(defaultOpt);
+
+                    matchingEvents.forEach(ev => {
+                        const opt = document.createElement('option');
+                        opt.value = ev.event_id;
+                        opt.textContent = formatEventOption(ev);
+                        eventInstanceSelect.appendChild(opt);
+                    });
+
+                    eventInstanceSelect.disabled = false;
+                });
+            }
+
+            // Handle registration status change to update hidden field
+            const regInputs = document.querySelectorAll('input[name="registration_status"]');
+            const hiddenAttend = document.getElementById("attendStatusHidden");
+
+            if (regInputs && hiddenAttend) {
+                regInputs.forEach(input => {
+                    input.addEventListener("change", () => {
+                        hiddenAttend.value = (input.value === "attended") ? 1 : 0;
+                    });
+                });
+            }
+        }
+
         // ---------------- FORM ANIMATIONS ----------------
         const formInputs = document.querySelectorAll('.form-input, .form-select');
         formInputs.forEach(input => {

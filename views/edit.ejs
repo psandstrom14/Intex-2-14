@@ -257,9 +257,14 @@
                     </div>
                 </form>
 
-            <!-- Edit-Event registration Form -->
-            <% } else if (table_name === "event_registrations") { %>
-                <form id="addForm" class="modern-form" action="/edit/event_registrations/<%= info.event_id %>" method="POST">
+            <!-- Edit-Events Form -->
+            <% } else if (table_name === "events") { %>
+                <% 
+                    const formActionEvent = (typeof fromProfile !== 'undefined' && fromProfile) 
+                        ? `/profile-edit/events/${info.event_id}` 
+                        : `/edit/events/${info.event_id}`;
+                %>
+                <form id="addForm" class="modern-form" action="<%= formActionEvent %>" method="POST">
                     
                     <div class="form-section">
                         <h2 class="section-title">Event Details</h2>
@@ -267,28 +272,27 @@
 
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
-                            <select class="form-select" name="event_type_id" id="eventSelect" value="<%= info.event_name || '' %>"required>
-                        <option value="">Select an Event Type</option>
-                        <% event_types.forEach(t => { %>
-                            <option value="<%= t.event_type_id %>" 
-                                <%= info && info.event_type_id == t.event_type_id ? "selected" : "" %>>
-                                <%= t.event_name %>
-                            </option>
-                        <% }) %>
-                    </select>
+                            <select class="form-select" name="event_type_id" id="eventSelect" value="<%= info.event_name || '' %>" required>
+                                <option value="">Select an Event Type</option>
+                                <% event_types.forEach(t => { %>
+                                    <option value="<%= t.event_type_id %>" 
+                                        <%= info && info.event_type_id == t.event_type_id ? "selected" : "" %>>
+                                        <%= t.event_type_name %>
+                                    </option>
+                                <% }) %>
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Location <span class="required">*</span></label>
                             <select class="form-select" name="event_location" id="locations" required>
-                                <datalist id="">
                                 <option value="">Select a location</option>
                                 <option value="Ella Rises HQ" <%= info.event_location == "Ella Rises HQ" ? 'selected' : '' %>>Ella Rises HQ</option>
                                 <option value="Virtual Zoom" <%= info.event_location == "Virtual Zoom" ? 'selected' : '' %>>Virtual Zoom</option>
                                 <option value="Art Studio 2" <%= info.event_location == "Art Studio 2" ? 'selected' : '' %>>Art Studio 2</option>
                                 <option value="Community Center Room A" <%= info.event_location == "Community Center Room A" ? 'selected' : '' %>>Community Center Room A</option>
                                 <option value="Local Library" <%= info.event_location == "Local Library" ? 'selected' : '' %>>Local Library</option>
-                                </select>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -365,7 +369,7 @@
                                 <input 
                                     type="time" 
                                     class="form-input" 
-                                    name="event_registration_deadline_time" 
+                                    name="registration_deadline_time" 
                                     value="<%= info.registration_deadline_time ? info.registration_deadline_time.toString().slice(0,5) : '' %>"
                                     required>
                             </div>
@@ -373,7 +377,12 @@
                     </div>
 
                     <div class="form-actions">
-                        <a href="/events" class="btn btn-secondary">Cancel</a>
+                        <% 
+                            const cancelLinkEvent = (typeof fromProfile !== 'undefined' && fromProfile) 
+                                ? `/profile/${info.event_id}?tab=events` 
+                                : '/events';
+                        %>
+                        <a href="<%= cancelLinkEvent %>" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">Edit Event</button>
                     </div>
                 </form>
@@ -1301,6 +1310,120 @@
                     const selectedName = eventSelectSurvey.value;
                     populateEventInstances(selectedName, null);
                 });
+            }
+        }
+
+        // ---------------- EVENT REGISTRATIONS PAGE JS ----------------
+        if (currentTable === "event_registrations") {
+            const existingRegistration = <%- JSON.stringify(info || {}) %>;
+            const allEvents = <%- JSON.stringify(typeof events !== 'undefined' ? (events || []) : []) %>;
+            const eventSelect = document.getElementById("eventSelect");
+            const eventInstanceSelect = document.getElementById("eventInstanceSelect");
+
+            function formatTime(timeString) {
+                if (!timeString) return '';
+                if (timeString.includes('AM') || timeString.includes('PM')) return timeString;
+                const timeParts = timeString.toString().split(':');
+                let hours = parseInt(timeParts[0]);
+                const minutes = timeParts[1] || '00';
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                return `${hours}:${minutes} ${ampm}`;
+            }
+
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${month}/${day}/${year}`;
+            }
+
+            function formatEventOption(ev) {
+                let label = formatDate(ev.event_date);
+                if (ev.event_start_time && ev.event_end_time) {
+                    label += ` (${formatTime(ev.event_start_time)}–${formatTime(ev.event_end_time)})`;
+                } else if (ev.event_start_time) {
+                    label += ` (${formatTime(ev.event_start_time)})`;
+                }
+                return label;
+            }
+
+            function populateEventInstances(selectedName, preselectedId) {
+                eventInstanceSelect.innerHTML = "";
+                eventInstanceSelect.disabled = true;
+
+                if (!selectedName) {
+                    const opt = document.createElement("option");
+                    opt.value = "";
+                    opt.textContent = "Select an event above first";
+                    eventInstanceSelect.appendChild(opt);
+                    return;
+                }
+
+                const matchingEvents = allEvents.filter(ev => ev.event_name === selectedName);
+
+                if (matchingEvents.length === 0) {
+                    const opt = document.createElement("option");
+                    opt.value = "";
+                    opt.textContent = "No dates found for this event";
+                    eventInstanceSelect.appendChild(opt);
+                    return;
+                }
+
+                const defaultOpt = document.createElement("option");
+                defaultOpt.value = "";
+                defaultOpt.textContent = "Select a Date/Time";
+                eventInstanceSelect.appendChild(defaultOpt);
+
+                matchingEvents.forEach(ev => {
+                    const opt = document.createElement("option");
+                    opt.value = ev.event_id;
+                    opt.textContent = formatEventOption(ev);
+                    if (preselectedId && String(preselectedId) === String(ev.event_id)) {
+                        opt.selected = true;
+                    }
+                    eventInstanceSelect.appendChild(opt);
+                });
+
+                eventInstanceSelect.disabled = false;
+            }
+
+            if (eventSelect && eventInstanceSelect) {
+                // Pre-select existing event + instance on edit
+                if (existingRegistration.event_name) {
+                    eventSelect.value = existingRegistration.event_name;
+                    populateEventInstances(existingRegistration.event_name, existingRegistration.event_id);
+                }
+
+                eventSelect.addEventListener("change", () => {
+                    const selectedName = eventSelect.value;
+                    populateEventInstances(selectedName, null);
+                });
+            }
+
+            // Handle registration status change to update hidden field
+            const regInputs = document.querySelectorAll('input[name="registration_status"]');
+            const hiddenAttend = document.getElementById("attendStatusHidden");
+
+            if (regInputs && hiddenAttend) {
+                regInputs.forEach(input => {
+                    // Pre-select based on existing status
+                    if (existingRegistration.registration_status && input.value === existingRegistration.registration_status) {
+                        input.checked = true;
+                        hiddenAttend.value = (existingRegistration.registration_status === "attended") ? 1 : 0;
+                    }
+
+                    input.addEventListener("change", () => {
+                        hiddenAttend.value = (input.value === "attended") ? 1 : 0;
+                    });
+                });
+
+                if (!hiddenAttend.value && existingRegistration.registration_status) {
+                    hiddenAttend.value = (existingRegistration.registration_status === "attended") ? 1 : 0;
+                }
             }
         }
 
