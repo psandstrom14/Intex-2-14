@@ -14,7 +14,6 @@
     <!-- Skip Navigation Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- Navigation -->
     <nav>
       <div class="nav-container">
           <div class="logo">
@@ -22,22 +21,21 @@
           </div>
           <ul class="nav-links">
               <li><a href="/">Home</a></li>
-              <li><a href="/about" class="selected-nav">About</a></li>
-              <li><a href="/performance">Performance</a></li>
+              <li><a href="/about">About</a></li>
               <li><a href="/calendar">Calendar</a></li>
               <li><a href="/donate_now">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>
                   <li class="dropdown">
                       <span class="dropdown-toggle">
-                          <a href="#">Pages ▾</a>
+                          <a href="#" >Records ▾</a>
                       </span>
                       <ul class="dropdown-menu">
-                          <li><a href="/users">Participants</a></li>
+                          <li><a href="/users">Users</a></li>
                           <li><a href="/events">Events</a></li>
                           <li><a href="/event_registrations">Event Registrations</a></li>
                           <li><a href="/surveys">Surveys</a></li>
@@ -64,24 +62,6 @@
       </div>
     </section>
 
-    <!-- Mission Section -->
-    <section class="home-mission-section">
-      <div class="home-mission-content">
-        <h2 class="home-mission-heading">Our Mission</h2>
-        <p class="home-mission-text">
-          Ella Rises is dedicated to breaking down barriers and creating
-          pathways to success for young women from all backgrounds. Through
-          comprehensive programs in education, cultural arts, and personal
-          growth, we help women realize their full potential.
-        </p>
-        <p class="home-mission-text">
-          We believe that when women thrive, entire communities flourish. Every
-          donation, volunteer hour, and word of encouragement contributes to
-          building a more equitable and empowered future for all women.
-        </p>
-      </div>
-    </section>
-
     <section class="container mt-4" style="text-align: center">
       <video
         src="https://video.wixstatic.com/video/e5f869_f075e19ca2744354bb20a65881dce28f/1080p/mp4/file.mp4"
@@ -100,8 +80,58 @@
         <p>Your browser does not support the video tag. Please visit our <a href="/about">About page</a> to learn more about Ella Rises.</p>
       </video>
     </section>
+
+    <!-- Mission Section -->
+    <section class="home-mission-section">
+      <div class="home-mission-content">
+        <h2 class="home-mission-heading">Our Mission</h2>
+        <p class="home-mission-text">
+          Ella Rises is dedicated to breaking down barriers and creating
+          pathways to success for young women from all backgrounds. Through
+          comprehensive programs in education, cultural arts, and personal
+          growth, we help women realize their full potential.
+        </p>
+        <p class="home-mission-text">
+          We believe that when women thrive, entire communities flourish. Every
+          donation, volunteer hour, and word of encouragement contributes to
+          building a more equitable and empowered future for all women.
+        </p>
+      </div>
+    </section>
+
+    <!-- A message from our Founder Section -->
+    <section>
+      <div style="margin: 2rem auto; max-width: 900px; text-align: left;">
+                <h2 class="home-mission-heading">A Message from Our Founder</h2>
+                <p><strong>Rise With Ella: Empowering Futures Together</strong></p>
+                <p>We believe in the power of community and the brilliance of our youth.</p>
+                <p><strong>Why We&rsquo;re Fundraising</strong><br>
+                Your generous contribution will impact these programs and experiences:</p>
+                <ul style="margin-left: 1.2rem; list-style: disc;">
+                    <li>Ella Rises Youth Summits: day camps focused on the Ella Rises Experience* across the state of Utah.</li>
+                    <li>Educational tours to local universities, colleges, and businesses.</li>
+                    <li>STEM, education, and our arts programs like the Ella Rises Mariachi band and Ballet Folklorico.</li>
+                </ul>
+                <p>*The Ella Rises Experience is a joyful blend of art, STEM, and educational exploration — designed to build confidence in each girl's divine worth and purpose.</p>
+                <p><strong>Here&rsquo;s How You Can Help Today</strong></p>
+                <ul style="margin-left: 1.2rem; list-style: disc;">
+                    <li>Donate — Make a one-time or monthly gift.</li>
+                    <li>Share — Post our campaign on your social platforms.</li>
+                    <li>Join — Become a mentor, volunteer, or community partner.</li>
+                </ul>
+                <p>With your support, Ella Rises.</p>
+                <p>With gratitude,<br>
+                Nadia Cates, Founder of Ella Rises</p>
+            </div>
+
+    </section>
+    
     </main>
 
+        <div style="margin-top: 1.5rem;">
+                <a class="btn btn-primary" href="/donate_now">Donate Now</a>
+        </div>
+    
     <!--Footer-->
 <footer>
   <p>&copy; 2025 Ella Rises. All Rights Reserved.</p>

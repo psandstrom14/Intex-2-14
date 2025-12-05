@@ -735,11 +735,11 @@ app.get("/profile/:id", async (req, res) => {
       )
       .orderBy("milestone_date", "desc");
 
-    // Get donations sorted by most recent first (only for this participant)
+    // Get donations sorted by most recent first, nulls last (only for this participant)
     const donations = await knex("donations")
       .where("user_id", participantId)
       .select("donation_id", "donation_date", "donation_amount")
-      .orderBy("donation_date", "desc");
+      .orderByRaw("donation_date DESC NULLS LAST");
 
     // Convert donation amounts to numbers
     donations.forEach((donation) => {
@@ -2232,8 +2232,8 @@ app.get("/donations", requireAdmin, async (req, res) => {
         query.orderBy(`d.${sortColumn}`, sortOrder);
       }
     } else {
-      // Default sort by donation_date descending
-      query.orderBy("d.donation_date", "desc");
+    // Default sort by donation_date descending, nulls last
+    query.orderByRaw("d.donation_date DESC NULLS LAST");
     }
 
     // Get distinct years from database for filter options

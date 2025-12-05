@@ -1671,6 +1671,38 @@ footer p {
   margin-bottom: 0;
 }
 
+/* About page call-to-action */
+.about-cta {
+  max-width: 900px;
+  margin: 3rem auto 4rem;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #f7fbff 0%, #eef5ff 50%, #fdf7f3 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(34, 51, 84, 0.08);
+}
+
+.about-cta-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--charcoal);
+}
+
+.about-cta-text {
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+  color: var(--text-medium);
+  line-height: 1.7;
+}
+
+.about-cta-button {
+  padding: 0.9rem 2.4rem;
+  font-size: 1.05rem;
+  border-radius: 999px;
+}
+
 /* Thank You Section */
 .home-thank-you-section {
   background-color: #fff;

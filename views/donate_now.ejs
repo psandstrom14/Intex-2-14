@@ -14,48 +14,45 @@
     <!-- Skip Navigation Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <div class="logo">
-                <a href="/"><img src="/images/logo.png" alt="Ella Rises Logo"> ELLA RISES</a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/about">About</a></li>
-                <li><a href="/performance">Performance</a></li>
-                <li><a href="/calendar">Calendar</a></li>
-                <li><a href="/donate_now" class="selected-nav">Donate Now</a></li>
+ <nav>
+      <div class="nav-container">
+          <div class="logo">
+              <a href="/"><img src="/images/logo.png" alt="Ella Rises Logo"> ELLA RISES</a>
+          </div>
+          <ul class="nav-links">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about">About</a></li>
+              <li><a href="/calendar">Calendar</a></li>
+              <li><a href="/donate_now">Donate Now</a></li>
 
-                <% if (isLoggedIn && userId) { %>
-                    <li><a href="/profile/<%= userId %>">Profile</a></li>
-                <% } %>
+              <% if (isLoggedIn && userId) { %>
+                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
+              <% } %>
 
-                <% if (role === "admin") { %>
-                    <li class="dropdown">
-                        <span class="dropdown-toggle">
-                            <a href="#">Pages ▾</a>
-                        </span>
-                        <ul class="dropdown-menu">
-                            <li><a href="/users">Users</li>
-                            <li><a href="/participants">Participants</a></li>
-                            <li><a href="/events">Events</a></li>
-                            <li><a href="/event_registrations">Event Registrations</a></li>
-                            <li><a href="/surveys">Surveys</a></li>
-                            <li><a href="/milestones">Milestones</a></li>
-                            <li><a href="/donations">Donations</a></li>
-                        </ul>
-                    </li>
-                <% } %>
+              <% if (role === "admin") { %>
+                  <li class="dropdown">
+                      <span class="dropdown-toggle">
+                          <a href="#" >Records ▾</a>
+                      </span>
+                      <ul class="dropdown-menu">
+                          <li><a href="/users">Users</a></li>
+                          <li><a href="/events">Events</a></li>
+                          <li><a href="/event_registrations">Event Registrations</a></li>
+                          <li><a href="/surveys">Surveys</a></li>
+                          <li><a href="/milestones">Milestones</a></li>
+                          <li><a href="/donations">Donations</a></li>
+                      </ul>
+                  </li>
+              <% } %>
 
-                <% if (isLoggedIn) { %>
-                    <li><a href="/logout" class="login-btn">Logout</a></li>
-                <% } else { %>
-                    <li><a href="/login" class="login-btn">Login</a></li>
-                <% } %>
-            </ul>
-        </div>
-    </nav>
+              <% if (isLoggedIn) { %>
+                  <li><a href="/logout" class="login-btn">Logout</a></li>
+              <% } else { %>
+                  <li><a href="/login" class="login-btn">Login</a></li>
+              <% } %>
+          </ul>
+      </div>
+  </nav>
 
     <!-- Hero Section -->
     <main id="main-content">
