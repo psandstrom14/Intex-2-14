@@ -127,10 +127,35 @@
                         </div>
                     </div>
 
-                    <!-- Advanced Filters (City, School, Interest, Donations) -->
+                    <!-- Advanced Filters (Role, City, Interest, Donations) -->
                     <div id="filterSection" class="advanced-filter-section is-hidden">
                         <h3 class="filter-options-title">Filter Options</h3>
                         <div class="filter-cards-grid">
+                            <!-- Role Filter -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="filter-card-title">User Role</h4>
+                                </div>
+                                <div class="card-body">
+                                    <%
+                                        const roleFilters = filters.role || ['all'];
+                                        const isRoleAll = roleFilters.includes('all');
+                                    %>
+                                    <label class="filter-checkbox-label">
+                                        <input type="checkbox" name="role" value="all" class="role-checkbox" <%= isRoleAll ? 'checked' : '' %>> All
+                                    </label>
+                                    <label class="filter-checkbox-label">
+                                        <input type="checkbox" name="role" value="admin" class="role-checkbox" <%= roleFilters.includes('admin') ? 'checked' : '' %>> Admin
+                                    </label>
+                                    <label class="filter-checkbox-label">
+                                        <input type="checkbox" name="role" value="participant" class="role-checkbox" <%= roleFilters.includes('participant') ? 'checked' : '' %>> Participant
+                                    </label>
+                                    <label class="filter-checkbox-label">
+                                        <input type="checkbox" name="role" value="donor" class="role-checkbox" <%= roleFilters.includes('donor') ? 'checked' : '' %>> Donor
+                                    </label>
+                                </div>
+                            </div>
+
                             <!-- City Filter -->
                             <div class="card">
                                 <div class="card-header">
@@ -197,58 +222,6 @@
                                     </label>
                                     <label class="filter-checkbox-label">
                                         <input type="checkbox" name="city" value="West Valley City" class="city-checkbox" <%= cityFilters.includes('West Valley City') ? 'checked' : '' %>> West Valley City
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- School/Employer Filter -->
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4 class="filter-card-title">School/Employer</h4>
-                                </div>
-                                <div class="card-body filter-card-scroll">
-                                    <%
-                                        const schoolFilters = filters.school || ['all'];
-                                        const isSchoolAll = schoolFilters.includes('all');
-                                    %>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="all" class="school-checkbox" <%= isSchoolAll ? 'checked' : '' %>> All
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Art Studio" class="school-checkbox" <%= schoolFilters.includes('Art Studio') ? 'checked' : '' %>> Art Studio
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="BYU" class="school-checkbox" <%= schoolFilters.includes('BYU') ? 'checked' : '' %>> BYU
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Cafe Rio" class="school-checkbox" <%= schoolFilters.includes('Cafe Rio') ? 'checked' : '' %>> Cafe Rio
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Community Center" class="school-checkbox" <%= schoolFilters.includes('Community Center') ? 'checked' : '' %>> Community Center
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="East Ridge Middle" class="school-checkbox" <%= schoolFilters.includes('East Ridge Middle') ? 'checked' : '' %>> East Ridge Middle
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Ella Rises" class="school-checkbox" <%= schoolFilters.includes('Ella Rises') ? 'checked' : '' %>> Ella Rises
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Local Library" class="school-checkbox" <%= schoolFilters.includes('Local Library') ? 'checked' : '' %>> Local Library
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Mountain View High" class="school-checkbox" <%= schoolFilters.includes('Mountain View High') ? 'checked' : '' %>> Mountain View High
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="North Summit High" class="school-checkbox" <%= schoolFilters.includes('North Summit High') ? 'checked' : '' %>> North Summit High
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Retail Store" class="school-checkbox" <%= schoolFilters.includes('Retail Store') ? 'checked' : '' %>> Retail Store
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="UVU" class="school-checkbox" <%= schoolFilters.includes('UVU') ? 'checked' : '' %>> UVU
-                                    </label>
-                                    <label class="filter-checkbox-label">
-                                        <input type="checkbox" name="school" value="Startup Lab" class="school-checkbox" <%= schoolFilters.includes('Startup Lab') ? 'checked' : '' %>> Startup Lab
                                     </label>
                                 </div>
                             </div>
@@ -615,7 +588,7 @@
             const buttonText = document.getElementById('filterButtonText');
             const filtersVisible = sessionStorage.getItem('filtersVisible_participants');
 
-            const hasActiveFilters = "<%= ((filters.city && !filters.city.includes('all')) || (filters.school && !filters.school.includes('all')) || (filters.interest && !filters.interest.includes('all')) || (filters.donations && !filters.donations.includes('all'))) ? 'true' : 'false' %>";
+            const hasActiveFilters = "<%= ((filters.role && !filters.role.includes('all')) || (filters.city && !filters.city.includes('all')) || (filters.interest && !filters.interest.includes('all')) || (filters.donations && !filters.donations.includes('all'))) ? 'true' : 'false' %>";
 
             if (filtersVisible === 'true' || (filtersVisible === null && hasActiveFilters === 'true')) {
                 filterSection.style.display = 'block';
@@ -675,18 +648,18 @@
             });
         });
 
-        // School
-        const schoolCheckboxes = document.querySelectorAll('.school-checkbox');
-        const schoolAllCheckbox = document.querySelector('.school-checkbox[value="all"]');
-        schoolCheckboxes.forEach(checkbox => {
+        // Role
+        const roleCheckboxes = document.querySelectorAll('.role-checkbox');
+        const roleAllCheckbox = document.querySelector('.role-checkbox[value="all"]');
+        roleCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 if (this.value === 'all' && this.checked) {
-                    schoolCheckboxes.forEach(cb => { if (cb.value !== 'all') cb.checked = false; });
+                    roleCheckboxes.forEach(cb => { if (cb.value !== 'all') cb.checked = false; });
                 } else if (this.value !== 'all' && this.checked) {
-                    schoolAllCheckbox.checked = false;
+                    roleAllCheckbox.checked = false;
                 } else if (this.value !== 'all' && !this.checked) {
-                    const anyChecked = Array.from(schoolCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
-                    if (!anyChecked) schoolAllCheckbox.checked = true;
+                    const anyChecked = Array.from(roleCheckboxes).some(cb => cb.value !== 'all' && cb.checked);
+                    if (!anyChecked) roleAllCheckbox.checked = true;
                 }
             });
         });

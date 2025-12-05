@@ -1176,7 +1176,7 @@ app.get("/users", requireAdmin, async (req, res) => {
       searchColumn,
       searchValue,
       city,
-      school,
+      role,
       interest,
       donations,
       sortColumn,
@@ -1188,9 +1188,6 @@ app.get("/users", requireAdmin, async (req, res) => {
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
     let query = knex("users");
-
-    // Filter by role - only show participants
-    query.where("participant_role", "participant");
 
     // Case-insensitive search
     if (searchValue && searchColumn) {
@@ -1227,16 +1224,16 @@ app.get("/users", requireAdmin, async (req, res) => {
       }
     }
 
+    // Role filter
+    const roleArr = paramToArray(role);
+    if (!roleArr.includes("all")) {
+      query.whereIn("participant_role", roleArr);
+    }
+
     // City filter
     const cityArr = paramToArray(city);
     if (!cityArr.includes("all")) {
       query.whereIn("participant_city", cityArr);
-    }
-
-    // School filter
-    const schoolArr = paramToArray(school);
-    if (!schoolArr.includes("all")) {
-      query.whereIn("participant_school_or_employer", schoolArr);
     }
 
     // Interest filter
@@ -1268,7 +1265,7 @@ app.get("/users", requireAdmin, async (req, res) => {
       searchColumn,
       searchValue: searchValue || "",
       city: cityArr,
-      school: schoolArr,
+      role: roleArr,
       interest: interestArr,
       donations: donationsArr,
       sortColumn: sortColumn || "",
@@ -1294,7 +1291,7 @@ app.get("/users", requireAdmin, async (req, res) => {
         searchColumn: "participant_first_name",
         searchValue: "",
         city: ["all"],
-        school: ["all"],
+        role: ["all"],
         interest: ["all"],
         donations: ["all"],
         sortColumn: "",
