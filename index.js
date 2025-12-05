@@ -2565,7 +2565,7 @@ app.get(
 // Route that adds the form inputs to the databases
 app.post("/add/:table", requireAdmin, async (req, res) => {
   let table_name = req.params.table;
-  const newData = req.body;
+  let newData = req.body;
 
   // Backward compatibility: map old "participants" to "users"
   if (table_name === "participants") {
@@ -2573,6 +2573,39 @@ app.post("/add/:table", requireAdmin, async (req, res) => {
   }
 
   try {
+    // Special handling for event_registrations - filter out invalid columns
+    if (table_name === "event_registrations") {
+      const { event_name, registration_attend_status, ...registrationFields } =
+        newData;
+
+      // Map registration_attend_status to registration_attended_flag if provided
+      if (registration_attend_status !== undefined) {
+        registrationFields.registration_attended_flag =
+          registration_attend_status === "1" || registration_attend_status === 1
+            ? 1
+            : 0;
+      }
+
+      // Only insert valid event_registrations columns
+      const validColumns = [
+        "user_id",
+        "event_id",
+        "registration_status",
+        "registration_attended_flag",
+        "registration_created_at_date",
+        "registration_created_at_time",
+        "registration_check_in_date",
+        "registration_check_in_time",
+      ];
+
+      newData = {};
+      for (const key of validColumns) {
+        if (registrationFields[key] !== undefined) {
+          newData[key] = registrationFields[key];
+        }
+      }
+    }
+
     await knex(table_name).insert(newData);
 
     // Set flash message in session
