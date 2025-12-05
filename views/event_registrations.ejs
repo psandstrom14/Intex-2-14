@@ -329,8 +329,8 @@
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                                     <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= er.event_registration_id %>" data-name="<%= er.participant_first_name %> <%= er.participant_last_name %> - <%= er.event_name %>" aria-label="Select registration for <%= er.participant_first_name %> <%= er.participant_last_name %> - <%= er.event_name %>"></td>
                                     <% } %>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= er.participant_first_name %></td>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= er.participant_last_name %></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= er.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= er.participant_first_name %></a></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= er.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= er.participant_last_name %></a></td>
                                     <td style="max-width: none; min-width: 180px; padding: 0.8rem 0.6rem; text-align: center;"><%= er.event_name %></td>
                                     <td style="max-width: none; min-width: 90px; padding: 0.8rem 0.6rem;"><%= formattedEventDate %></td>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= er.registration_status %></td>

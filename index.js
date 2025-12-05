@@ -1756,6 +1756,7 @@ app.get("/surveys", requireAdmin, async (req, res) => {
       .select(
         "s.survey_id",
         "s.event_registration_id",
+        "p.user_id",
         "p.participant_first_name",
         "p.participant_last_name",
         "e.event_name",

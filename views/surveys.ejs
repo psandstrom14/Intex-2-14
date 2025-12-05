@@ -414,8 +414,8 @@
                                             aria-label="Select survey for <%= s.participant_first_name %> <%= s.participant_last_name %> - <%= s.event_name %>">
                                     </td>
                                     <% } %>
-                                    <td><%= s.participant_first_name %></td>
-                                    <td><%= s.participant_last_name %></td>
+                                    <td><a href="/profile/<%= s.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= s.participant_first_name %></a></td>
+                                    <td><a href="/profile/<%= s.user_id%>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= s.participant_last_name %></a></td>
                                     <td><%= s.event_name %></td>
                                     <td><%= formattedEventDate %></td>
                                     <td><%= s.survey_satisfaction_score %></td>

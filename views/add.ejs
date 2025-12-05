@@ -63,7 +63,17 @@
     <!-- Hero Section -->
     <section class="hero hero-compact">
         <div class="hero-content">
-            <h1>Add New <%= table_name.charAt(0).toUpperCase() + table_name.slice(1, -1) %></h1>
+            <% 
+                let displayTitle;
+                if (table_name === "survey_results") {
+                    displayTitle = "Survey Response";
+                } else if (table_name === "event_registrations") {
+                    displayTitle = "Event Registration";
+                } else {
+                    displayTitle = table_name.charAt(0).toUpperCase() + table_name.slice(1, -1);
+                }
+            %>
+            <h1>Add New <%= displayTitle %></h1>
             <p class="hero-subtitle">Fill in the details below to create a new record</p>
         </div>
     </section>
