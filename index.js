@@ -80,7 +80,6 @@ app.use((req, res, next) => {
     req.path === "/login" ||
     req.path === "/logout" ||
     req.path === "/signup" ||
-    req.path === "/donate_now" ||
     req.path === "/set-language"
   ) {
     //continue with the request path
@@ -1095,7 +1094,7 @@ app.get("/profile-edit/:table/:id", async (req, res) => {
 app.post("/profile-edit/:table/:id", async (req, res) => {
   let table_name = req.params.table;
   const id = req.params.id;
-  const updatedData = req.body;
+  let updatedData = req.body;
 
   // Backward compatibility: map old "participants" to "users"
   if (table_name === "participants") {
@@ -1115,6 +1114,48 @@ app.post("/profile-edit/:table/:id", async (req, res) => {
   const primaryKey = primaryKeyByTable[table_name];
 
   try {
+    // Special handling for survey_results - filter out invalid columns and handle event_registration_id
+    if (table_name === "survey_results") {
+      const { user_id, event_id, event_name, ...surveyFields } = updatedData;
+
+      // If event_id and user_id are provided, find the corresponding event_registration_id
+      if (event_id && user_id) {
+        const registration = await knex("event_registrations")
+          .where({ event_id: parseInt(event_id), user_id: parseInt(user_id) })
+          .first();
+
+        if (registration) {
+          surveyFields.event_registration_id =
+            registration.event_registration_id;
+        } else {
+          throw new Error(
+            "No event registration found for the specified user and event"
+          );
+        }
+      }
+
+      // Only update valid survey_results columns
+      const validColumns = [
+        "event_registration_id",
+        "survey_satisfaction_score",
+        "survey_usefulness_score",
+        "survey_instructor_score",
+        "survey_recommendation_score",
+        "survey_overall_score",
+        "survey_nps_bucket",
+        "survey_comments",
+        "submission_date",
+        "submission_time",
+      ];
+
+      updatedData = {};
+      for (const key of validColumns) {
+        if (surveyFields[key] !== undefined) {
+          updatedData[key] = surveyFields[key];
+        }
+      }
+    }
+
     await knex(table_name).where(primaryKey, id).update(updatedData);
 
     req.session.flashMessage = "Updated Successfully!";
@@ -1744,7 +1785,7 @@ app.get("/surveys", requireAdmin, async (req, res) => {
     sortOrder = sortOrder === "desc" ? "desc" : "asc";
 
     // base query with joins
-    // ðŸ” if your join table has a different name, update "event_registrations" + its cols
+    // ðŸ" if your join table has a different name, update "event_registrations" + its cols
     let query = knex("survey_results as s")
       .join(
         "event_registrations as er",
@@ -2232,8 +2273,8 @@ app.get("/donations", requireAdmin, async (req, res) => {
         query.orderBy(`d.${sortColumn}`, sortOrder);
       }
     } else {
-    // Default sort by donation_date descending, nulls last
-    query.orderByRaw("d.donation_date DESC NULLS LAST");
+      // Default sort by donation_date descending, nulls last
+      query.orderByRaw("d.donation_date DESC NULLS LAST");
     }
 
     // Get distinct years from database for filter options
