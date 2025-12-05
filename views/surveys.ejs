@@ -773,62 +773,64 @@
         setupAllCheckboxGroup('.nps-checkbox[value="all"]', '.nps-checkbox');
 
         // Bulk selection
-        const selectAllCheckbox = document.getElementById('selectAll');
-        const bulkActionsBar = document.getElementById('bulkActionsBar');
-        const selectedCountSpan = document.getElementById('selectedCount');
-        const editButton = document.getElementById('editSelected');
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const bulkActionsBar = document.getElementById('bulkActionsBar');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const editButton = document.getElementById('editSelected');
 
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
+            function updateBulkActions() {
+                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                const count = checkedBoxes.length;
+
+                if (count > 0 && bulkActionsBar) {
+                    bulkActionsBar.style.display = 'block';
+                    if (selectedCountSpan) selectedCountSpan.textContent = count + ' selected';
+                    if (editButton) editButton.style.display = count === 1 ? 'inline-block' : 'none';
+                } else {
+                    if (bulkActionsBar) bulkActionsBar.style.display = 'none';
+                    if (editButton) editButton.style.display = 'none';
+                }
+
                 const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-                rowCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
-                updateBulkActions();
-            });
-        }
-
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('row-checkbox')) {
-                updateBulkActions();
-            }
-        });
-
-        function updateBulkActions() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const count = checkedBoxes.length;
-
-            if (count > 0 && bulkActionsBar) {
-                bulkActionsBar.style.display = 'block';
-                if (selectedCountSpan) selectedCountSpan.textContent = count + ' selected';
-                if (editButton) editButton.style.display = count === 1 ? 'inline-block' : 'none';
-            } else {
-                if (bulkActionsBar) bulkActionsBar.style.display = 'none';
-                if (editButton) editButton.style.display = 'none';
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
+                }
             }
 
-            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
             if (selectAllCheckbox) {
-                selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
+                selectAllCheckbox.addEventListener('change', function() {
+                    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                    rowCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
+                    updateBulkActions();
+                });
             }
-        }
 
-        if (document.getElementById('clearSelection')) {
-            document.getElementById('clearSelection').addEventListener('click', function() {
-                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-                if (selectAllCheckbox) selectAllCheckbox.checked = false;
-                updateBulkActions();
-            });
-        }
-
-        // Edit Selected (single)
-        if (editButton) {
-            editButton.addEventListener('click', function() {
-                const checkedBox = document.querySelector('.row-checkbox:checked');
-                if (checkedBox) {
-                    const surveyId = checkedBox.value;
-                    window.location.href = '/edit/survey_results/' + surveyId;
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('row-checkbox')) {
+                    updateBulkActions();
                 }
             });
-        }
+
+            if (document.getElementById('clearSelection')) {
+                document.getElementById('clearSelection').addEventListener('click', function() {
+                    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+                    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                    updateBulkActions();
+                });
+            }
+
+            // Edit Selected (single)
+            if (editButton) {
+                editButton.addEventListener('click', function() {
+                    const checkedBox = document.querySelector('.row-checkbox:checked');
+                    if (checkedBox) {
+                        const surveyId = checkedBox.value;
+                        window.location.href = '/edit/survey_results/' + surveyId;
+                    }
+                });
+            }
+        });
 
         // Delete Selected (bulk)
         if (document.getElementById('deleteSelected')) {
