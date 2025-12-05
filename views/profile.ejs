@@ -93,10 +93,15 @@
         <button class="tab-btn" data-tab="profile">
           Personal Information
         </button>
+        <% if (isLoggedIn && participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
         <button class="tab-btn" data-tab="milestones">Milestones</button>
+        <% } %>
         <button class="tab-btn" data-tab="donations">Donations</button>
+        <button class="tab-btn" data-tab="chatbot">Chatbot</button>
+        <% if (isLoggedIn && participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
         <button class="tab-btn" data-tab="events">Event Registrations</button>
         <button class="tab-btn" data-tab="surveys">Survey Results</button>
+        <% } %>
       </div>
 
       <!-- Quick View Tab (Role-Based Content) -->
@@ -615,79 +620,81 @@
         </div>
       </div>
 
-      <!-- Milestones Tab -->
-      <div id="milestones-tab" class="tab-content">
-        <div class="table-container">
-          <!--Table Header-->
-          <div class="table-header">
-            <h2 class="table-title">Milestones</h2>
-            <div class="table-actions">
-              <button onclick="addMilestone()" class="btn btn-add">Add Milestone</button>
-              <button
-                id="milestones-edit-btn"
-                class="btn btn-secondary"
-                style="display: none"
-              >
-                Edit Selected
-              </button>
-              <button
-                id="milestones-delete-btn"
-                class="btn btn-danger"
-                style="display: none"
-              >
-                Delete Selected
-              </button>
+      <% if (isLoggedIn && participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
+        <!-- Milestones Tab -->
+        <div id="milestones-tab" class="tab-content">
+          <div class="table-container">
+            <!--Table Header-->
+            <div class="table-header">
+              <h2 class="table-title">Milestones</h2>
+              <div class="table-actions">
+                <button onclick="addMilestone()" class="btn btn-add">Add Milestone</button>
+                <button
+                  id="milestones-edit-btn"
+                  class="btn btn-secondary"
+                  style="display: none"
+                >
+                  Edit Selected
+                </button>
+                <button
+                  id="milestones-delete-btn"
+                  class="btn btn-danger"
+                  style="display: none"
+                >
+                  Delete Selected
+                </button>
+              </div>
             </div>
+            <!--Table-->
+            <% if (milestones && milestones.length > 0) { %>
+            <div>
+              <table>
+                <!--Table Column Names-->
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="milestones-select-all" /></th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <!--Table Rows-->
+                <tbody>
+                  <% milestones.forEach(function(milestone) { %>
+                  <tr>
+                    <td>
+                      <input
+                        type="checkbox"
+                        class="row-checkbox milestones-checkbox"
+                        data-id="<%= milestone.milestone_id %>"
+                      />
+                    </td>
+                    <td><%= milestone.milestone_title %></td>
+                    <td>
+                      <span class="badge badge-primary"
+                        ><%= milestone.milestone_category || 'General' %></span
+                      >
+                    </td>
+                    <td>
+                      <%= milestone.milestone_date ? new
+                      Date(milestone.milestone_date).toLocaleDateString() : 'N/A'
+                      %>
+                    </td>
+                  </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+            <!--If no rows: -->
+            <% } else { %>
+            <div class="empty-state">
+              <h2>No Milestones Yet</h2>
+              <p>Start tracking achievements by adding a milestone.</p>
+            </div>
+            <% } %>
           </div>
-          <!--Table-->
-          <% if (milestones && milestones.length > 0) { %>
-          <div>
-            <table>
-              <!--Table Column Names-->
-              <thead>
-                <tr>
-                  <th><input type="checkbox" id="milestones-select-all" /></th>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <!--Table Rows-->
-              <tbody>
-                <% milestones.forEach(function(milestone) { %>
-                <tr>
-                  <td>
-                    <input
-                      type="checkbox"
-                      class="row-checkbox milestones-checkbox"
-                      data-id="<%= milestone.milestone_id %>"
-                    />
-                  </td>
-                  <td><%= milestone.milestone_title %></td>
-                  <td>
-                    <span class="badge badge-primary"
-                      ><%= milestone.milestone_category || 'General' %></span
-                    >
-                  </td>
-                  <td>
-                    <%= milestone.milestone_date ? new
-                    Date(milestone.milestone_date).toLocaleDateString() : 'N/A'
-                    %>
-                  </td>
-                </tr>
-                <% }); %>
-              </tbody>
-            </table>
-          </div>
-          <!--If no rows: -->
-          <% } else { %>
-          <div class="empty-state">
-            <h2>No Milestones Yet</h2>
-            <p>Start tracking achievements by adding a milestone.</p>
-          </div>
-          <% } %>
         </div>
-      </div>
+      <% } %>
 
       <!-- Donations Tab -->
       <div id="donations-tab" class="tab-content">
@@ -737,11 +744,31 @@
         </div>
       </div>
 
-      <!-- Event Registrations Tab -->
-      <div id="events-tab" class="tab-content">
-        <div class="table-container">
-          <!--Table Header-->
-          <div class="table-header">
+  <!-- Chatbot Tab -->
+    <div id="chatbot-tab" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">
+          <h2 class="table-title">Chatbot</h2>
+        </div>
+        <div class="table-body" style="padding: 1.5rem;">
+          <p style="margin-bottom: 1rem;">Need help? Start a conversation with our virtual assistant.</p>
+          <!-- Replace this iframe with your real chatbot embed later -->
+          <iframe
+            src="/chatbot"
+            title="Chatbot"
+            style="width: 100%; min-height: 500px; border: 1px solid var(--border-color); border-radius: 8px; background: #fff;"
+            allow="clipboard-write; microphone"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+      <% if (isLoggedIn && participant.participant_role && participant.participant_role.toLowerCase() === 'participant') { %>
+        <!-- Event Registrations Tab -->
+        <div id="events-tab" class="tab-content">
+          <div class="table-container">
+            <!--Table Header-->
+            <div class="table-header">
             <h2 class="table-title">Event Registrations</h2>
             <div class="table-actions">
               <button onclick="registerForEvent()" class="btn btn-add">
@@ -910,6 +937,7 @@
         </div>
       </div>
     </div>
+    <% } %>
 
     <!-- Delete Account Confirmation Modal -->
     <div id="deleteAccountModal" class="modal">
