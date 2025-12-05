@@ -773,124 +773,122 @@
         setupAllCheckboxGroup('.nps-checkbox[value="all"]', '.nps-checkbox');
 
         // Bulk selection
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAllCheckbox = document.getElementById('selectAll');
-            const bulkActionsBar = document.getElementById('bulkActionsBar');
-            const selectedCountSpan = document.getElementById('selectedCount');
-            const editButton = document.getElementById('editSelected');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const bulkActionsBar = document.getElementById('bulkActionsBar');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        const editButton = document.getElementById('editSelected');
 
-            function updateBulkActions() {
-                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-                const count = checkedBoxes.length;
-
-                if (count > 0 && bulkActionsBar) {
-                    bulkActionsBar.style.display = 'block';
-                    if (selectedCountSpan) selectedCountSpan.textContent = count + ' selected';
-                    if (editButton) editButton.style.display = count === 1 ? 'inline-block' : 'none';
-                } else {
-                    if (bulkActionsBar) bulkActionsBar.style.display = 'none';
-                    if (editButton) editButton.style.display = 'none';
-                }
-
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
                 const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-                if (selectAllCheckbox) {
-                    selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
-                }
-            }
-
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function() {
-                    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-                    rowCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
-                    updateBulkActions();
-                });
-            }
-
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('row-checkbox')) {
-                    updateBulkActions();
-                }
+                rowCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
+                updateBulkActions();
             });
+        }
 
-            if (document.getElementById('clearSelection')) {
-                document.getElementById('clearSelection').addEventListener('click', function() {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-                    if (selectAllCheckbox) selectAllCheckbox.checked = false;
-                    updateBulkActions();
-                });
-            }
-
-            // Edit Selected (single)
-            if (editButton) {
-                editButton.addEventListener('click', function() {
-                    const checkedBox = document.querySelector('.row-checkbox:checked');
-                    if (checkedBox) {
-                        const surveyId = checkedBox.value;
-                        window.location.href = '/edit/survey_results/' + surveyId;
-                    }
-                });
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-checkbox')) {
+                updateBulkActions();
             }
         });
+
+        function updateBulkActions() {
+            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+            const count = checkedBoxes.length;
+
+            if (count > 0 && bulkActionsBar) {
+                bulkActionsBar.style.display = 'block';
+                if (selectedCountSpan) selectedCountSpan.textContent = count + ' selected';
+                if (editButton) editButton.style.display = count === 1 ? 'inline-block' : 'none';
+            } else {
+                if (bulkActionsBar) bulkActionsBar.style.display = 'none';
+                if (editButton) editButton.style.display = 'none';
+            }
+
+            const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = count === rowCheckboxes.length && count > 0;
+            }
+        }
+
+        if (document.getElementById('clearSelection')) {
+            document.getElementById('clearSelection').addEventListener('click', function() {
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+                if (selectAllCheckbox) selectAllCheckbox.checked = false;
+                updateBulkActions();
+            });
+        }
+
+        // Edit Selected (single)
+        if (editButton) {
+            editButton.addEventListener('click', function() {
+                const checkedBox = document.querySelector('.row-checkbox:checked');
+                if (checkedBox) {
+                    const surveyId = checkedBox.value;
+                    window.location.href = '/edit/survey_results/' + surveyId;
+                }
+            });
+        }
 
         // Delete Selected (bulk)
         if (document.getElementById('deleteSelected')) {
             document.getElementById('deleteSelected').addEventListener('click', function() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const ids = Array.from(checkedBoxes).map(cb => cb.value);
-            const count = ids.length;
-            
-            if (count === 0) return;
+                const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                const count = ids.length;
+                
+                if (count === 0) return;
 
-            let confirmMessage;
-            let finalMessage;
+                let confirmMessage;
+                let finalMessage;
 
-            if (count === 1) {
-                const name = checkedBoxes[0].getAttribute('data-name');
-                confirmMessage = `Are you sure you want to delete the survey for ${name}?`;
-                finalMessage = `Survey for ${name} deleted`;
-            } else {
-                confirmMessage = `Are you sure you want to delete ${count} surveys?`;
-                finalMessage = `${count} surveys deleted`;
-            }
-            
-            showDeleteConfirmation(confirmMessage, async function() {
-                const table = 'survey_results'; // hardcoded per page
-
-                try {
-                    // Call /delete/:table/:id for each selected id
-                    const deleteUrl = '/delete/' + table + '/';
-                    const responses = await Promise.all(
-                        ids.map(id =>
-                            fetch(deleteUrl + id, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Accept': 'application/json'
-                                },
-                                body: JSON.stringify({}) // body not used by route, can be empty
-                            })
-                        )
-                    );
-
-                    const allOk = responses.every(r => r.ok);
-
-                    if (!allOk) {
-                        console.error('Some delete requests failed:', responses);
-                        alert('Some surveys could not be deleted. Please check the console for details.');
-                        return;
-                    }
-
-                    const message = encodeURIComponent(finalMessage);
-                    const messageType = 'success';
-
-                    window.location.href = '/surveys?message=' + message + '&messageType=' + messageType;
-
-                } catch (err) {
-                    console.error('Error deleting surveys:', err);
-                    alert('There was an error deleting surveys. Please try again.');
+                if (count === 1) {
+                    const name = checkedBoxes[0].getAttribute('data-name');
+                    confirmMessage = `Are you sure you want to delete the survey for ${name}?`;
+                    finalMessage = `Survey for ${name} deleted`;
+                } else {
+                    confirmMessage = `Are you sure you want to delete ${count} surveys?`;
+                    finalMessage = `${count} surveys deleted`;
                 }
+                
+                showDeleteConfirmation(confirmMessage, async function() {
+                    const table = 'survey_results'; // hardcoded per page
+
+                    try {
+                        // Call /delete/:table/:id for each selected id
+                        const deleteUrl = '/delete/' + table + '/';
+                        const responses = await Promise.all(
+                            ids.map(id =>
+                                fetch(deleteUrl + id, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json'
+                                    },
+                                    body: JSON.stringify({}) // body not used by route, can be empty
+                                })
+                            )
+                        );
+
+                        const allOk = responses.every(r => r.ok);
+
+                        if (!allOk) {
+                            console.error('Some delete requests failed:', responses);
+                            alert('Some surveys could not be deleted. Please check the console for details.');
+                            return;
+                        }
+
+                        const message = encodeURIComponent(finalMessage);
+                        const messageType = 'success';
+
+                        window.location.href = '/surveys?message=' + message + '&messageType=' + messageType;
+
+                    } catch (err) {
+                        console.error('Error deleting surveys:', err);
+                        alert('There was an error deleting surveys. Please try again.');
+                    }
+                });
             });
-        });
         }
 
         // Delete confirmation modal
