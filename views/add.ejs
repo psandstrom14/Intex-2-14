@@ -576,13 +576,17 @@
                         <div class="form-group">
                             <label class="form-label">Event Name <span class="required">*</span></label>
                             <select class="form-select" name="event_name" id="eventSelect" required>
-                                <% if (survey_prefill && survey_prefill.event_name) { %>
-                                    <option value="<%= survey_prefill.event_name %>"><%= survey_prefill.event_name %> (from your registration)</option>
-                                <% } %>
                                 <option value="">Select an Event</option>
                                 <% if (events && events.length > 0) { %>
                                     <% 
                                         const seenEventNames = new Set();
+                                        // Add prefill event name to the set if it exists to avoid duplicates
+                                        if (survey_prefill && survey_prefill.event_name) {
+                                            seenEventNames.add(survey_prefill.event_name);
+                                    %>
+                                            <option value="<%= survey_prefill.event_name %>"><%= survey_prefill.event_name %> (from your registration)</option>
+                                    <% 
+                                        }
                                         events.forEach(ev => {
                                             const eventName = ev.event_name;
                                             if (eventName && !seenEventNames.has(eventName)) {

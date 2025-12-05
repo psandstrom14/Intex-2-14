@@ -760,11 +760,20 @@
                             <label class="form-label">Event Name <span class="required">*</span></label>
                             <select class="form-select" name="event_name" id="eventSelect" required>
                                 <option value="">Select an Event</option>
-                                <% events.forEach(ev => { %>
-                                    <option value="<%= ev.event_name %>" <%= info.event_name === ev.event_name ? 'selected' : '' %>>
-                                        <%= ev.event_name %>
-                                    </option>
-                                <% }); %>
+                                <% 
+                                    const seenEventNames = new Set();
+                                    events.forEach(ev => {
+                                        const eventName = ev.event_name;
+                                        if (eventName && !seenEventNames.has(eventName)) {
+                                            seenEventNames.add(eventName);
+                                %>
+                                            <option value="<%= eventName %>" <%= info.event_name === eventName ? 'selected' : '' %>>
+                                                <%= eventName %>
+                                            </option>
+                                <% 
+                                        }
+                                    }); 
+                                %>
                             </select>
                         </div>
                         
