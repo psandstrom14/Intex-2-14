@@ -32,7 +32,7 @@
               <li><a href="/donate_now">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>"  class="selected-nav" >Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>

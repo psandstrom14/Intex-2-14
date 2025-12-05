@@ -23,10 +23,10 @@
               <li><a href="/">Home</a></li>
               <li><a href="/about">About</a></li>
               <li><a href="/calendar">Calendar</a></li>
-              <li><a href="/donate_now">Donate Now</a></li>
+              <li><a href="/donate_now"  class="selected-nav">Donate Now</a></li>
 
               <% if (isLoggedIn && userId) { %>
-                  <li><a href="/profile/<%= userId %>"  class="selected-nav">Profile</a></li>
+                  <li><a href="/profile/<%= userId %>">Profile</a></li>
               <% } %>
 
               <% if (role === "admin") { %>
