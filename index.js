@@ -2367,7 +2367,13 @@ app.get("/add/:table/:id", requireAdmin, async (req, res) => {
       .orderBy(["event_name", "event_date", "event_start_time"]);
   }
 
-  res.render("add", { table_name, events, event_types, pass_id });
+  res.render("add", {
+    table_name,
+    events,
+    event_types,
+    pass_id,
+    survey_prefill: null,
+  });
 });
 
 // Participant-facing route to add their own milestones
@@ -2389,7 +2395,7 @@ app.get("/profile-add/milestones/:userId", async (req, res) => {
   });
 });
 
-// Participant-facing route to add their own survey results for a specific registration
+// Participant-facing route to add their own survey results (requires registration)
 app.get("/profile-add/survey_results/:eventRegistrationId", async (req, res) => {
   const eventRegistrationId = parseInt(req.params.eventRegistrationId, 10);
   if (!Number.isInteger(eventRegistrationId)) {
@@ -2416,7 +2422,6 @@ app.get("/profile-add/survey_results/:eventRegistrationId", async (req, res) => 
 
   if (!requireSelfOrAdmin(req, res, registration.user_id)) return;
 
-  // Provide just the matching event to simplify the select options
   const events = [
     {
       event_id: registration.event_id,
@@ -2514,7 +2519,7 @@ app.post("/profile-add/milestones/:userId", async (req, res) => {
   }
 });
 
-// Participant-facing route to submit their own survey results
+// Participant-facing route to submit their own survey results (requires registration id)
 app.post("/profile-add/survey_results/:eventRegistrationId", async (req, res) => {
   const eventRegistrationId = parseInt(req.params.eventRegistrationId, 10);
   if (!Number.isInteger(eventRegistrationId)) {

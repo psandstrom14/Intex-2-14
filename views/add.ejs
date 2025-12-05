@@ -392,7 +392,7 @@
                         
                         <div class="form-group">
                             <label class="form-label">Event Date & Time <span class="required">*</span></label>
-                            <select class="form-select" name="event_id" id="eventInstanceSelect" required disabled>
+                            <select class="form-select" name="event_id" id="eventInstanceSelect" required <%= survey_prefill && survey_prefill.event_id ? "" : "disabled" %>>
                                 <% if (survey_prefill && survey_prefill.event_id) { %>
                                     <option value="<%= survey_prefill.event_id %>" selected>Use my registered event</option>
                                 <% } %>
@@ -568,7 +568,7 @@
                     <%} else {%>
                         <input type="hidden" name="user_id" value="<%= pass_id %>">
                     <%};%>
-                    <% if (survey_prefill && survey_prefill.event_registration_id) { %>
+                                <% if (survey_prefill && survey_prefill.event_registration_id) { %>
                         <input type="hidden" name="event_registration_id" value="<%= survey_prefill.event_registration_id %>">
                     <% } %>
 
@@ -580,7 +580,7 @@
                             <label class="form-label">Event Name <span class="required">*</span></label>
                             <select class="form-select" name="event_name" id="eventSelect" required>
                                 <% if (survey_prefill && survey_prefill.event_name) { %>
-                                    <option value="<%= survey_prefill.event_name %>" selected><%= survey_prefill.event_name %> (from your registration)</option>
+                                    <option value="<%= survey_prefill.event_name %>"><%= survey_prefill.event_name %> (from your registration)</option>
                                 <% } %>
                                 <option value="">Select an Event</option>
                                 <option value="Mentor Office Hours">Mentor Office Hours</option>
@@ -1063,7 +1063,7 @@
                     eventInstanceSelect.appendChild(defaultOpt);
 
                     matchingEvents.forEach(ev => {
-                        const opt = document.createElement("option");
+                        const opt = document.createElement('option');
                         opt.value = ev.event_id;
                         opt.textContent = formatEventOption(ev);
                         eventInstanceSelect.appendChild(opt);
@@ -1072,18 +1072,19 @@
                     eventInstanceSelect.disabled = false;
                 });
 
-                // Preselect event and instance when coming from profile pending survey link
+                // Preselect if we have a survey prefill event
                 if (surveyPrefill && surveyPrefill.event_name && surveyPrefill.event_id) {
                     eventSelectSurvey.value = surveyPrefill.event_name;
 
-                    eventInstanceSelect.innerHTML = "";
-                    const opt = document.createElement("option");
+                    eventInstanceSelect.innerHTML = '';
+                    const opt = document.createElement('option');
                     opt.value = surveyPrefill.event_id;
-                    opt.textContent = "Use my registered event";
+                    opt.textContent = 'Use my registered event';
                     opt.selected = true;
                     eventInstanceSelect.appendChild(opt);
                     eventInstanceSelect.disabled = false;
                 }
+
             }
         }
 
