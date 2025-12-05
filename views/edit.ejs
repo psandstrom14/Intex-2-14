@@ -1360,115 +1360,136 @@
 
         // ---------------- EVENT REGISTRATIONS PAGE JS ----------------
         if (currentTable === "event_registrations") {
-            const existingRegistration = <%- JSON.stringify(info || {}) %>;
-            const allEvents = <%- JSON.stringify(typeof events !== 'undefined' ? (events || []) : []) %>;
-            const eventSelect = document.getElementById("eventSelect");
-            const eventInstanceSelect = document.getElementById("eventInstanceSelect");
+            // Function to initialize registration form
+            function initializeRegistrationForm() {
+                const existingRegistration = <%- JSON.stringify(info || {}) %>;
+                const allEvents = <%- JSON.stringify(typeof events !== 'undefined' ? (events || []) : []) %>;
+                const eventSelect = document.getElementById("eventSelect");
+                const eventInstanceSelect = document.getElementById("eventInstanceSelect");
 
-            function formatTime(timeString) {
-                if (!timeString) return '';
-                if (timeString.includes('AM') || timeString.includes('PM')) return timeString;
-                const timeParts = timeString.toString().split(':');
-                let hours = parseInt(timeParts[0]);
-                const minutes = timeParts[1] || '00';
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12;
-                return `${hours}:${minutes} ${ampm}`;
-            }
-
-            function formatDate(dateString) {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                const year = date.getFullYear();
-                return `${month}/${day}/${year}`;
-            }
-
-            function formatEventOption(ev) {
-                let label = formatDate(ev.event_date);
-                if (ev.event_start_time && ev.event_end_time) {
-                    label += ` (${formatTime(ev.event_start_time)}–${formatTime(ev.event_end_time)})`;
-                } else if (ev.event_start_time) {
-                    label += ` (${formatTime(ev.event_start_time)})`;
-                }
-                return label;
-            }
-
-            function populateEventInstances(selectedName, preselectedId) {
-                eventInstanceSelect.innerHTML = "";
-                eventInstanceSelect.disabled = true;
-
-                if (!selectedName) {
-                    const opt = document.createElement("option");
-                    opt.value = "";
-                    opt.textContent = "Select an event above first";
-                    eventInstanceSelect.appendChild(opt);
-                    return;
+                function formatTime(timeString) {
+                    if (!timeString) return '';
+                    if (timeString.includes('AM') || timeString.includes('PM')) return timeString;
+                    const timeParts = timeString.toString().split(':');
+                    let hours = parseInt(timeParts[0]);
+                    const minutes = timeParts[1] || '00';
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    return `${hours}:${minutes} ${ampm}`;
                 }
 
-                const matchingEvents = allEvents.filter(ev => ev.event_name === selectedName);
-
-                if (matchingEvents.length === 0) {
-                    const opt = document.createElement("option");
-                    opt.value = "";
-                    opt.textContent = "No dates found for this event";
-                    eventInstanceSelect.appendChild(opt);
-                    return;
+                function formatDate(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${month}/${day}/${year}`;
                 }
 
-                const defaultOpt = document.createElement("option");
-                defaultOpt.value = "";
-                defaultOpt.textContent = "Select a Date/Time";
-                eventInstanceSelect.appendChild(defaultOpt);
-
-                matchingEvents.forEach(ev => {
-                    const opt = document.createElement("option");
-                    opt.value = ev.event_id;
-                    opt.textContent = formatEventOption(ev);
-                    if (preselectedId && String(preselectedId) === String(ev.event_id)) {
-                        opt.selected = true;
+                function formatEventOption(ev) {
+                    let label = formatDate(ev.event_date);
+                    if (ev.event_start_time && ev.event_end_time) {
+                        label += ` (${formatTime(ev.event_start_time)}–${formatTime(ev.event_end_time)})`;
+                    } else if (ev.event_start_time) {
+                        label += ` (${formatTime(ev.event_start_time)})`;
                     }
-                    eventInstanceSelect.appendChild(opt);
-                });
-
-                eventInstanceSelect.disabled = false;
-            }
-
-            if (eventSelect && eventInstanceSelect) {
-                // Pre-select existing event + instance on edit
-                if (existingRegistration.event_name) {
-                    eventSelect.value = existingRegistration.event_name;
-                    populateEventInstances(existingRegistration.event_name, existingRegistration.event_id);
+                    return label;
                 }
 
-                eventSelect.addEventListener("change", () => {
-                    const selectedName = eventSelect.value;
-                    populateEventInstances(selectedName, null);
-                });
-            }
+                function populateEventInstances(selectedName, preselectedId) {
+                    if (!eventInstanceSelect) {
+                        console.error("eventInstanceSelect element not found!");
+                        return;
+                    }
+                    
+                    eventInstanceSelect.innerHTML = "";
+                    eventInstanceSelect.disabled = true;
 
-            // Handle registration status change to update hidden field
-            const regInputs = document.querySelectorAll('input[name="registration_status"]');
-            const hiddenAttend = document.getElementById("attendStatusHidden");
+                    if (!selectedName) {
+                        const opt = document.createElement("option");
+                        opt.value = "";
+                        opt.textContent = "Select an event above first";
+                        eventInstanceSelect.appendChild(opt);
+                        return;
+                    }
 
-            if (regInputs && hiddenAttend) {
-                regInputs.forEach(input => {
-                    // Pre-select based on existing status
-                    if (existingRegistration.registration_status && input.value === existingRegistration.registration_status) {
-                        input.checked = true;
+                    // More robust matching - trim whitespace and handle case
+                    const matchingEvents = allEvents.filter(ev => {
+                        const evName = (ev.event_name || '').toString().trim();
+                        const selName = selectedName.toString().trim();
+                        return evName === selName;
+                    });
+
+                    if (matchingEvents.length === 0) {
+                        const opt = document.createElement("option");
+                        opt.value = "";
+                        opt.textContent = "No dates found for this event";
+                        eventInstanceSelect.appendChild(opt);
+                        return;
+                    }
+
+                    const defaultOpt = document.createElement("option");
+                    defaultOpt.value = "";
+                    defaultOpt.textContent = "Select a Date/Time";
+                    eventInstanceSelect.appendChild(defaultOpt);
+
+                    matchingEvents.forEach(ev => {
+                        const opt = document.createElement("option");
+                        opt.value = ev.event_id;
+                        opt.textContent = formatEventOption(ev);
+                        if (preselectedId && String(preselectedId) === String(ev.event_id)) {
+                            opt.selected = true;
+                        }
+                        eventInstanceSelect.appendChild(opt);
+                    });
+
+                    eventInstanceSelect.disabled = false;
+                }
+
+                if (eventSelect && eventInstanceSelect) {
+                    // Pre-select existing event + instance on edit
+                    if (existingRegistration.event_name) {
+                        eventSelect.value = existingRegistration.event_name;
+                        populateEventInstances(existingRegistration.event_name, existingRegistration.event_id);
+                    }
+
+                    eventSelect.addEventListener("change", () => {
+                        const selectedName = eventSelect.value;
+                        populateEventInstances(selectedName, null);
+                    });
+                }
+
+                // Handle registration status change to update hidden field
+                const regInputs = document.querySelectorAll('input[name="registration_status"]');
+                const hiddenAttend = document.getElementById("attendStatusHidden");
+
+                if (regInputs && hiddenAttend) {
+                    regInputs.forEach(input => {
+                        // Pre-select based on existing status
+                        if (existingRegistration.registration_status && input.value === existingRegistration.registration_status) {
+                            input.checked = true;
+                            hiddenAttend.value = (existingRegistration.registration_status === "attended") ? 1 : 0;
+                        }
+
+                        input.addEventListener("change", () => {
+                            hiddenAttend.value = (input.value === "attended") ? 1 : 0;
+                        });
+                    });
+
+                    if (!hiddenAttend.value && existingRegistration.registration_status) {
                         hiddenAttend.value = (existingRegistration.registration_status === "attended") ? 1 : 0;
                     }
-
-                    input.addEventListener("change", () => {
-                        hiddenAttend.value = (input.value === "attended") ? 1 : 0;
-                    });
-                });
-
-                if (!hiddenAttend.value && existingRegistration.registration_status) {
-                    hiddenAttend.value = (existingRegistration.registration_status === "attended") ? 1 : 0;
                 }
+            }
+
+            // Run immediately if DOM is ready, otherwise wait for DOMContentLoaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeRegistrationForm);
+            } else {
+                // DOM is already loaded
+                initializeRegistrationForm();
             }
         }
 
