@@ -180,7 +180,12 @@
                 <% if (upcomingEvents && upcomingEvents.length > 0) { %>
                   <div class="dashboard-event-list">
                     <% upcomingEvents.forEach(function(event) { %>
-                      <div class="dashboard-event-item" onclick="showEventDetailsModal('<%= event.event_name.replace(/'/g, "\\'") %>', '<%= event.event_date ? new Date(event.event_date).toLocaleDateString() : "N/A" %>', '<%= event.event_start_time || "N/A" %>', '<%= event.event_end_time || "N/A" %>', '<%= event.event_location ? event.event_location.replace(/'/g, "\\'") : "N/A" %>', 'No additional details available.')">
+                      <div
+                       class="dashboard-event-item"
+                        onclick="showEventDetailsModal('<%= event.event_name.replace(/'/g, "\\'") %>', '<%= (event.event_date ? new Date(event.event_date).toLocaleDateString() : "N/A" %>', '<%= event.event_start_time || "N/A" %>', '<%= event.event_end_time || "N/A" %>', '<%= event.event_location ? event.event_location.replace(/'/g, "\\'") : "N/A" %>', 
+                        'No additional details available.'
+                        )"
+                        >
                         <div class="dashboard-event-icon">▶</div>
                         <div class="dashboard-event-info">
                           <div class="dashboard-event-name"><%= event.event_name %></div>
