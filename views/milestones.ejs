@@ -242,8 +242,8 @@
                                     <% if (isLoggedIn && role && role.toLowerCase() === 'admin') { %>
                                     <td style="max-width: 40px;"><input type="checkbox" class="row-checkbox" value="<%= m.milestone_id %>" data-name="<%= m.participant_first_name %> <%= m.participant_last_name %> - <%= m.milestone_title %>" aria-label="Select milestone for <%= m.participant_first_name %> <%= m.participant_last_name %> - <%= m.milestone_title %>"></td>
                                     <% } %>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= m.participant_first_name %></td>
-                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= m.participant_last_name %></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= m.user_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= m.participant_first_name %></a></td>
+                                    <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><a href="/profile/<%= m.user_id %>" style="color: var(--primary); text-decoration: underline; font-weight: 600;"><%= m.participant_last_name %></a></td>
                                     <td style="max-width: none; min-width: 200px; padding: 0.8rem 0.6rem;"><%= m.milestone_title %></td>
                                     <td style="max-width: none; min-width: 150px; padding: 0.8rem 0.6rem;"><%= m.milestone_category %></td>
                                     <td style="max-width: none; min-width: 120px; padding: 0.8rem 0.6rem;"><%= formattedDate %></td>
